@@ -1,0 +1,1907 @@
+\documentclass[conference,a4paper]{IEEEtran}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,tabularx,array,multirow,makecell}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{algorithm}
+\usepackage{float}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage[hidelinks]{hyperref}
+\usepackage{balance}
+
+\sisetup{locale=FR,output-decimal-marker={,},per-mode=symbol}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcommand{\statusData}{\textsc{datasheet}}
+\newcommand{\statusLit}{\textsc{litt.}}
+\newcommand{\statusDer}{\textsc{dérivé}}
+\newcommand{\statusScen}{\textsc{scénario}}
+\newcommand{\statusPol}{\textsc{politique}}
+\newcommand{\statusCal}{\textsc{calibré}}
+\newcommand{\statusVal}{\textcolor{red!70!black}{\textbf{à valider}}}
+\newcommand{\Rauth}{R^{\mathrm{auth}}}
+\newcommand{\Rkey}{Q^{\mathrm{key}}}
+\newcommand{\FAR}{\mathrm{FAR}}
+\newcommand{\FRR}{\mathrm{FRR}}
+\newcommand{\KDR}{\mathrm{KDR}}
+\newcommand{\ToA}{T_{\mathrm{air}}}
+\newcommand{\Hb}{h_2}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+%%%%%%%%
+%%%%%%%% INPUT & OTHERS
+%%%%%%%%
+
+% \input{IEEE_Conference_Template/macros}
+
+%%%%%%%%
+%%%%%%%% TITLE
+%%%%%%%%
+
+\title{Modélisation des mécanismes de sécurité à la couche physique pour les réseaux du futur}
+
+\author{
+    \IEEEauthorblockN{1\textsuperscript{er} DEFFOHE Parfait}
+    \IEEEauthorblockA{\textit{Master 2 Intelligence Artificielle et Robotique (IAR)} \\
+    \textit{CY Cergy Paris Université} \\
+    Cergy, France \\
+    parfait.deffohengobnkamguygnyol@ensea.fr}
+\and
+    \IEEEauthorblockN{2\textsuperscript{e} Lylia Alouache}
+    \IEEEauthorblockA{\textit{Enseignante-Chercheuse, Laboratoire ETIS, UMR 8051} \\
+    \textit{CY Tech -- CY Cergy Paris Université} \\
+    Cergy, France \\
+    lylia.alouache@cyu.fr}
+\and
+    \IEEEauthorblockN{3\textsuperscript{e} Victor Mollimard}
+    \IEEEauthorblockA{\textit{Enseignant-Chercheur, Laboratoire ETIS, UMR 8051} \\
+    \textit{CY Tech -- CY Cergy Paris Université} \\
+    Cergy, France \\
+    victor.mollimard@cyu.fr}
+}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Ce modèle scientifique d'un \emph{Decision Maker} (DM) choisit conjointement une méthode d'authentification et une méthode de gestion de clé pour un capteur LoRa alimenté par batterie. Le fil conducteur est volontairement opérationnel : un capteur Alice transmet périodiquement des mesures à une passerelle Bob, tandis qu'un adversaire Mallory peut tenter d'usurper son identité. Le DM doit exploiter la couche physique uniquement lorsque le canal la rend suffisamment fiable, tout en respectant les budgets d'énergie, de délai, de temps d'antenne et de sécurité. Le document spécifie le scénario, les hypothèses, toutes les variables, les équations, la provenance des paramètres, les quatre objectifs, les règles d'admissibilité, le front de Pareto, l'arbitrage final, le protocole de simulation et l'architecture logicielle attendue.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Sécurité à la couche physique, authentification, empreinte radio, génération de clé, LoRa, IoT, optimisation multi-objectif, Pareto, efficacité énergétique, Decision Maker.
+\end{IEEEkeywords}
+
+\section{But  et question scientifique}
+
+\subsection{Le problème rencontré}
+Alice est un capteur LoRa alimenté par une pile. À chaque période, elle mesure une grandeur physique et transmet un message à Bob, une passerelle alimentée sur secteur. Deux fonctions de sécurité doivent être assurées :
+\begin{enumerate}
+    \item Bob doit vérifier que le message provient réellement d'Alice ;
+    \item Alice et Bob doivent maintenir une clé de session suffisamment fraîche et exploitable.
+\end{enumerate}
+
+La cryptographie conventionnelle fournit une solution robuste mais coûte des calculs, des octets transmis et parfois des échanges supplémentaires. La sécurité à la couche physique (PhySec) offre deux alternatives : reconnaître l'émetteur à partir de son empreinte radio et extraire une clé à partir de la réciprocité du canal. Ces mécanismes sont potentiellement économiques, mais leur fiabilité dépend des conditions radio. Une empreinte devient difficile à distinguer lorsque le SNR baisse ; une génération de clé devient difficile lorsque les observations d'Alice et de Bob sont insuffisamment réciproques.
+
+La question n'est donc pas de savoir si la PhySec est toujours meilleure. La question est :
+
+\vspace{.4em}
+\noindent\fbox{\parbox{.94\columnwidth}{\small
+\textbf{Problème.} Comment choisir, \emph{à chaque message} et
+\emph{conjointement}, une méthode d'authentification et une méthode de gestion de
+clé qui offrent le meilleur compromis entre \textbf{énergie}, \textbf{latence},
+\textbf{robustesse d'authentification} et \textbf{qualité de clé}, sans jamais
+sélectionner une solution physiquement impossible ou insuffisamment sûre~?}}
+\vspace{.4em}
+
+\subsection{Objectif scientifique}
+À chaque instant $t$, le DM observe un contexte $\mathbf{c}_t$, évalue huit décisions conjointes, élimine celles qui sont incohérentes ou inadmissibles, construit le front de Pareto des décisions restantes et retourne une décision unique :
+\begin{equation}
+D_t^\star=(A_j,K_i).
+\end{equation}
+Le choix doit simultanément :
+\begin{equation}
+\begin{aligned}
+&\min E_t(D),\qquad &&\min L_t(D),\\
+&\max \Rauth_t(D),\qquad &&\max \Rkey_t(D).
+\end{aligned}
+\label{eq:four-objectives}
+\end{equation}
+
+Dans ce document, $\Rkey$ est appelé \emph{indice de qualité/fraîcheur de clé}. Il ne doit pas être interprété comme une probabilité absolue de non-compromission, car le modèle ne représente pas encore explicitement l'information observée par Mallory.
+
+\subsection{Principe de démarche}
+La chaîne de travail imposée est :
+\begin{equation}
+\boxed{\begin{gathered}
+\text{sources}\rightarrow\text{modèle}\rightarrow\text{validation}\\
+\rightarrow\text{pseudo-code}\rightarrow\text{code}\rightarrow\text{simulation}\rightarrow\text{résultats}
+\end{gathered}}
+\end{equation}
+
+
+\subsection{Règle de traçabilité scientifique}
+Chaque équation et chaque valeur numérique sont classées selon l'un des statuts suivants :
+\begin{itemize}
+    \item \statusLit{} ou \statusData{} : relation ou valeur reprise directement d'une source originale identifiée ;
+    \item \statusDer{} : relation obtenue par dérivation explicite à partir d'éléments sourcés ;
+    \item \statusCal{} : paramètre ajusté sur des résultats expérimentaux et soumis à sensibilité ;
+    \item \statusScen{} ou \statusPol{} : choix de scénario ou règle de décision propres à cette étude ;
+    \item \statusVal{} : valeur dont le point de fonctionnement exact n'est pas encore suffisamment documenté.
+\end{itemize}
+Une citation placée après une formule ne signifie donc pas automatiquement que la formule complète apparaît telle quelle dans la source. Le texte précise systématiquement si elle est \emph{reprise}, \emph{adaptée}, \emph{dérivée} ou \emph{proposée}. Le registre de l'Annexe~\ref{ann:traceabilite} fournit la correspondance entre équations, sources, hypothèses et futurs modules Python.
+
+
+\section{Scénario, acteurs et domaine de validité}
+
+\subsection{Acteurs}
+\begin{itemize}
+    \item \textbf{Alice} : capteur LoRa fixe sur batterie ; C'est elle qu'on veut économiser.
+    \item \textbf{Bob} : passerelle de confiance sur secteur ; il extrait l'empreinte radio, estime le canal et exécute le DM; C'est
+lui qui \emph{héberge le décideur} et tranche avant de traiter le message.
+    \item \textbf{Mallory} : adversaire \emph{active} qui cherche à se faire passer pour Alice. Elle teste l'objectif d'authentification ($\Rauth$) et alimente le calcul de la FAR.
+    \item \textbf{Ève} (extension \statusScen{}) : espionne \emph{passive}, distincte de Mallory, qui écoute le canal depuis une position fixe séparée de Bob et d'Alice afin de tenter de reconstituer la clé physique (K1a/K1b). Elle ne modifie jamais le trafic ni le contexte présenté au DM ; elle teste l'objectif de qualité/secret de clé ($\Rkey$), jamais l'authentification. Voir Section~\ref{sec:eve-model}.
+\end{itemize}
+
+\paragraph{Pourquoi Ève est distincte de Mallory.}
+Le modèle initial ne couvrait que Mallory (usurpation active d'identité). Après discussion avec l'encadrante, une extension a été ajoutée pour couvrir le second rôle classique de la littérature PhySec/SKG (Ruotsalainen \emph{et al.}, Zeng~\cite{zeng2015}) : un espion passif dont l'objectif n'est pas de se faire passer pour Alice, mais de deviner la clé physique à partir de ses propres observations du canal. Confondre les deux rôles masquerait le cas où l'authentification physique résiste à Mallory alors que la génération de clé reste vulnérable à Ève, ou inversement.
+
+\subsection{Séparation indispensable entre trafic légitime et attaques}
+Alice émet un message légitime toutes les $T_{\mathrm{msg}}$ secondes. Les tentatives de Mallory sont modélisées comme un processus séparé. Elles affectent les métriques de sécurité de Bob, mais ne doivent pas débiter la batterie d'Alice. Cette séparation évite de compter à tort, dans l'énergie d'Alice, le coût d'une trame envoyée par l'attaquant.
+
+À chaque période $t$ :
+\begin{enumerate}
+    \item Alice produit un message légitime et paie l'énergie normale de fonctionnement ;
+    \item indépendamment, Mallory tente une usurpation avec probabilité $p_M$ ou selon un taux d'attaque spécifié ;
+    \item Bob applique la décision du DM aux messages légitimes et évalue les tentatives adverses pour calculer la FAR.
+\end{enumerate}
+
+\subsection{Plateforme matérielle simulée de référence}
+
+La présente étude est réalisée intégralement par modélisation et
+simulation sous Python. Aucun transceiver radio ni microcontrôleur
+physique n'est utilisé dans cette première phase.
+
+Afin de calculer des coûts énergétiques et temporels cohérents, le
+modèle est toutefois paramétré pour une plateforme matérielle de
+référence composée d'un transceiver Semtech SX1276 en bande EU868
+et d'un microcontrôleur ARM Cortex-M3.
+
+Les caractéristiques électriques et temporelles de ces composants
+ne résultent pas de mesures réalisées dans ce travail. Elles sont
+extraites de fiches techniques et de travaux expérimentaux publiés.
+Elles servent uniquement d'entrées au modèle Python pour estimer
+l'énergie et la latence des différentes décisions.
+
+La validation sur une plateforme matérielle réelle constitue une
+étape ultérieure, distincte de la présente étude. \cite{sx1276ds,stml1ds}.
+
+\subsection{Topologie et classe LoRaWAN}
+Le cas de base est un réseau en étoile, LoRaWAN Classe A. Après une transmission montante, le nœud ouvre des fenêtres de réception. Le délai de la première fenêtre est pris dans la spécification LoRaWAN applicable \cite{lorawan104}. La réutilisation opportuniste d'un couple trame montante/ACK pour la génération de clé n'est considérée gratuite que si les messages confirmés et les fenêtres de réception font déjà partie du fonctionnement normal.
+
+\subsection{Modèle de menace}
+\label{sec:threat-model-eve}
+Le modèle initial suppose Mallory passive vis-à-vis de l'estimation du canal et active uniquement pour l'usurpation d'identité. Elle ne modifie pas volontairement l'environnement, ne réalise pas d'attaque de relais et ne synthétise pas parfaitement l'empreinte matérielle d'Alice. Sa proximité effective est résumée par un paramètre de séparation $d_M$. Une analyse de sensibilité sur $d_M$ est obligatoire.
+
+\paragraph{Extension : Ève.} Ève est purement passive : elle écoute les échanges radio d'Alice et de Bob (montants et descendants) depuis une position fixe, sans jamais émettre ni perturber le canal. Elle ne coopère pas avec Mallory. Son seul objectif est de reconstituer la clé physique en construisant sa propre estimation du canal. Sa position est résumée par deux séparations, $d_{BE}$ (vis-à-vis de Bob) et $d_{AE}$ (vis-à-vis d'Alice) ; voir Section~\ref{sec:eve-model}. Une analyse de sensibilité sur ces distances est obligatoire : aucune distance ne doit être présentée comme garantissant la sécurité de façon universelle.
+
+\subsection{Hors périmètre initial}
+Le modèle ne couvre pas, dans sa première version :
+\begin{itemize}
+    \item une attaque active de manipulation du canal ou de relais (par Mallory ou par Ève) ;
+    \item un calcul rigoureux de capacité secrète conditionnelle (information mutuelle $I(K;Z_E,\Pi_{\mathrm{public}})$), incluant la fuite de la réconciliation publique et le taux de compression réel de l'amplification de confidentialité ;
+    \item la consommation énergétique de Bob ;
+    \item les collisions réseau, la congestion, les retransmissions MAC complètes et l'ADR ;
+    \item la chimie détaillée de la pile et sa dépendance à la température.
+\end{itemize}
+Ces limites doivent être rappelées au moment d'interpréter les résultats.
+
+\paragraph{Précision suite à l'extension Ève.} La version initiale de ce document excluait \emph{tout} modèle explicite du canal Alice--Mallory/Ève. Cette exclusion est maintenant partiellement levée : un modèle simplifié du canal Alice--Ève est intégré (Section~\ref{sec:eve-model}) et sert à une \textbf{évaluation exploratoire} de la marge de secret (différence de KDR entre Ève et Bob). Le calcul rigoureux d'information mutuelle et de capacité secrète conditionnelle reste hors périmètre : les résultats produits par ce module ne doivent jamais être présentés comme une preuve de sécurité informationnelle complète, seulement comme une marge empirique pré-enregistrée.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+node distance=18mm and 23mm,
+box/.style={draw,rounded corners,minimum width=34mm,minimum height=12mm,align=center,fill=blue!6},
+attack/.style={draw,rounded corners,minimum width=30mm,minimum height=12mm,align=center,fill=red!7},
+dm/.style={draw,rounded corners,minimum width=47mm,minimum height=17mm,align=center,fill=green!8},
+arr/.style={-{Latex[length=2.5mm]},thick}]
+\node[box] (alice) {Alice\\capteur sur batterie};
+\node[box,right=of alice] (bob) {Bob\\passerelle sur secteur};
+\node[attack,below=of alice] (mallory) {Mallory\\tentative d'usurpation};
+\node[dm,right=of bob] (decision) {Decision Maker\\8 décisions, 4 objectifs\\filtre $\rightarrow$ Pareto $\rightarrow$ arbitrage};
+\draw[arr] (alice) -- node[above]{message légitime + signal radio} (bob);
+\draw[arr,red!70!black] (mallory) -- node[below,sloped]{trame usurpée} (bob);
+\draw[arr] (bob) -- node[above]{SNR, empreinte, $\rho_{AB}$, état} (decision);
+\draw[arr] (decision) to[bend left=20] node[below]{décision $D_t^\star$} (bob);
+\end{tikzpicture}
+\caption{Architecture fonctionnelle. L'énergie optimisée est celle d'Alice. Les attaques de Mallory sont évaluées par Bob mais ne sont pas débitées de la batterie d'Alice.}
+\label{fig:architecture}
+\end{figure*}
+
+\section{Espace des décisions}
+\label{sec:decision-space}
+
+\subsection{Actions d'authentification}
+\begin{itemize}
+    \item $A_1$ : authentification cryptographique conventionnelle par MAC ;
+    \item $A_2$ : authentification par empreinte radio chez Bob, suivie d'un défi--réponse cryptographique uniquement en cas de rejet de l'empreinte \cite{haenel2021}.
+\end{itemize}
+
+\subsection{Actions de gestion de clé}
+\begin{itemize}
+    \item $K_0$ : conserver la clé courante ;
+    \item $K_{1a}$ : génération de clé physique opportuniste. 
+    Alice et Bob utilisent les messages de données et les accusés de réception
+    déjà échangés par le réseau pour mesurer le canal. Aucun paquet supplémentaire
+    n’est envoyé, ce qui réduit la consommation d’énergie, mais augmente le temps
+    nécessaire pour obtenir suffisamment de mesures. \cite{zhang2018} ;
+    \item $K_{1b}$ : génération de clé physique par sondages dédiés.
+    Alice et Bob échangent des paquets supplémentaires uniquement pour mesurer
+    le canal et générer une nouvelle clé. Cette méthode est plus rapide, mais elle
+    consomme davantage d’énergie et de temps d’antenne. \cite{ruotsalainen2018,ruotsalainen2020} ;
+    \item $K_2$ : renouvellement conventionnel utilisant un mécanisme ECC sur Cortex-M3 \cite{mossinger2016}.
+\end{itemize}
+
+L'espace brut est :
+\begin{equation}
+\mathcal{D}=\{A_1,A_2\}\times\{K_0,K_{1a},K_{1b},K_2\},\qquad |\mathcal{D}|=8.
+\label{eq:decision-space}
+\end{equation}
+
+
+Le sens opérationnel détaillé des huit décisions est présenté dans le Tableau~\ref{tab:eight-decisions} de l'Annexe~\ref{ann:decisions}.
+
+
+% ================================================================
+
+\section{Modèle du canal radio}
+\label{sec:canal_radio}
+
+Le canal fournit au Decision Maker le rapport signal sur bruit et une estimation de la réciprocité entre Alice et Bob. Deux modes de production du SNR sont conservés : un mode contrôlé pour les balayages et un mode fondé sur la distance pour les études de couverture. Ils ne sont pas utilisés simultanément dans une même expérience.
+
+\subsection{Notations du SNR}
+Le SNR linéaire est défini par le rapport de puissances
+\begin{equation}
+    \gamma_t=\frac{P_{\mathrm{s},t}}{P_{\mathrm{n}}},
+    \label{eq:snr-linear}
+\end{equation}
+et sa valeur en décibels par
+\begin{equation}
+    \Gamma_t=10\log_{10}(\gamma_t),
+    \qquad
+    \gamma_t=10^{\Gamma_t/10}.
+    \label{eq:snr-conversion}
+\end{equation}
+Ici, $P_{\mathrm{s},t}$ et $P_{\mathrm{n}}$ sont respectivement les puissances du signal et du bruit, exprimées dans la même unité. Les équations~\eqref{eq:snr-linear}--\eqref{eq:snr-conversion} sont des définitions physiques, non des choix du DM.
+
+\subsection{Option A : SNR moyen imposé}
+Pour isoler l'effet du SNR, le scénario fixe une moyenne $\mu_\Gamma$ et ajoute une fluctuation gaussienne en dB :
+\begin{align}
+    \Gamma_t &= \mu_\Gamma+X_{\mathrm{sh},t},
+    \label{eq:snr-imposed}\\
+    X_{\mathrm{sh},t}&\sim\mathcal{N}(0,\sigma_{\mathrm{sh}}^2).
+    \label{eq:shadowing-db}
+\end{align}
+Ce modèle est la forme en décibels du \emph{log-normal shadowing model} présenté dans les modèles de propagation à grande échelle \cite[Chap.~4]{rappaport2002}. $\mu_\Gamma$ est le SNR moyen imposé, $X_{\mathrm{sh},t}$ la fluctuation de shadowing et $\sigma_{\mathrm{sh}}$ son écart-type en dB. Dans cette étude, les valeurs de $\mu_\Gamma$ et $\sigma_{\mathrm{sh}}$ sont des paramètres de scénario ; elles ne sont pas attribuées à une campagne de mesures particulière.
+
+\paragraph{Utilisation dans le modèle.}
+Cette option alimente directement les fonctions d'authentification et de réciprocité lors des balayages de SNR. Elle sera implémentée dans le module \texttt{channel} sans calcul de distance.
+
+\subsection{Option B : SNR dérivé de la distance}
+
+\subsubsection{Perte de propagation log-distance}
+Rappaport décrit la perte moyenne de propagation à partir d'une distance de référence $d_0$ par le modèle log-distance \cite[Chap.~4]{rappaport2002} :
+\begin{equation}
+    {PL}(d)=PL(d_0)+10n_p\log_{10}\!\left(\frac{d}{d_0}\right),
+    \label{eq:path-loss}
+\end{equation}
+où $d$ et $d_0$ sont en mètres, $PL(d_0)$ et $\overline{PL}(d)$ en dB, et $n_p$ est l'exposant de perte. La structure de l'équation vient de la littérature ; les valeurs de $PL(d_0)$ et $n_p$ doivent provenir d'une campagne ou d'un environnement comparable au cas étudié.
+
+\subsubsection{Bilan de liaison}
+Le bilan de liaison est une conservation des gains et pertes en échelle logarithmique :
+\begin{equation}
+\begin{split}
+P_{\mathrm{rx},t}={}&P_{\mathrm{tx}}+G_{\mathrm{tx}}+G_{\mathrm{rx}}
+-{PL}(d)-L_{\mathrm{sys}}+X_{\mathrm{sh},t}.
+\end{split}
+\label{eq:link-budget}
+\end{equation}
+$P_{\mathrm{tx}}$ et $P_{\mathrm{rx},t}$ sont en dBm, $G_{\mathrm{tx}}$ et $G_{\mathrm{rx}}$ en dBi, et $L_{\mathrm{sys}}$ en dB. Cette équation est un bilan dérivé ; elle n'est pas attribuée à une seule publication. Lorsque les gains et pertes sont absorbés dans $PL(d_0)$, la forme réduite est
+\begin{equation}
+    P_{\mathrm{rx},t}=P_{\mathrm{tx}}-{PL}(d)+X_{\mathrm{sh},t}.
+\end{equation}
+
+\subsubsection{Bruit thermique dans la bande}
+La loi de bruit thermique de Johnson--Nyquist donne $P_{\mathrm{th}}=kTBW$ \cite{johnson1928,nyquist1928}. À environ \SI{290}{K}, sa densité vaut approximativement \SI{-174}{dBm/Hz}. En intégrant la bande et la figure de bruit du récepteur, on obtient
+\begin{equation}
+    P_N=-174+10\log_{10}(BW)+NF,
+    \label{eq:noise-power}
+\end{equation}
+où $P_N$ est en dBm, $BW$ en hertz et $NF$ en dB. Le SNR reçu est alors
+\begin{equation}
+    \Gamma_t=P_{\mathrm{rx},t}-P_N.
+    \label{eq:snr-db}
+\end{equation}
+Les équations~\eqref{eq:noise-power}--\eqref{eq:snr-db} sont dérivées de $kTBW$ et de la définition logarithmique du SNR. La valeur de $NF$ doit correspondre au mode exact du récepteur retenu.
+
+\paragraph{Utilisation dans le modèle.}
+L'option B transforme une distance et une configuration radio en $\Gamma_t$. Elle sert aux cartes de couverture et non au calibrage des lois RFF ou SKG.
+
+\subsection{Réciprocité observée entre Alice et Bob}
+
+\subsubsection{Observations bruitées}
+Le modèle de base écrit
+\begin{align}
+    z_{A,t}&=h(t)+n_{A,t},
+    \label{eq:obs-alice}\\
+    z_{B,t}&=h(t+\Delta t)+n_{B,t},
+    \label{eq:obs-bob}
+\end{align}
+où $h(\cdot)$ est la réponse du canal, $\Delta t$ le délai entre les sondages et $n_{A,t},n_{B,t}$ les erreurs d'estimation. Cette écriture est un modèle d'observation classique, adapté ici au sondage semi-duplex LoRa. Ruotsalainen \emph{et al.} montrent expérimentalement que le faible SNR et le délai aller--retour dégradent la corrélation des mesures LoRaWAN \cite[Sec.~I--II]{ruotsalainen2020}.
+
+La corrélation des observations est définie par
+\begin{equation}
+\rho_{AB,t}=
+\frac{\mathbb{E}\!\left[(z_{A,t}-\mu_A)(z_{B,t}-\mu_B)^*\right]}
+{\sigma_A\sigma_B}.
+\label{eq:rho-definition}
+\end{equation}
+Ruotsalainen \emph{et al.} utilisent cette même métrique de corrélation comme figure de mérite dans leur équation~(9) \cite[Eq.~(9)]{ruotsalainen2020}. $\mu_A,\mu_B$ sont les moyennes, $\sigma_A,\sigma_B$ les écarts-types, et $(\cdot)^*$ le conjugué complexe.
+
+\subsubsection{Décorrélation temporelle de Clarke--Jakes}
+Dans le modèle isotrope de Clarke--Jakes, la corrélation temporelle normalisée est \cite{jakes1974}
+\begin{equation}
+    \rho_{\mathrm{time},t}=J_0(2\pi f_{d,t}\Delta t),
+    \label{eq:jakes}
+\end{equation}
+avec
+\begin{equation}
+    f_{d,t}=\frac{v_t f_c}{c}.
+    \label{eq:doppler}
+\end{equation}
+$J_0$ est la fonction de Bessel de première espèce d'ordre zéro, $f_{d,t}$ la fréquence Doppler, $v_t$ une vitesse effective, $f_c$ la porteuse et $c$ la vitesse de propagation. L'équation~\eqref{eq:jakes} est issue de la littérature ; son application à un environnement industriel fixe constitue une approximation à tester.
+
+\subsubsection{Dégradation par le bruit}
+Sous les hypothèses de variances identiques, de bruits indépendants et d'un même SNR aux deux extrémités, la corrélation des observations bruitées est réduite par
+\begin{equation}
+    \rho_{\mathrm{noise},t}=\frac{\gamma_t}{1+\gamma_t}.
+    \label{eq:rho-noise}
+\end{equation}
+Cette relation est dérivée dans cette étude à partir de
+\begin{equation}
+\frac{\sigma_h^2}{\sigma_h^2+\sigma_n^2}
+=\frac{\gamma_t}{1+\gamma_t},
+\qquad \gamma_t=\frac{\sigma_h^2}{\sigma_n^2}.
+\end{equation}
+Elle n'est donc pas citée comme une formule autonome de Ruotsalainen ou de Jakes.
+
+\subsubsection{Asymétrie matérielle et modèle composite}
+Les chaînes RF ne sont pas parfaitement réciproques. Nous représentons cette perte par un facteur calibrable $\rho_{\mathrm{HW}}\in[0,1]$. Le modèle composite adopté est
+\begin{equation}
+\boxed{
+\rho_{AB,t}=\rho_{\mathrm{HW}}J_0(2\pi f_{d,t}\Delta t)
+\frac{\gamma_t}{1+\gamma_t}}
+\label{eq:rho-composite}
+\end{equation}
+L'équation~\eqref{eq:rho-composite} est une \textbf{construction de cette étude}. Elle combine : le terme de Jakes, la dérivation du bruit et un facteur matériel empirique. Aucune source ne publie nécessairement ce produit exact. $\rho_{\mathrm{HW}}$ doit être calibré ou balayé ; il ne doit pas être présenté comme une constante universelle.
+
+Les corrélations négatives ne sont pas automatiquement nulles. Pour une quantification par signe, leur effet est déjà pris en compte dans la loi de l'arc-sinus. Une variante tronquée
+\begin{equation}
+    \rho_{AB,t}^{+}=\max\{0,\rho_{AB,t}\}
+\end{equation}
+ne peut être utilisée qu'en tant que choix algorithmique explicite et comparé en sensibilité.
+
+\subsection{Condition de faisabilité de l'accord}
+La condition d'accord sera définie dans la Section~\ref{sec:key-management} à partir d'un seuil de KDR ou de corrélation. Une corrélation élevée indique que Bob et Alice peuvent obtenir des bits similaires ; elle ne prouve pas à elle seule que le canal possède assez d'entropie temporelle. Une condition séparée de variabilité doit donc être ajoutée avant toute revendication de sécurité complète.
+
+\paragraph{$\phi_t^{\mathrm{var}}$ réellement calculé.} Contrairement à une version antérieure de ce document qui laissait $\phi_t^{\mathrm{var}}$ non spécifiée (booléen fourni par le scénario), cette condition est désormais un test statistique calculé sur une fenêtre glissante des dernières observations de $\rho_{AB,t}$. Quatre composantes sont combinées par un ET logique (statut \statusDer{}/\statusPol{} : les statistiques elles-mêmes sont standard, les seuils et la taille de fenêtre sont des choix de politique, à balayer en sensibilité) :
+\begin{enumerate}
+    \item écart-type de $\rho_{AB}$ sur la fenêtre $\geq$ seuil (canal non figé) ;
+    \item autocorrélation au décalage 1 de $\rho_{AB}$ sur la fenêtre $\leq$ seuil (observations successives non redondantes) ;
+    \item taux de transition d'une quantification par signe de $\rho_{AB}$ relative à sa médiane sur la fenêtre $\geq$ seuil, dont on déduit une min-entropie empirique bornée $H_{\min}=-\log_2(\text{fréquence maximale})$ (le bit quantifié ne doit pas rester bloqué du même côté) ;
+    \item nombre de mesures valides sur la fenêtre (taille de fenêtre $\times$ $\eta_{\mathrm{samp}}$) $\geq$ minimum requis.
+\end{enumerate}
+Une min-entropie calculée directement sur le bit marginal d'une seule mesure serait triviale sous l'hypothèse gaussienne centrée déjà adoptée (Section~\ref{sec:auth-phy}) : chaque bit isolé y est par construction équilibré. La composante 3 ci-dessus porte donc sur la \emph{séquence temporelle} quantifiée, pas sur un bit isolé, ce qui la rend informative sans introduire de biais non modélisé ailleurs dans ce document.
+
+\section{Modèle du canal d'Ève (extension)}
+\label{sec:eve-model}
+
+Cette section additionnelle modélise le canal observé par Ève, l'espionne passive introduite en Section~\ref{sec:threat-model-eve}. Elle ne remplace ni ne modifie les équations~\eqref{eq:snr-linear}--\eqref{eq:phy-feasibility} : elle les réutilise pour un second récepteur.
+
+\subsection{Corrélation spatiale de Clarke--Jakes}
+Le modèle de Clarke--Jakes utilisé en Section~\ref{sec:canal_radio} pour la décorrélation \emph{temporelle} (équation~\eqref{eq:jakes}) admet, sous la même hypothèse de diffusion isotrope, une forme \emph{spatiale} strictement analogue : la corrélation entre deux récepteurs séparés d'une distance $d$ est
+\begin{equation}
+    \rho_{\mathrm{spatial}}(d)=J_0\!\left(\frac{2\pi d}{\lambda}\right),
+    \qquad \lambda=\frac{c}{f_c}.
+    \label{eq:eve-spatial}
+\end{equation}
+Ce n'est pas une nouvelle formule : c'est la même construction de Clarke--Jakes déjà citée, appliquée à une séparation spatiale plutôt qu'à un délai temporel. L'hypothèse de diffusion isotrope doit être annoncée explicitement : en propagation longue portée à trajet direct dominant (cas fréquent pour LoRa), la décorrélation réelle peut être plus faible que ne le prédit ce modèle, et l'hypothèse usuelle « demi-longueur d'onde suffit » ne doit pas être présentée comme une garantie universelle. Statut : \statusDer{}, sous hypothèse de diffusion isotrope.
+
+\subsection{Deux directions, deux séparations}
+Pour la liaison montante (Alice émet, Bob et Ève reçoivent), la similarité des observations dépend de la séparation \emph{entre les deux récepteurs}, donc de $d_{BE}$. Pour la liaison descendante (Bob émet, Alice et Ève reçoivent), elle dépend de $d_{AE}$. Une hypothèse symétrique $d_{BE}=d_{AE}=d_{\mathrm{eve}}$ peut être utilisée comme simplification explicite de scénario (\statusScen{}), balayée en sensibilité ; les deux distances peuvent aussi être renseignées séparément pour une géométrie plus réaliste.
+
+\begin{align}
+    \rho_{AE,t}^{\mathrm{UL}}&=\rho_{\mathrm{HW}}J_0\!\left(\frac{2\pi d_{BE}}{\lambda}\right)\frac{\gamma_t}{1+\gamma_t},
+    \label{eq:eve-rho-ul}\\
+    \rho_{AE,t}^{\mathrm{DL}}&=\rho_{\mathrm{HW}}J_0\!\left(\frac{2\pi d_{AE}}{\lambda}\right)\frac{\gamma_t}{1+\gamma_t}.
+    \label{eq:eve-rho-dl}
+\end{align}
+Ces deux relations réutilisent directement l'équation~\eqref{eq:rho-composite} avec le terme spatial~\eqref{eq:eve-spatial} à la place du terme temporel de Jakes.
+
+\subsection{KDR effectif d'Ève : l'inversion de bits}
+Une corrélation fortement négative ne doit pas être interprétée automatiquement comme une mauvaise observation pour Ève : sous quantification par signe, une inversion de la règle de décision (lire $0$ à la place de $1$ et réciproquement) transforme un fort désaccord en fort accord. Le pire cas pour la sécurité (le meilleur cas pour Ève) est donc
+\begin{equation}
+    \KDR_{E,t}^{\mathrm{eff}}=\min\!\left(\KDR_{E,t},\,1-\KDR_{E,t}\right),
+    \qquad \KDR_{E,t}=\frac{\arccos(\rho_{AE,t})}{\pi}.
+    \label{eq:eve-kdr-effective}
+\end{equation}
+Ève retient ensuite le meilleur de ses deux canaux accessibles :
+\begin{equation}
+    \KDR_{E,t}^{\star}=\min\!\left(\KDR_{E,t}^{\mathrm{eff},\mathrm{UL}},\,\KDR_{E,t}^{\mathrm{eff},\mathrm{DL}}\right).
+    \label{eq:eve-kdr-best}
+\end{equation}
+Cette correction ne s'applique \textbf{qu'à Ève} : le modèle nominal d'accord Alice--Bob (équation~\eqref{eq:kdr-arcsine}) reste inchangé, sans inversion, conformément à la remarque déjà faite en Section~\ref{sec:canal_radio} sur les corrélations négatives. L'asymétrie est volontaire : Alice et Bob suivent un protocole de réconciliation fixé à l'avance, sans connaître par avance le signe de $\rho_{AB,t}$, alors que l'évaluation d'Ève est un majorant prudent \emph{a posteriori} de ce qu'une adversaire optimale pourrait obtenir.
+
+\subsection{Marge de secret empirique}
+\begin{equation}
+    m_t=\KDR_{E,t}^{\star}-\KDR_{\mathrm{brut},t}.
+    \label{eq:eve-margin}
+\end{equation}
+Une clé n'est considérée comme sécurisée, selon ce critère exploratoire, que si :
+\begin{equation}
+    \KDR_{E,t}^{\star}>\KDR_{\mathrm{brut},t}
+    \quad\text{et}\quad
+    m_t>m_{\min}.
+    \label{eq:eve-secure}
+\end{equation}
+La première condition est nécessaire et absolue : si Ève se trompe au plus aussi souvent que Bob, aucun secret ne peut être revendiqué, quelle que soit la marge exigée. $m_{\min}=0{,}10$ est retenu comme critère principal \emph{pré-enregistré} (\statusPol{}), avec une sensibilité publiée pour $m_{\min}\in\{0{,}05;\,0{,}10;\,0{,}15\}$ ; il ne doit jamais être présenté comme un seuil universel de la littérature.
+
+\subsection{Portée et limites}
+Ce module ne calcule ni la fuite de la réconciliation publique, ni un taux de compression rigoureux de l'amplification de confidentialité, ni une borne d'information mutuelle $I(K;Z_E,\Pi_{\mathrm{public}})$. Il fournit une \textbf{évaluation exploratoire} de la marge de KDR, calculée \emph{après} la décision du Decision Maker, jamais transmise au contexte $\mathbf{c}_t$ ni utilisée par aucune contrainte d'admissibilité : Ève n'influence jamais une décision.
+
+
+\section{Modèle d'authentification physique}
+\label{sec:auth-phy}
+
+L'action $A_2$ combine une décision RFF exécutée chez Bob et un repli cryptographique lorsque l'empreinte n'est pas acceptée. Haenel \emph{et al.} proposent précisément une architecture cross-layer dans laquelle une identification RF est associée à un mécanisme conventionnel afin de réduire le coût du capteur tout en conservant un niveau de sécurité acceptable \cite[Secs.~4--6]{haenel2021}. Leur article justifie l'architecture du protocole ; il ne fournit pas le modèle $\chi^2$ adopté ci-dessous.
+
+\subsection{Empreinte matérielle et provenance des attributs}
+Alla \emph{et al.} exploitent conjointement le décalage de fréquence porteuse, le décalage continu et le décalage de phase dans leur authentification hybride \cite[Sec.~III]{alla2024}. Nous retenons donc
+\begin{equation}
+\mathbf f_X=
+\begin{bmatrix}
+\mathrm{CFO}_X&\mathrm{DCO}_X&\mathrm{PO}_X
+\end{bmatrix}^{\!T},
+\qquad n_f=3,
+\label{eq:rff-vector}
+\end{equation}
+où $X\in\{A,M\}$ désigne Alice ou Mallory. $\mathrm{CFO}$ est le \emph{Carrier Frequency Offset}, $\mathrm{DCO}$ le \emph{DC Offset} et $\mathrm{PO}$ le \emph{Phase Offset}. La valeur $n_f=3$ vient du nombre d'attributs retenus ; elle n'est pas une constante universelle. Alla \emph{et al.} utilisent des classifieurs d'apprentissage, alors que notre test analytique est une adaptation statistique.
+
+\subsection{Observation gaussienne adoptée}
+Bob observe
+\begin{equation}
+    \mathbf f_{\mathrm{obs},t}=\mathbf f_X+\mathbf w_t,
+    \qquad
+    \mathbf w_t\sim\mathcal N(\mathbf 0,\boldsymbol\Sigma_w).
+    \label{eq:rff-observation}
+\end{equation}
+$\mathbf f_{\mathrm{obs},t}$ est le vecteur extrait, $\mathbf f_X$ sa moyenne pour l'émetteur $X$, et $\boldsymbol\Sigma_w$ la covariance de l'erreur. L'hypothèse gaussienne est un \textbf{choix de modélisation} destiné à obtenir des FAR/FRR analytiques. Elle devra être vérifiée sur données RFF ; Fang \emph{et al.} rappellent justement que la distribution des attributs peut être difficile à connaître et proposent une approche d'apprentissage \cite{fang2018}.
+
+Pendant l'enrôlement, Bob estime la référence d'Alice par
+\begin{equation}
+    \mathbf f_{A,\mathrm{ref}}=\frac{1}{N_{\mathrm{enr}}}
+    \sum_{i=1}^{N_{\mathrm{enr}}}\mathbf f_{A,i}.
+    \label{eq:rff-reference}
+\end{equation}
+Cette moyenne empirique est une relation d'estimation standard ; $N_{\mathrm{enr}}$ doit être fixé par le protocole d'enrôlement.
+
+\subsection{Statistique de Mahalanobis et test binaire}
+Forssell \emph{et al.} utilisent un discriminant quadratique de type Mahalanobis pour l'authentification PHY et établissent les distributions centrale et non centrale associées \cite[Sec.~III, Eqs.~(2)--(6)]{forssell2018}. Nous adaptons cette structure, initialement écrite pour un vecteur CSI complexe, au vecteur RFF réel de l'équation~\eqref{eq:rff-vector} :
+\begin{equation}
+T_t=(\mathbf f_{\mathrm{obs},t}-\mathbf f_{A,\mathrm{ref}})^T
+\boldsymbol\Sigma_w^{-1}
+(\mathbf f_{\mathrm{obs},t}-\mathbf f_{A,\mathrm{ref}}).
+\label{eq:rff-mahalanobis}
+\end{equation}
+Le test est
+\begin{equation}
+\begin{cases}
+T_t\leq\theta,&\text{empreinte acceptée comme Alice},\\
+T_t>\theta,&\text{empreinte rejetée et repli déclenché}.
+\end{cases}
+\label{eq:rff-decision}
+\end{equation}
+$\theta$ est le seuil. Une valeur faible réduit les acceptations de Mallory mais augmente les rejets d'Alice.
+
+Dans le cas isotrope $\boldsymbol\Sigma_w=\sigma_w^2\mathbf I_{n_f}$,
+\begin{equation}
+T_t=\frac{\|\mathbf f_{\mathrm{obs},t}-\mathbf f_{A,\mathrm{ref}}\|_2^2}{\sigma_w^2}.
+\end{equation}
+Cette expression est le cas particulier de Mahalanobis, non une nouvelle loi.
+
+\subsection{Distributions et erreurs de décision}
+Sous Alice, avec une référence et une covariance correctement estimées,
+\begin{equation}
+    T_t\mid\mathcal H_A\sim\chi^2_{n_f}.
+    \label{eq:rff-central}
+\end{equation}
+Sous Mallory,
+\begin{equation}
+    T_t\mid\mathcal H_M\sim\chi'^2_{n_f}(\lambda_{M,t}),
+    \label{eq:rff-noncentral}
+\end{equation}
+avec
+\begin{equation}
+\lambda_{M,t}=(\mathbf f_M-\mathbf f_{A,\mathrm{ref}})^T
+\boldsymbol\Sigma_w^{-1}
+(\mathbf f_M-\mathbf f_{A,\mathrm{ref}}).
+\label{eq:rff-lambda}
+\end{equation}
+Ces résultats viennent de la statistique quadratique gaussienne utilisée par Forssell \emph{et al.}; l'application à CFO--DCO--PO est notre adaptation.
+
+Le taux de faux rejet d'Alice est
+\begin{equation}
+\FRR(\theta)=\Pr[T_t>\theta\mid\mathcal H_A]
+=1-F_{\chi^2_{n_f}}(\theta),
+\label{eq:frr}
+\end{equation}
+et le taux de fausse acceptation de Mallory est
+\begin{equation}
+\FAR(\theta,\lambda_{M,t})=\Pr[T_t\leq\theta\mid\mathcal H_M]
+=F_{\chi'^2_{n_f}(\lambda_{M,t})}(\theta).
+\label{eq:far}
+\end{equation}
+Les équations~\eqref{eq:frr}--\eqref{eq:far} sont dérivées des fonctions de répartition des lois~\eqref{eq:rff-central}--\eqref{eq:rff-noncentral}.
+
+\subsection{Lien simplifié avec le SNR}
+Pour une première simulation analytique, nous posons
+\begin{equation}
+    \sigma_w^2(\gamma_{M,t})=\frac{\sigma_0^2}{\gamma_{M,t}},
+    \label{eq:rff-variance-snr}
+\end{equation}
+et définissons
+\begin{equation}
+    d_M^2=\frac{\|\mathbf f_M-\mathbf f_{A,\mathrm{ref}}\|_2^2}{\sigma_0^2}.
+\end{equation}
+Il en résulte
+\begin{equation}
+    \lambda_{M,t}=d_M^2\gamma_{M,t}.
+    \label{eq:rff-lambda-snr}
+\end{equation}
+L'équation~\eqref{eq:rff-lambda-snr} est \textbf{dérivée} de l'hypothèse~\eqref{eq:rff-variance-snr}; elle n'est pas extraite d'Alla, de Haenel ou de Forssell. $d_M$ est une séparation normalisée d'empreintes, sans unité, à calibrer ou à balayer.
+
+Dans ce modèle idéalement normalisé, la FRR ne dépend pas explicitement du SNR, alors que la FAR dépend de $\gamma_{M,t}$ par $\lambda_{M,t}$. Cette propriété disparaît si la covariance est mal estimée, si l'empreinte dérive ou si la loi n'est pas gaussienne.
+
+\subsection{Choix du seuil}
+Pour une cible de faux rejet $\alpha_{\mathrm{FRR}}$,
+\begin{equation}
+    \theta=F^{-1}_{\chi^2_{n_f}}(1-\alpha_{\mathrm{FRR}}).
+    \label{eq:rff-threshold}
+\end{equation}
+Avec $n_f=3$ et $\alpha_{\mathrm{FRR}}=0{,}05$, le quantile vaut environ $7{,}815$. Cette valeur est \statusDer{} ; elle est calculée à partir de la loi $\chi^2_3$ et non copiée d'un article.
+
+\subsection{Robustesse des actions et repli}
+Pour un tag MAC idéal de $b_{\mathrm{MAC}}$ bits et une seule tentative, la probabilité de deviner le tag est modélisée par
+\begin{equation}
+    p_{\mathrm{forge}}=2^{-b_{\mathrm{MAC}}}.
+\end{equation}
+C'est une borne cryptographique idéalisée : elle suppose une clé non compromise et un tag uniforme. Ainsi
+\begin{equation}
+    \Rauth_t(A_1)=1-2^{-b_{\mathrm{MAC}}}.
+\label{eq:rauth-a1}
+\end{equation}
+Pour $A_2$, Mallory peut être acceptée directement par la RFF ou réussir le repli après rejet. La probabilité totale d'usurpation est donc dérivée par la loi des probabilités totales :
+\begin{equation}
+\begin{split}
+P_{\mathrm{FA},t}(A_2)={}&\FAR_t+
+(1-\FAR_t)2^{-b_{\mathrm{MAC}}},
+\end{split}
+\label{eq:a2-total-far}
+\end{equation}
+\begin{equation}
+    \Rauth_t(A_2)=1-P_{\mathrm{FA},t}(A_2).
+    \label{eq:rauth-a2}
+\end{equation}
+L'approximation $1-\FAR_t$ n'est valable que si le repli est supposé impossible à falsifier.
+
+Pour un message légitime,
+\begin{equation}
+    p_{\mathrm{fb},t}^{(A)}=\FRR(\theta),
+    \label{eq:fallback-alice}
+\end{equation}
+et, pour une trame de Mallory,
+\begin{equation}
+    p_{\mathrm{fb},t}^{(M)}=1-\FAR_t.
+    \label{eq:fallback-mallory}
+\end{equation}
+Seule l'équation~\eqref{eq:fallback-alice} entre dans l'espérance d'énergie d'Alice ; les émissions de Mallory ne sont pas débitées de sa batterie.
+
+
+\section{Modèle de génération et de gestion de clé}
+\label{sec:key-management}
+
+\subsection{Chaîne fonctionnelle et source}
+Ruotsalainen \emph{et al.} décrivent, pour LoRaWAN, une chaîne comprenant la collecte et la synchronisation des mesures, une pré-correction DCT, une quantification avec bande de garde, une réconciliation BCH et une amplification de confidentialité par SHA-256 \cite[Sec.~III-A, Eqs.~(7)--(8)]{ruotsalainen2020}. Nous regroupons cette chaîne en quatre blocs :
+\begin{enumerate}
+    \item sondage du canal ;
+    \item quantification ;
+    \item réconciliation ;
+    \item amplification de confidentialité.
+\end{enumerate}
+Cette simplification conserve les fonctions essentielles mais ne signifie pas que les coûts de DCT, BCH et SHA-256 sont déjà calibrés pour notre microcontrôleur.
+
+\subsection{KDR analytique par loi de l'arc-sinus}
+Pour deux variables gaussiennes conjointes, centrées, corrélées par $\rho_{AB,t}$ et quantifiées par leur signe, la probabilité de désaccord est donnée par la loi de l'arc-sinus de Van Vleck--Middleton \cite{vanvleck1966} :
+\begin{equation}
+    \KDR_{\mathrm{brut},t}=\frac{\arccos(\rho_{AB,t})}{\pi}.
+    \label{eq:kdr-arcsine}
+\end{equation}
+$\KDR_{\mathrm{brut},t}\in[0,1]$ est un taux de désaccord avant réconciliation. L'équation est exacte uniquement sous les hypothèses de gaussianité et de quantification binaire par signe. Elle ne reproduit pas automatiquement une quantification différentielle ou une bande de garde.
+
+\subsection{Origine du seuil $\rho_{\min}$}
+Nous fixons d'abord un seuil de politique
+\begin{equation}
+    \KDR_{\max}=0{,}30.
+    \label{eq:kdr-max-policy}
+\end{equation}
+La valeur $30\,\%$ est une exigence de scénario à analyser en sensibilité, et non une constante attribuée à Ruotsalainen. En inversant l'équation~\eqref{eq:kdr-arcsine},
+\begin{equation}
+    \rho_{\min}=\cos(\pi\KDR_{\max})
+    =\cos(0{,}30\pi)\simeq0{,}588.
+    \label{eq:rho-min-derived}
+\end{equation}
+La valeur de simulation retenue est la valeur exacte dérivée $\rho_{\min}=0{,}588$ (\statusDer{}/\statusPol{}), sans arrondi supplémentaire : une version antérieure de ce document mentionnait par erreur un arrondi à $0{,}60$, incohérent avec le Tableau des paramètres du canal, de l'authentification et de la SKG (Annexe~\ref{ann:parametres}), qui a toujours utilisé $0{,}588$. En pratique, le test de faisabilité implémenté compare directement $\KDR_t$ à $\KDR_{\max}=0{,}30$ (équation~\eqref{eq:agreement-feasibility}) ; $\rho_{\min}$ n'est qu'une grandeur dérivée et informative, jamais utilisée seule comme condition de filtrage dans le code. $\rho_{\min}$ ne doit pas être présenté comme une valeur universelle publiée.
+
+\subsection{Quantification réelle : deux modes distincts}
+Ruotsalainen \emph{et al.} quantifient les mesures normalisées avec une bande de garde : les valeurs entre $-gb$ et $+gb$ sont abandonnées, comme indiqué dans leur équation~(8) \cite[Eq.~(8)]{ruotsalainen2020}. Zhang \emph{et al.} proposent une quantification différentielle adaptée aux enveloppes LoRa \cite{zhang2018}.
+
+Pour éviter de faire passer une approximation pour une loi de la littérature, l'implémentation prévoit deux modes :
+\begin{align}
+\text{mode analytique:}\quad &\KDR_t=\KDR_{\mathrm{brut},t},
+\label{eq:kdr-mode-analytic}\\
+\text{mode calibré:}\quad &\KDR_t=g_{\mathrm q}(\rho_{AB,t};\boldsymbol\beta_{\mathrm q}),
+\label{eq:kdr-mode-calibrated}
+\end{align}
+où $g_{\mathrm q}$ est une courbe monotone ajustée sur des mesures du quantificateur retenu et $\boldsymbol\beta_{\mathrm q}$ ses paramètres. Une forme multiplicative $\KDR_t=\kappa_{\mathrm{gb}}\KDR_{\mathrm{brut},t}$ peut être utilisée comme \emph{surrogate} exploratoire, mais elle est alors classée \statusCal{} et balayée ; elle ne valide pas le quantificateur.
+
+\subsection{Rendement et nombre de mesures}
+L'entropie binaire est
+\begin{equation}
+    h_2(p)=-p\log_2p-(1-p)\log_2(1-p),
+    \label{eq:binary-entropy}
+\end{equation}
+avec la convention $0\log_2 0=0$. La borne de Slepian--Wolf caractérise le taux minimal de description de sources corrélées \cite{slepian1973}. Pour un canal binaire symétrique idéal, elle motive le terme $1-h_2(\KDR_t)$.
+
+Nous définissons le \textbf{surrogate en ligne}
+\begin{equation}
+    y_{\mathrm{rec},t}=\eta_{\mathrm{keep}}
+    \left[1-h_2(\KDR_t)\right],
+    \label{eq:online-yield}
+\end{equation}
+avec $\eta_{\mathrm{keep}}\in(0,1]$ la proportion de mesures conservées après bande de garde et prétraitement. L'équation~\eqref{eq:online-yield} est une \statusDer{}/\statusCal{} de cette étude ; Slepian--Wolf ne fournit pas cette formule complète et elle ne constitue pas une capacité secrète vis-à-vis de Mallory.
+
+Le nombre de mesures estimé en ligne est
+\begin{equation}
+    N_{\mathrm{meas},t}^{\mathrm{online}}=
+    \left\lceil\frac{\ell_K}{\max(y_{\mathrm{rec},t},\epsilon)}\right\rceil,
+    \label{eq:nmeas-online}
+\end{equation}
+où $\ell_K$ est la longueur cible en bits et $\epsilon>0$ une protection numérique. Cette relation est dérivée par division de la longueur cible par le rendement en bits par mesure.
+
+\paragraph{Formules expérimentales de Ruotsalainen.}
+Lorsque la statistique de l'espion est connue hors ligne, Ruotsalainen \emph{et al.} écrivent
+\begin{align}
+    n_{\mathrm{keys}}&=\frac{128}{\KDR_{\mathrm{Eve}}-\KDR_{AB}},
+    \label{eq:ruotsalainen-nkeys}\\
+    n_{\mathrm{meas}}&=\frac{n_{\mathrm{keys}}}{\mathrm{KPM}},
+    \label{eq:ruotsalainen-nmeas}\\
+    T_{\mathrm{AES}}&=n_{\mathrm{meas}}T_s,
+    \label{eq:ruotsalainen-taes}
+\end{align}
+respectivement dans leurs équations~(12)--(14) \cite[Sec.~V-C, Eqs.~(12)--(14)]{ruotsalainen2020}. Ces relations servent à reproduire leur expérience, mais $\KDR_{\mathrm{Eve}}$ n'est pas une observation disponible en temps réel chez Bob. Elles ne sont donc pas utilisées directement comme règle en ligne du DM.
+
+L'article emploie notamment $\mathrm{KPM}=70\,\%$, $\KDR_{AB}=17\,\%$, un payload de 32 octets et $SF=12$ dans une étude de rafraîchissement \cite[Sec.~V-C]{ruotsalainen2020}. Ces valeurs décrivent leur expérience ; elles ne sont pas des constantes générales de notre scénario.
+
+\subsection{Faisabilité de la SKG}
+La faisabilité d'accord est
+\begin{equation}
+    \phi_t^{\mathrm{agree}}=\mathbb 1\{\KDR_t\leq\KDR_{\max}\}.
+    \label{eq:agreement-feasibility}
+\end{equation}
+Dans le seul mode analytique de l'équation~\eqref{eq:kdr-mode-analytic}, elle équivaut à $\mathbb 1\{\rho_{AB,t}\geq\rho_{\min}\}$. Après calibrage d'un autre quantificateur, le seuil doit être recalculé à partir de $g_{\mathrm q}$.
+
+L'accord ne garantit pas l'imprévisibilité. Nous réservons donc
+\begin{equation}
+    \phi_t^{\mathrm{PHY}}=\phi_t^{\mathrm{agree}}\phi_t^{\mathrm{var}},
+    \label{eq:phy-feasibility}
+\end{equation}
+où $\phi_t^{\mathrm{var}}$ devra tester une métrique de variabilité ou d'entropie. Tant que cette métrique n'est pas validée, l'étude doit annoncer seulement la \emph{faisabilité d'accord}, et non une sécurité informationnelle complète.
+
+\subsection{Gestion de la cryptopériode}
+Le NIST définit une cryptopériode comme la durée pendant laquelle une clé est autorisée et indique que sa longueur dépend notamment du type de clé, de la quantité d'information protégée, du nombre de transactions, de l'environnement et des conséquences d'une compromission \cite[Sec.~5.3]{nist80057}. Le NIST ne fournit pas le score normalisé ci-dessous ; nous le construisons pour le DM.
+
+Les taux d'utilisation sont
+\begin{align}
+    u_t^{\mathrm{time}}&=\min\left\{1,\frac{a_t^{\mathrm{key}}}{\tau_{\max}}\right\},\\
+    u_t^{\mathrm{msg}}&=\min\left\{1,\frac{n_t^{\mathrm{key}}}{N_{\max}}\right\}.
+\end{align}
+L'indice de consommation de la cryptopériode est la règle conservative
+\begin{equation}
+    q_t=\max\{u_t^{\mathrm{time}},u_t^{\mathrm{msg}}\}.
+    \label{eq:key-aging}
+\end{equation}
+Les équations sont \statusPol{} : $a_t^{\mathrm{key}}$ est l'âge, $\tau_{\max}$ l'âge maximal, $n_t^{\mathrm{key}}$ le nombre de messages déjà protégés et $N_{\max}$ la limite d'usage.
+
+Le renouvellement anticipé est
+\begin{equation}
+    r_t=\mathbb 1\{q_t\geq q_{\mathrm{trig}}\},
+    \label{eq:key-renew-trigger}
+\end{equation}
+et l'expiration dure
+\begin{equation}
+    e_t^{\mathrm{key}}=\mathbb 1\{a_t^{\mathrm{key}}\geq\tau_{\max}
+    \lor n_t^{\mathrm{key}}\geq N_{\max}\lor c_t=1\},
+    \label{eq:key-expired}
+\end{equation}
+où $c_t$ indique une compromission ou suspicion. Lorsque $e_t^{\mathrm{key}}=1$, $K_0$ est interdit.
+
+Sous un trafic périodique d'un message toutes les $T_{\mathrm{msg}}$ secondes, les temps restants sont dérivés par comptabilisation :
+\begin{align}
+T_t^{\mathrm{age}}&=\max\{\tau_{\max}-a_t^{\mathrm{key}},0\},
+\label{eq:deadline-age}\\
+T_t^{\mathrm{msg}}&=\max\{N_{\max}-n_t^{\mathrm{key}},0\}T_{\mathrm{msg}},
+\label{eq:deadline-msg}\\
+T_t^{\mathrm{deadline}}&=\max\left\{T_{\min},
+\min(T_t^{\mathrm{age}},T_t^{\mathrm{msg}})\right\}.
+\label{eq:key-deadline}
+\end{align}
+Ces équations ne viennent pas d'un article : elles traduisent la première limite de cryptopériode qui sera atteinte. $T_t^{\mathrm{msg}}$ n'est valable que pour un trafic périodique ou une période moyenne explicitement assumée.
+
+\subsection{Indice de qualité/fraîcheur du DM}
+Pour conserver un objectif scalaire dans $[0,1]$, nous proposons
+\begin{align}
+    \Rkey_t(K_0)&=1-q_t,
+    \label{eq:qkey-k0}\\
+    \Rkey_t(K_{1a})=\Rkey_t(K_{1b})&=1-h_2(\KDR_t),
+    \label{eq:qkey-k1}\\
+    \Rkey_t(K_2)&=1-2^{-b_{\mathrm{sec}}}.
+    \label{eq:qkey-k2}
+\end{align}
+Ces expressions sont des \textbf{indices de décision proposés}. Elles mettent sur une échelle commune une fraîcheur, une qualité d'accord et une borne cryptographique. Elles ne doivent jamais être appelées probabilités universelles de sécurité. Une analyse de sensibilité et une validation par l'encadrante sont requises.
+
+
+\section{Modèle d'énergie et de latence}
+\label{sec:energy-latency}
+
+L'objectif énergétique porte sur Alice, le nœud sur batterie. Les traitements chez Bob sont comptés dans la latence lorsqu'ils bloquent la décision, mais pas dans l'énergie d'Alice.
+
+\subsection{Temps d'antenne LoRa}
+Le guide et la fiche technique Semtech définissent le calcul du \emph{Time-on-Air} dans la partie consacrée au temps de paquet LoRa \cite[Sec.~4.1.1.6]{sx1276ds}. La durée d'un symbole est
+\begin{equation}
+    T_{\mathrm{sym}}=\frac{2^{SF}}{BW},
+    \label{eq:lora-tsym}
+\end{equation}
+où $SF$ est le facteur d'étalement, $BW$ la bande en hertz et $T_{\mathrm{sym}}$ en secondes. Le temps de préambule est
+\begin{equation}
+    T_{\mathrm{pre}}=(N_{\mathrm{pre}}+4{,}25)T_{\mathrm{sym}},
+    \label{eq:lora-tpre}
+\end{equation}
+et le nombre de symboles utiles est
+\begin{align}
+\Xi(M)&=\left\lceil
+\frac{8M-4SF+28+16CRC-20IH}{4(SF-2DE)}
+\right\rceil,
+\label{eq:lora-payload-intermediate}\\
+N_{\mathrm{pl}}&=8+\max\!\left\{0,
+(CR_{\mathrm{idx}}+4)\Xi(M)\right\}.
+\label{eq:lora-npayload}
+\end{align}
+Le temps total est
+\begin{equation}
+    \ToA(M)=T_{\mathrm{pre}}+N_{\mathrm{pl}}T_{\mathrm{sym}}.
+    \label{eq:toa}
+\end{equation}
+Dans ces équations, $M$ est la charge utile en octets, $N_{\mathrm{pre}}$ le nombre de symboles programmés, $CRC\in\{0,1\}$ indique le CRC, $IH\in\{0,1\}$ l'en-tête implicite, $DE\in\{0,1\}$ l'optimisation bas débit, et $CR_{\mathrm{idx}}\in\{1,2,3,4\}$ code respectivement $4/5,4/6,4/7,4/8$. L'usage d'un indice $CR_{\mathrm{idx}}$ évite de confondre le taux $4/5$ avec la valeur entière attendue par la formule Semtech.
+
+Ruotsalainen \emph{et al.} utilisent également un calcul d'airtime LoRaWAN pour obtenir l'intervalle $T_s$ dans leur étude de renouvellement \cite[Sec.~V-C]{ruotsalainen2020}. Dans notre DM, $\ToA$ alimente l'énergie TX/RX, le délai des échanges et la contrainte de duty-cycle.
+
+\subsection{Énergie électrique des états radio et CPU}
+La relation physique $E=VIT$ donne
+\begin{align}
+E_{\mathrm{tx}}(M)&=V_{DD}I_{\mathrm{tx}}\ToA(M),
+\label{eq:energy-tx}\\
+E_{\mathrm{rx}}(M)&=V_{DD}I_{\mathrm{rx}}\ToA(M).
+\label{eq:energy-rx}
+\end{align}
+$V_{DD}$ est en volts, les courants en ampères et les énergies en joules. Les valeurs de courant doivent être lues au point de fonctionnement exact de la fiche SX1276 ; elles ne sont pas transférables d'un mode ou d'une puissance à un autre.
+
+Si un traitement exige $N_{\mathrm{cyc}}$ cycles à une fréquence $f_{\mathrm{CPU}}$ et un courant actif approximativement constant,
+\begin{equation}
+E_{\mathrm{cpu}}(N_{\mathrm{cyc}})=N_{\mathrm{cyc}}
+\frac{V_{DD}I_{\mathrm{cpu}}}{f_{\mathrm{CPU}}}.
+\label{eq:energy-cpu}
+\end{equation}
+Cette équation est \statusDer{} : la durée du calcul est $N_{\mathrm{cyc}}/f_{\mathrm{CPU}}$, puis l'énergie est $VI$ multiplié par cette durée. Elle doit être remplacée par une mesure si le courant varie avec la fréquence, la mémoire ou les périphériques.
+
+\subsection{Énergie totale d'une période}
+Nous séparons le fonctionnement normal et le surcoût de sécurité :
+\begin{equation}
+    E_t(D)=E_{\mathrm{base},t}+E_t^{\mathrm{sec}}(D),
+    \label{eq:total-energy}
+\end{equation}
+\begin{equation}
+E_{\mathrm{base},t}=E_{\mathrm{sens}}+E_{\mathrm{app}}+
+E_{\mathrm{tx}}(M_{\mathrm{data}})+E_{\mathrm{RXwin}}+E_{\mathrm{sleep}}.
+\label{eq:base-energy}
+\end{equation}
+Cette décomposition est un \textbf{bilan construit pour le scénario}. Elle évite d'annoncer une autonomie absolue en ne comptant que la sécurité. $E_{\mathrm{sens}}$, $E_{\mathrm{app}}$, les fenêtres RX et la veille doivent être mesurés ou documentés pour la plateforme finale.
+
+\subsection{Coût de l'authentification conventionnelle $A_1$}
+Lorsque le tag est ajouté à la trame de données,
+\begin{equation}
+\begin{split}
+E^{\mathrm{sec}}(A_1)={}&E_{\mathrm{MAC}}+
+E_{\mathrm{tx}}(M_{\mathrm{data}}+M_{\mathrm{tag}})
+-E_{\mathrm{tx}}(M_{\mathrm{data}}),
+\end{split}
+\label{eq:cost-a1}
+\end{equation}
+\begin{equation}
+\begin{split}
+L^{\mathrm{auth}}(A_1)={}&T_{\mathrm{MAC}}+
+\ToA(M_{\mathrm{data}}+M_{\mathrm{tag}})-\ToA(M_{\mathrm{data}}).
+\end{split}
+\end{equation}
+Ces relations sont des bilans différentiels \statusDer{} du format de paquet choisi. Une trame de tag séparée constitue un autre protocole et doit être simulée séparément.
+
+\subsection{Coût de l'authentification hybride $A_2$}
+Haenel \emph{et al.} placent l'analyse RFF du côté infrastructure et utilisent un protocole hybride pour économiser le nœud IoT \cite[Secs.~4--6]{haenel2021}. Dans notre bilan d'Alice, le coût RFF incrémental est donc nul tant que Bob accepte l'empreinte. En cas de faux rejet, Alice reçoit un défi, calcule un MAC et répond :
+\begin{align}
+E_{\mathrm{CR}}&=E_{\mathrm{rx}}(M_{\mathrm{chal}})+E_{\mathrm{MAC}}
++E_{\mathrm{tx}}(M_{\mathrm{resp}}),
+\label{eq:challenge-energy}\\
+E_t^{\mathrm{sec}}(A_2)&=\FRR(\theta)E_{\mathrm{CR}},
+\label{eq:cost-a2}\\
+L_t^{\mathrm{auth}}(A_2)&=T_{\mathrm{RFF,Bob}}+
+\FRR(\theta)L_{\mathrm{CR}}.
+\label{eq:latency-a2}
+\end{align}
+Les deux dernières équations sont des espérances pour un trafic légitime. L'admissibilité emploie le pire cas $T_{\mathrm{RFF,Bob}}+L_{\mathrm{CR}}$.
+
+Owusu \emph{et al.} rapportent, dans leur Tableau~1, \SI{1.84}{ms} pour TinyRFNet et \SI{4.10}{ms} pour RFNet sur leur plateforme simulée Raspberry Pi \cite[Tab.~1]{owusu2025}. Ces valeurs peuvent servir de points de comparaison, mais elles ne sont pas transférées comme constantes du Cortex-M3 ni comme temps universel de RFF. $T_{\mathrm{RFF,Bob}}$ reste un paramètre mesuré ou balayé.
+
+\subsection{Coûts de gestion de clé}
+Pour conserver la clé,
+\begin{equation}
+    E^{\mathrm{sec}}(K_0)=0,\qquad L^{\mathrm{key}}(K_0)=0.
+\end{equation}
+Le coût de réconciliation et d'amplification est modélisé par
+\begin{align}
+E_{\mathrm{rec+PA}}={}&E_{\mathrm{cpu}}(N_{\mathrm{raw}}C_{\mathrm{rec/bit}})
++E_{\mathrm{msg,rec}}+E_{\mathrm{cpu}}(C_{\mathrm{PA}}),
+\label{eq:rec-energy}\\
+L_{\mathrm{rec+PA}}={}&\frac{N_{\mathrm{raw}}C_{\mathrm{rec/bit}}}{f_{\mathrm{CPU}}}
++L_{\mathrm{msg,rec}}+\frac{C_{\mathrm{PA}}}{f_{\mathrm{CPU}}}.
+\label{eq:rec-latency}
+\end{align}
+Ruotsalainen \emph{et al.} justifient les opérations BCH et SHA-256 \cite[Sec.~III-A]{ruotsalainen2020}; les nombres de cycles de nos équations restent toutefois à mesurer pour l'implémentation choisie.
+
+Pour les sondages dédiés,
+\begin{align}
+E(K_{1b})={}&N_{\mathrm{meas},t}
+E_{\mathrm{probe}}+E_{\mathrm{rec+PA}},
+\label{eq:k1b-energy}\\
+E_{\mathrm{probe}}={}&E_{\mathrm{tx}}(M_{\mathrm{probe}})
++E_{\mathrm{rx}}(M_{\mathrm{probe}}),\\
+L^{\mathrm{key}}(K_{1b})={}&N_{\mathrm{meas},t}T_s+L_{\mathrm{rec+PA}}.
+\label{eq:k1b-latency}
+\end{align}
+Pour la collecte opportuniste,
+\begin{align}
+E(K_{1a})&=E_{\mathrm{rec+PA}},
+\label{eq:k1a-energy}\\
+L^{\mathrm{key}}(K_{1a})&=N_{\mathrm{meas},t}T_{\mathrm{msg}}+L_{\mathrm{rec+PA}}.
+\label{eq:k1a-latency}
+\end{align}
+Le sondage de $K_{1a}$ est incrémentalement nul uniquement si les trames et ACK utilisés existent déjà dans $E_{\mathrm{base}}$. Ruotsalainen \emph{et al.} montrent que les délais, fenêtres RX et limitations de duty-cycle de LoRaWAN affectent fortement le temps de génération \cite[Secs.~I, V-C]{ruotsalainen2020}.
+
+Pour le renouvellement conventionnel,
+\begin{equation}
+E(K_2)=\sum_{r\in\mathcal O_{\mathrm{ECC}}}E_r+
+\sum_u E_{\mathrm{tx}}(M_u)+\sum_v E_{\mathrm{rx}}(M_v).
+\label{eq:k2-cost}
+\end{equation}
+Mössinger \emph{et al.} mesurent, sur Zolertia Re-Mote/CC2538, environ \SI{0.019}{J} pour une signature secp192r1 dans leur Tableau~VI et environ \SI{218}{ms} dans leur Tableau~VII \cite[Tabs.~VI--VII]{mossinger2016}. Ce sont des mesures d'une \emph{signature ECC}, pas d'un protocole complet de renouvellement LoRaWAN. Elles ne peuvent être utilisées dans $K_2$ qu'en identifiant exactement le nombre et le type d'opérations, puis en ajoutant les échanges radio.
+
+\subsection{Objectif de latence normalisée}
+La latence d'authentification et le délai de production d'une clé ont des budgets différents. Nous proposons
+\begin{equation}
+L_t(D)=\max\left\{
+\frac{L_t^{\mathrm{auth}}(D)}{L_{\max}(\sigma_t)},
+\frac{L_t^{\mathrm{key}}(D)}{T_t^{\mathrm{deadline}}}
+\right\}.
+\label{eq:normalized-latency}
+\end{equation}
+Cette normalisation est une \statusPol{} de l'étude. Elle vaut au plus $1$ lorsque les deux budgets sont respectés et empêche d'additionner directement des échelles temporelles incompatibles.
+
+\section{Paramètres numériques de départ et provenance}
+
+Les tableaux~\ref{tab:params-hw} à \ref{tab:params-policy} donnent le scénario de départ.
+
+Les paramètres matériels et radio sont regroupés dans le Tableau~\ref{tab:params-hw} de l'Annexe~\ref{ann:parametres}.
+
+Les paramètres du canal, de l'authentification et de la SKG sont regroupés dans le Tableau~\ref{tab:params-phy} de l'Annexe~\ref{ann:parametres}.
+
+Les paramètres cryptographiques, de politique et de mission sont regroupés dans le Tableau~\ref{tab:params-policy} de l'Annexe~\ref{ann:parametres}.
+
+
+\section{Formulation multi-objectif}
+
+\subsection{Vecteur objectif}
+Pour chaque décision admissible :
+\begin{equation}
+\mathbf{f}_t(D)=
+\begin{bmatrix}
+E_t(D)\\
+L_t(D)\\
+-\Rauth_t(D)\\
+-\Rkey_t(D)
+\end{bmatrix}.
+\label{eq:objective-vector}
+\end{equation}
+L'énergie et la latence sont minimisées ; les deux indices de sécurité/qualité sont maximisés.
+
+\subsection{Pourquoi séparer authentification et clé}
+$\Rauth$ dépend principalement de la séparabilité de l'empreinte et du SNR. $\Rkey$ dépend de la réciprocité, du KDR et de l'état de la clé. Les fusionner en un score de sécurité unique masquerait le cas où l'authentification physique fonctionne alors que la SKG ne fonctionne pas, ou inversement.
+
+\section{Admissibilité : logique, ressources et sécurité}
+
+\subsection{Conditions de raisonnement}
+Ces règles ne sont pas des contraintes d'optimisation ; elles empêchent d'évaluer des décisions sans sens :
+\begin{align}
+A_2\text{ autorisée} &\Rightarrow v_t^{\mathrm{RFF}}=1,\\
+r_t=0 &\Rightarrow K_i=K_0,\\
+r_t=1 &\Rightarrow K_i\neq K_0.
+\end{align}
+Ces relations s'appliquent \textbf{sans exception} à la décision $D_t^\star$ retournée par le Decision Maker : tant que $r_t=0$, seule $K_0$ peut être choisie, y compris pour $K_{1a}$ et $K_{1b}$.
+
+\paragraph{Précision d'implémentation (collecte passive de $K_{1a}$).} $K_{1a}$ réutilise, par définition (Section~\ref{sec:decision-space}), des messages et accusés de réception \emph{déjà échangés} indépendamment de la décision de sécurité retenue ce jour-là. Une mesure de canal exploitable pour une future clé $K_{1a}$ peut donc être obtenue, à titre d'observation, à chaque période où un message légitime est servi et où $\phi_t^{\mathrm{PHY}}=1$ — que $K_{1a}$ soit ou non la décision $D_t^\star$ retournée. Cette accumulation est un phénomène de \emph{mission} (comptage passif d'observations), jamais une décision alternative que le Decision Maker pourrait retourner : elle ne viole donc pas la règle $r_t=0\Rightarrow K_i=K_0$ ci-dessus. $K_{1b}$, à l'inverse, exige des sondages dédiés réellement coûteux : elle ne progresse que lorsqu'elle est réellement sélectionnée comme $D_t^\star$, ce qui n'est possible que lorsque $r_t=1$ ; elle ne bénéficie d'aucune collecte anticipée.
+
+\subsection{Contraintes physiques et de ressources}
+Pour toute décision $D$ :
+\begin{align}
+K_i\in\{K_{1a},K_{1b}\}&\Rightarrow \phi_t^{\mathrm{PHY}}=1,
+\label{cons:phy}\\
+E_t(D)&\leq B_t-B_{\min},
+\label{cons:battery}\\
+L_t^{\mathrm{auth}}(D)&\leq L_{\max}(\sigma_t),
+\label{cons:authlat}\\
+L_t^{\mathrm{key}}(D)&\leq T_t^{\mathrm{deadline}},
+\label{cons:keylat}\\
+T_{\mathrm{air},t}(D)&\leq\tau_t^{\mathrm{duty}}.
+\label{cons:duty}
+\end{align}
+Le coût utilisé dans les contraintes doit être un majorant prudent lorsque l'action comporte un repli aléatoire.
+
+\subsection{Plancher de sécurité}
+Un objectif « maximiser $\Rauth$ » n'est pas une garantie. Le seuil de FAR est donc imposé :
+\begin{equation}
+\FAR_t(D)\leq
+\FAR_{\max}(\sigma_t)=
+\begin{cases}
+\FAR_{\max}^{C}, & \sigma_t=1,\\
+\FAR_{\max}^{N}, & \sigma_t=0.
+\end{cases}
+\label{cons:far-floor}
+\end{equation}
+Pour $A_1$, $\FAR_t(D)=2^{-b_{\mathrm{MAC}}}$ ; pour $A_2$, elle est donnée par~\eqref{eq:far}.
+
+\subsection{Ensemble admissible}
+\begin{equation}
+\mathcal{A}(\mathbf{c}_t)=
+\{D\in\mathcal{D}:D\text{ respecte les règles et }\eqref{cons:phy}\text{--}\eqref{cons:far-floor}\}.
+\end{equation}
+Si $\mathcal{A}(\mathbf{c}_t)=\varnothing$, le DM refuse le service ou applique un mode de secours défini à l'avance. Le mode de secours ne doit pas être caché dans le code.
+
+\section{Front de Pareto et arbitrage}
+
+\subsection{Dominance}
+Une décision $D_a$ domine $D_b$ si elle n'est jamais moins bonne sur les quatre objectifs et est strictement meilleure sur au moins un :
+\begin{equation}
+\begin{aligned}
+D_a\prec D_b\iff{}&
+\forall k,\ f_{t,k}(D_a)\leq f_{t,k}(D_b),\\
+&\exists k,\ f_{t,k}(D_a)<f_{t,k}(D_b).
+\end{aligned}
+\label{eq:pareto-dominance}
+\end{equation}
+Le front exact est :
+\begin{equation}
+\mathcal{P}(\mathbf{c}_t)=
+\left\{D\in\mathcal{A}(\mathbf{c}_t):
+\nexists D'\in\mathcal{A}(\mathbf{c}_t)\ \text{tel que}\ D'\prec D\right\}.
+\end{equation}
+Avec huit décisions, l'énumération exhaustive demande au plus $8\times7$ comparaisons orientées ; une métaheuristique n'est pas justifiée \cite{miettinen1999}.
+
+\subsection{Tchebychev pondéré}
+Pour choisir un point unique :
+\begin{equation}
+D_t^\star=\arg\min_{D\in\mathcal{P}(\mathbf{c}_t)}
+\max_k\left[
+w_k(\mathbf{c}_t)
+\frac{f_{t,k}(D)-f_{t,k}^{\mathrm{id}}}
+{f_{t,k}^{\mathrm{nad}}-f_{t,k}^{\mathrm{id}}+\varepsilon}
+\right].
+\label{eq:tcheby}
+\end{equation}
+La méthode de Tchebychev est retenue pour atteindre des points Pareto non supportés \cite{wierzbicki1982,miettinen1999}.
+
+\subsection{Poids contextuels : ce qui doit être validé}
+Les poids sont une politique, non une loi physique :
+\begin{equation}
+w_k(\mathbf{c}_t)\geq0,\qquad \sum_kw_k(\mathbf{c}_t)=1.
+\end{equation}
+Leur structure doit respecter des monotonicités explicites :
+\begin{align}
+B_t\downarrow &\Rightarrow w_E\uparrow,\\
+\sigma_t=1 &\Rightarrow w_{\mathrm{auth}}\uparrow,\;w_L\uparrow,\\
+q_t\uparrow &\Rightarrow w_{\mathrm{key}}\uparrow.
+\end{align}
+Aucun coefficient numérique arbitraire ne doit être codé avant validation par l'encadrante. Les poids devront être publiés dans une table de politique et balayés en sensibilité.
+
+\subsection{Bris d'égalité}
+Pour garantir la reproductibilité, en cas de scores égaux à une tolérance $\epsilon_S$, l'ordre suivant est proposé :
+\begin{enumerate}
+    \item plus faible FAR ;
+    \item plus faible énergie ;
+    \item plus faible latence bloquante ;
+    \item ordre lexicographique des actions.
+\end{enumerate}
+
+\section{Fonctionnement complet du Decision Maker}
+
+\begin{algorithm}[t]
+\caption{Decision Maker au temps $t$}
+\label{alg:dm}
+\begin{algorithmic}[1]
+\Require Contexte $\mathbf{c}_t$, paramètres validés, ensemble $\mathcal{D}$
+\Ensure Décision $D_t^\star$ ou refus motivé
+\State Calculer $\gamma_t$, $\rho_{AB,t}$, $q_t$, $r_t$ et $T_t^{\mathrm{deadline}}$
+\State $\mathcal{A}\gets\varnothing$ ; journal des rejets $\mathcal{J}\gets\varnothing$
+\ForAll{$D\in\mathcal{D}$}
+    \If{$D$ viole une condition de raisonnement}
+        \State ajouter le motif à $\mathcal{J}$
+    \Else
+        \State calculer $E_t$, $L_t^{\mathrm{auth}}$, $L_t^{\mathrm{key}}$, $\Rauth_t$, $\Rkey_t$
+        \If{$D$ viole une contrainte de ressource ou de sécurité}
+            \State ajouter le motif à $\mathcal{J}$
+        \Else
+            \State $\mathcal{A}\gets\mathcal{A}\cup\{D\}$
+        \EndIf
+    \EndIf
+\EndFor
+\If{$\mathcal{A}=\varnothing$}
+    \State \Return refus + $\mathcal{J}$
+\EndIf
+\State calculer le front exact $\mathcal{P}$
+\State calculer les poids $w_k(\mathbf{c}_t)$ validés
+\State appliquer~\eqref{eq:tcheby} et le bris d'égalité
+\State \Return $D_t^\star$, ses métriques, $\mathcal{P}$ et $\mathcal{J}$
+\end{algorithmic}
+\end{algorithm}
+
+Chaque décision doit être explicable par quatre objets enregistrés : le contexte observé, les motifs de rejet, le front de Pareto et le score final.
+
+\section{Protocole de simulation avant implémentation}
+
+\subsection{Étape 1 : tests unitaires des sous-modèles}
+Les tests doivent être réalisés avant le DM :
+\begin{itemize}
+    \item $\ToA(M)$ contre des exemples Semtech ;
+    \item $\FAR$ décroissante en SNR et croissante lorsque $d_M$ diminue ;
+    \item $\KDR_{\mathrm{brut}}(0{,}6)=0{,}2952$ ;
+    \item $N_{\mathrm{meas}}$ décroissant avec $\rho_{AB}$ ;
+    \item bilan énergétique de chaque action, vérifié à la main ;
+    \item cas limites $B_t\rightarrow B_{\min}$, $q_t\rightarrow1$ et SNR très faible/élevé.
+\end{itemize}
+
+\subsection{Étape 2 : balayages déterministes}
+Sans mission aléatoire :
+\begin{enumerate}
+    \item balayage SNR pour FAR, FRR et EER ;
+    \item balayage $(\Gamma,f_d)$ pour $\rho_{AB}$ et KDR ;
+    \item comparaison des coûts des actions ;
+    \item front de Pareto pour des contextes types ;
+    \item carte de décision en fonction du SNR, de la batterie, de la criticité et de l'âge de clé.
+\end{enumerate}
+Ces résultats vérifient les mécanismes avant d'accumuler les effets dans une mission.
+
+\subsection{Étape 3 : boucle d'une mission}
+La mission suit l'Algorithme~\ref{alg:mission}.
+
+\begin{algorithm}[t]
+\caption{Mission d'Alice et processus d'attaque séparé}
+\label{alg:mission}
+\begin{algorithmic}[1]
+\Require $B_0$, état de clé initial, paramètres radio, graine $s_r$
+\State $t\gets0$, initialiser les compteurs
+\While{$B_t>B_{\min}$ et critère d'arrêt non atteint}
+    \State générer/estimer $\Gamma_t$, $f_{d,t}$ et $\sigma_t$
+    \State construire $\mathbf{c}_t$ et appeler le DM
+    \If{le message légitime est accepté/servi}
+        \State débiter $E_{\mathrm{base},t}+E_t^{\mathrm{sec}}(D_t^\star)$
+        \State mettre à jour âge, compteur de clé et renouvellement
+    \Else
+        \State débiter uniquement les coûts réellement engagés avant refus
+        \State incrémenter $N_{\mathrm{ref}}$
+    \EndIf
+    \State tirer indépendamment une tentative Mallory selon $p_M$
+    \If{Mallory tente une usurpation}
+        \State évaluer acceptation/rejet chez Bob sans débiter Alice
+        \State mettre à jour $N_M$, $N_{\mathrm{FA}}$ et compteurs critiques
+    \EndIf
+    \State vérifier la décision au SNR réel pour compter $N_{\mathrm{viol}}$
+    \State $t\gets t+1$
+\EndWhile
+\State calculer les métriques de mission
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Étape 4 : politiques de référence}
+Au minimum :
+\begin{itemize}
+    \item B1 : authentification et renouvellement conventionnels ;
+    \item B2 : PhySec naïve dès qu'elle semble disponible, sans plancher ;
+    \item B3 : règle hybride fixe non adaptative ;
+    \item B4 : DM sans plancher de FAR, pour isoler l'effet de la contrainte de sécurité.
+\end{itemize}
+Toutes les politiques doivent subir les mêmes coûts de base, le même trafic, les mêmes traces radio et les mêmes attaques. Seule leur règle de décision change.
+
+\subsection{Étape 5 : répétitions et incertitude}
+Une seule graine ne suffit pas. Pour chaque scénario, utiliser des graines $s_1,\ldots,s_{N_{\mathrm{MC}}}$ communes à toutes les politiques. Augmenter $N_{\mathrm{MC}}$ jusqu'à ce que la demi-largeur de l'intervalle de confiance à 95\% soit inférieure à une tolérance $\epsilon_{\mathrm{CI}}$ définie pour les métriques principales.
+
+\subsection{Étape 6 : analyse de sensibilité}
+Les paramètres suivants doivent être balayés :
+\begin{equation}
+\mu_{\Gamma},\;\sigma_{\mathrm{sh}},\;f_d,\;d_M,\;
+\kappa_{\mathrm{gb}},\;q_{\mathrm{trig}},\;p_C,\;p_M,
+\;T_{\mathrm{msg}},\;C_B,\;\Delta_{\Gamma},\;w_k.
+\end{equation}
+L'objectif n'est pas seulement de montrer que le DM fonctionne, mais de cartographier où les conclusions changent.
+
+\paragraph{Paramètres additionnels de l'extension Ève/$\phi^{\mathrm{var}}$.} S'ajoutent à cette liste : $d_{\mathrm{eve}}$ (ou $d_{BE},d_{AE}$ séparément), $m_{\min}$ (marge de secret minimale), ainsi que la taille de fenêtre et les seuils de $\phi_t^{\mathrm{var}}$ (écart-type, autocorrélation, taux de transition, nombre minimal de mesures valides). Aucun de ces seuils ne doit être fixé sans être également balayé.
+
+
+\section{Conclusion}
+Le canal produit le SNR et la réciprocité ; ces grandeurs alimentent séparément l'authentification et la génération de clé ; les modèles de coût traduisent chaque action en énergie et en délai ; les règles logiques et les contraintes construisent l'ensemble admissible ; le Pareto extrait les compromis ; la scalarisation contextuelle retourne une décision explicable ; enfin, le protocole de mission mesure l'autonomie et la sécurité sans mélanger le trafic de Mallory avec la batterie d'Alice.
+
+
+\clearpage
+\appendices
+\onecolumn
+
+\section{Dictionnaire complet des variables et symboles}
+\label{ann:variables}
+Les tableaux de cette annexe constituent le dictionnaire officiel des variables du modèle. Les tableaux du canal complètent les variables générales utilisées par le Decision Maker.
+
+\begin{table}[H]
+\caption{Variables du contexte, de l'état et des décisions}
+\label{tab:variables-context}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l l Y Y@{}}
+\toprule
+Symbole & Unité/domaine & Type & Définition & Utilisation \\
+\midrule
+$t$ & entier & index & Période ou événement de décision & Indexe le contexte, la batterie et la clé \\
+$\mathbf{c}_t$ & -- & vecteur & Contexte observable par Bob au temps $t$ & Entrée principale du DM \\
+$\Gamma_t$ & dB & observée & SNR estimé par Bob & Authentification, réciprocité, décision \\
+$\gamma_t$ & linéaire & dérivée & $10^{\Gamma_t/10}$ & Équations de bruit et de FAR \\
+$f_{d,t}$ & Hz & observée/scénario & Fréquence Doppler effective & Décorrélation temporelle \\
+$B_t$ & J & état & Énergie restante dans la pile d'Alice & Contrainte batterie, poids énergétique \\
+$a_t^{\mathrm{key}}$ & s & état & Âge de la clé courante & Indice de vieillissement \\
+$n_t^{\mathrm{key}}$ & messages & état & Messages protégés avec la clé courante & Indice de vieillissement \\
+$\sigma_t$ & $\{0,1\}$ & contexte & Criticité du message, 1 si critique & Seuil FAR et délai admissible \\
+$\tau_t^{\mathrm{duty}}$ & s & état & Budget de temps d'antenne encore disponible & Contrainte duty-cycle \\
+$v_t^{\mathrm{RFF}}$ & $\{0,1\}$ & contexte & Disponibilité du profil d'empreinte & Autorise/interdit $A_2$ \\
+$q_t$ & $[0,1]$ & dérivée & Indice de vieillissement de la clé & Déclenchement du renouvellement \\
+$r_t$ & $\{0,1\}$ & dérivée & Besoin de renouvellement & Filtrage logique des actions $K_i$ \\
+$A_j$ & $\{A_1,A_2\}$ & décision & Action d'authentification & Première composante de $D_t$ \\
+$K_i$ & $\{K_0,K_{1a},K_{1b},K_2\}$ & décision & Action de gestion de clé & Deuxième composante de $D_t$ \\
+$D_t$ & $\mathcal{A}\times\mathcal{K}$ & décision & Décision conjointe $(A_j,K_i)$ & Point évalué dans l'espace multi-objectif \\
+$\mathcal{D}$ & ensemble & fixe & Les huit décisions possibles & Espace brut de recherche \\
+$\mathcal{A}(\mathbf{c}_t)$ & ensemble & dérivée & Décisions admissibles dans le contexte & Entrée du calcul de Pareto \\
+$\mathcal{P}(\mathbf{c}_t)$ & ensemble & dérivée & Front de Pareto exact & Ensemble final à arbitrer \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Variables du canal et de l'authentification}
+\label{tab:variables-auth}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l l Y Y@{}}
+\toprule
+Symbole & Unité/domaine & Type & Définition & Utilisation \\
+\midrule
+$d$ & m & scénario & Distance Alice--Bob & Modèle optionnel de perte de trajet \\
+$PL(d)$ & dB & dérivée & Perte de trajet log-distance & Calcul optionnel du SNR moyen \\
+$n_p$ & -- & scénario & Exposant de perte de trajet & Sensibilité à l'environnement \\
+$X_{\mathrm{sh},t}$ & dB & aléatoire & Shadowing log-normal exprimé en dB & Variation lente du SNR \\
+$P_{\mathrm{rx},t}$ & dBm & dérivée & Puissance reçue à Bob & Calcul du SNR \\
+$N_0$ & dBm & dérivée & Plancher de bruit dans la bande & Calcul du SNR \\
+$\rho_{AB,t}$ & $[-1,1]$ & dérivée & Corrélation entre observations d'Alice et Bob & Qualité d'accord SKG \\
+$\rho_{\mathrm{HW}}$ & $[0,1]$ & paramètre & Plafond dû aux asymétries matérielles & Calibrage de la réciprocité \\
+$\Delta t$ & s & paramètre & Décalage entre sondages réciproques & Corrélation temporelle \\
+$J_0(\cdot)$ & -- & fonction & Bessel d'ordre zéro, modèle de Jakes & Décorrélation temporelle \cite{jakes1974} \\
+$\mathbf{f}_{\mathrm{HW}}$ & vecteur & référence & Empreinte matérielle d'Alice & Test d'authentification \\
+$\mathbf{f}_{\mathrm{obs}}$ & vecteur & observée & Empreinte estimée sur la trame reçue & Statistique de décision \\
+$n_f$ & entier & paramètre & Nombre de composantes de l'empreinte & Degrés de liberté du $\chi^2$ \\
+$\theta$ & -- & politique/dérivée & Seuil du test RFF & Compromis FAR--FRR \\
+$d_M$ & -- & scénario & Séparation normalisée Alice--Mallory & Paramètre non central \\
+$\lambda_t$ & -- & dérivée & $d_M^2\gamma_t$ & Loi du $\chi'^2$ sous Mallory \\
+$\FRR(\theta)$ & $[0,1]$ & dérivée & Probabilité de rejeter Alice & Coût de repli et QoS \\
+$\FAR(\theta,\gamma_t)$ & $[0,1]$ & dérivée & Probabilité d'accepter Mallory & Robustesse et plancher de sécurité \\
+$p_{\mathrm{fb},t}$ & $[0,1]$ & dérivée & Probabilité de repli cryptographique & Énergie/latence attendues de $A_2$ \\
+$\Rauth_t(D)$ & $[0,1]$ & objectif & Indice de robustesse d'authentification & Troisième objectif \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Variables de génération et de gestion de clé}
+\label{tab:variables-key}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l l Y Y@{}}
+\toprule
+Symbole & Unité/domaine & Type & Définition & Utilisation \\
+\midrule
+$\KDR_{\mathrm{brut}}$ & $[0,0{,}5]$ & dérivée & Désaccord de signe sous quantification binaire & Relation analytique avec $\rho_{AB}$ \\
+$\kappa_{\mathrm{gb}}$ & $[0,1]$ & calibré & Facteur représentant bande de garde/quantification réelle & Passage du KDR brut au KDR effectif \\
+$\KDR_t$ & $[0,0{,}5]$ & dérivée & Désaccord effectif entre Alice et Bob & Rendement de réconciliation \\
+$\Hb(p)$ & bit & fonction & Entropie binaire & Fuite minimale de réconciliation \\
+$\eta_{\mathrm{samp}}$ & bit/mesure & littérature/scénario/à valider & Rendement de mesures conservées, inspiré du cas $\mathrm{KPM}=70\,\%$ & Rendement de quantification \\
+$y_{\mathrm{sec},t}$ & bit/mesure & dérivée & Rendement secret approximatif & Nombre de mesures nécessaires \\
+$\ell_K$ & bit & politique & Longueur de clé cible & Dimensionnement du sondage \\
+$N_{\mathrm{meas},t}$ & mesures & dérivée & Nombre de mesures nécessaires & Énergie et délai des $K_1$ \\
+$T_s$ & s & scénario & Intervalle entre sondages dédiés & Délai de $K_{1b}$ \\
+$T_{\mathrm{msg}}$ & s & scénario & Période des messages légitimes & Délai de $K_{1a}$ \\
+$\rho_{\min}$ & -- & dérivée/politique & Seuil minimal de réciprocité obtenu depuis $\KDR_{\max}$ & Faisabilité d'accord \\
+$q_t$ & $[0,1]$ & dérivée & Vieillissement normalisé de la clé & Qualité de $K_0$ et déclenchement \\
+$q_{\mathrm{trig}}$ & $[0,1]$ & politique & Seuil anticipé de renouvellement & Garde $K_{1a}$ réalisable \\
+$\tau_{\max}$ & s & politique & Âge maximal de clé & Échéance de renouvellement \\
+$N_{\max}$ & messages & politique & Nombre maximal de messages par clé & Échéance de renouvellement \\
+$T_t^{\mathrm{deadline}}$ & s & dérivée & Temps restant avant expiration & Contrainte de délai de clé \\
+$\Rkey_t(D)$ & $[0,1]$ & objectif & Indice normalisé de qualité/fraîcheur & Quatrième objectif \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Variables énergétiques, temporelles et d'optimisation}
+\label{tab:variables-energy}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l l Y Y@{}}
+\toprule
+Symbole & Unité/domaine & Type & Définition & Utilisation \\
+\midrule
+$V_{DD}$ & V & datasheet & Tension d'alimentation & Tous les coûts électriques \\
+$I_{\mathrm{tx}},I_{\mathrm{rx}}$ & A & datasheet & Courants radio TX et RX & Énergie d'antenne \\
+$I_{\mathrm{sleep}}$ & A & datasheet/dérivé & Courant de veille total & Plancher énergétique par période \\
+$f_{\mathrm{CPU}}$ & Hz & datasheet & Fréquence du microcontrôleur & Temps et énergie CPU \\
+$N_{\mathrm{cyc}}$ & cycles & dérivé/littérature & Cycles d'une opération & Coût de calcul \\
+$M$ & octets & scénario/protocole & Taille de charge utile & Temps d'antenne \\
+$T_{\mathrm{sym}}$ & s & dérivée & Durée d'un symbole LoRa & Calcul du ToA \\
+$\ToA(M)$ & s & dérivée & Temps d'antenne d'une trame de $M$ octets & Énergie, latence, duty-cycle \\
+$E_{\mathrm{base},t}$ & J & dérivée & Fonctionnement normal hors décision sécurité & Autonomie réelle \\
+$E_t^{\mathrm{sec}}(D)$ & J & objectif/dérivée & Surcoût de sécurité de $D$ & Comparaison des décisions \\
+$E_t(D)$ & J & objectif & $E_{\mathrm{base},t}+E_t^{\mathrm{sec}}(D)$ & Batterie et premier objectif \\
+$L_t^{\mathrm{auth}}(D)$ & s & dérivée & Délai bloquant du message & QoS d'authentification \\
+$L_t^{\mathrm{key}}(D)$ & s & dérivée & Délai différé de renouvellement & Échéance de clé \\
+$L_t(D)$ & -- & objectif & Charge temporelle normalisée & Deuxième objectif \\
+$B_{\min}$ & J & politique & Réserve énergétique non consommable & Contrainte batterie \\
+$L_{\max}(\sigma_t)$ & s & politique & Délai bloquant maximal & Contrainte QoS \\
+$w_k(\mathbf{c}_t)$ & $[0,1]$ & politique & Poids contextuel du critère $k$ & Scalarisation finale \\
+$f_k^{\mathrm{id}}, f_k^{\mathrm{nad}}$ & -- & dérivées & Valeurs idéale et nadir sur le front & Normalisation Tchebychev \\
+$S(D\mid\mathbf{c}_t)$ & -- & dérivée & Score de Tchebychev & Choix d'un point Pareto \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Variables du protocole de simulation et métriques}
+\label{tab:variables-sim}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l l Y Y@{}}
+\toprule
+Symbole & Unité/domaine & Type & Définition & Utilisation \\
+\midrule
+$\mu_{\Gamma}$ & dB & scénario & SNR moyen de la mission & Balayage radio \\
+$\sigma_{\mathrm{sh}}$ & dB & scénario & Écart-type du shadowing & Variabilité radio \\
+$p_C$ & $[0,1]$ & scénario & Part de messages critiques & Distribution de criticité \\
+$p_M$ & $[0,1]$ & scénario & Taux de tentatives de Mallory & Pression adverse \\
+$N_{\mathrm{MC}}$ & entier & protocole & Nombre de répétitions Monte Carlo & Intervalles de confiance \\
+$s_r$ & entier & protocole & Graine de la répétition $r$ & Reproductibilité \\
+$N_{\mathrm{FA}}$ & entier & métrique & Attaques acceptées à tort & Numérateur FAR \\
+$N_{M}$ & entier & métrique & Tentatives totales de Mallory & Dénominateur FAR \\
+$N_{\mathrm{FA},C}$ & entier & métrique & Attaques critiques acceptées & FAR critique \\
+$N_{M,C}$ & entier & métrique & Tentatives critiques de Mallory & FAR critique \\
+$N_{\mathrm{ref}}$ & entier & métrique & Messages légitimes refusés & Disponibilité du service \\
+$N_{\mathrm{viol}}$ & entier & métrique & Décisions violant le plancher au SNR réel & Robustesse à l'estimation \\
+$T_{\mathrm{life}}$ & années & métrique & Temps jusqu'à $B_t\le B_{\min}$ & Autonomie simulée \\
+$\bar E_{\mathrm{msg}}$ & J/message & métrique & Énergie moyenne par message légitime & Efficacité énergétique \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Variables du modèle de canal radio}
+\label{tab:variables_canal}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{p{1.7cm} p{1.8cm} p{3.0cm} p{8.0cm}}
+\hline
+\textbf{Symbole} &
+\textbf{Unité} &
+\textbf{Nature} &
+\textbf{Définition} \\
+\hline
+
+$t$
+& -- & index
+& Numéro de la période ou de l'événement de décision. \\
+
+$\Gamma_t$
+& dB & observée/dérivée
+& Rapport signal sur bruit instantané en décibels. Il constitue
+l'entrée radio principale du Decision Maker. \\
+
+$\gamma_t$
+& -- & dérivée
+& SNR dans le domaine linéaire, obtenu par
+$\gamma_t=10^{\Gamma_t/10}$. \\
+
+$\mu_{\Gamma}$
+& dB & scénario
+& Valeur moyenne du SNR imposée dans l'option A. \\
+
+$X_{\mathrm{sh},t}$
+& dB & aléatoire
+& Variation du signal due au shadowing au temps $t$. \\
+
+$\sigma_{\mathrm{sh}}$
+& dB & scénario/mesure
+& Écart-type du shadowing log-normal. \\
+
+$d$
+& m & scénario
+& Distance entre Alice et Bob dans l'option B. \\
+
+$d_0$
+& m & référence
+& Distance de référence utilisée dans le modèle log-distance. \\
+
+$PL(d_0)$
+& dB & mesure/source
+& Perte de propagation à la distance de référence. \\
+
+$\overline{PL}(d)$
+& dB & dérivée
+& Perte moyenne de propagation à la distance $d$. \\
+
+$n_p$
+& -- & mesure/source
+& Exposant de perte de propagation dépendant de l'environnement. \\
+
+$P_{\mathrm{tx}}$
+& dBm & plateforme
+& Puissance d'émission d'Alice. \\
+
+$P_{\mathrm{rx},t}$
+& dBm & dérivée
+& Puissance du signal reçu par Bob au temps $t$. \\
+
+$G_{\mathrm{tx}}$
+& dBi & plateforme
+& Gain de l'antenne d'émission. \\
+
+$G_{\mathrm{rx}}$
+& dBi & plateforme
+& Gain de l'antenne de réception. \\
+
+$L_{\mathrm{sys}}$
+& dB & plateforme
+& Pertes supplémentaires dues aux câbles, connecteurs et circuits. \\
+
+$BW$
+& Hz & plateforme/scénario
+& Bande passante utilisée par le récepteur. \\
+
+$NF$
+& dB & datasheet
+& Figure de bruit du récepteur. \\
+
+$P_N$
+& dBm & dérivée
+& Puissance totale du bruit thermique dans la bande $BW$. \\
+
+\hline
+\end{tabular}
+\end{table}
+
+\section{Sens opérationnel des décisions}
+\label{ann:decisions}
+Le tableau suivant décrit les opérations exécutées chez Alice et chez Bob pour chacune des huit décisions conjointes.
+
+\begin{table}[H]
+\caption{Sens opérationnel des huit décisions}
+\label{tab:eight-decisions}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l l Y Y Y@{}}
+\toprule
+Décision & Situation & Opérations chez Alice & Opérations chez Bob & Coûts dépendants du canal \\
+\midrule
+$(A_1,K_0)$ & clé encore valide & calcul MAC, ajout du tag, émission & vérification MAC & aucun pour la robustesse ; énergie fixe \\
+$(A_1,K_{1a})$ & renouvellement anticipé & MAC + collecte opportuniste + réconciliation & vérification + mesures du canal & délai SKG via $\rho_{AB}$ \\
+$(A_1,K_{1b})$ & renouvellement rapide & MAC + sondages dédiés + réconciliation & réponses aux sondages & nombre de sondages via $\rho_{AB}$ \\
+$(A_1,K_2)$ & repli conventionnel & MAC + opérations ECC + échanges & vérification et échange ECC & pratiquement indépendant du canal hors erreurs radio \\
+$(A_2,K_0)$ & clé valide, RFF disponible & aucun tag supplémentaire si RFF accepte ; repli si rejet & extraction RFF, décision, éventuel défi & FAR et FRR via SNR \\
+$(A_2,K_{1a})$ & RFF + SKG opportuniste & repli éventuel + réconciliation & RFF + observations canal & FAR, FRR et $\rho_{AB}$ \\
+$(A_2,K_{1b})$ & RFF + sondages dédiés & repli éventuel + sondages & RFF + réponses & FAR, FRR et $\rho_{AB}$ \\
+$(A_2,K_2)$ & RFF + renouvellement ECC & repli éventuel + ECC & RFF + échange ECC & FAR et FRR seulement \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Paramètres numériques et provenance}
+\label{ann:parametres}
+Les tableaux suivants regroupent les valeurs de départ, leur statut, leur provenance et leur fonction dans le modèle.
+
+\begin{table}[H]
+\caption{Paramètres matériels et radio de départ}
+\label{tab:params-hw}
+\centering\scriptsize
+\begin{tabularx}{\textwidth}{@{}l l l l Y Y@{}}
+\toprule
+Paramètre & Symbole & Valeur & Statut & Source/provenance & Pourquoi il est utilisé \\
+\midrule
+Tension & $V_{DD}$ & \SI{3.3}{V} & \statusData{} & Conditions de référence du SX1276, $V_{DD}=\SI{3.3}{V}$ \cite[Sec.~2.5, Tab.~6]{sx1276ds} & Conversion courant--énergie \\
+Courant TX à \SI{14}{dBm} & $I_{\mathrm{tx}}$ & \SI{29}{mA} & \statusData{} & SX1276 : \SI{29}{mA} typiques à $+\SI{13}{dBm}$ sur la sortie RFO ; valeur datasheet la plus proche du point \SI{14}{dBm} \cite[Sec.~2.5.1, Tab.~6]{sx1276ds} & Énergie des trames \\
+Courant RX & $I_{\mathrm{rx}}$ & \SI{10.8}{mA} & \statusData{} & SX1276, mode réception, LNA Boost désactivé, bande~1 incluant \SI{868}{MHz} \cite[Sec.~2.5.1, Tab.~6]{sx1276ds} & Énergie de réception \\
+Sommeil radio & $I_{\mathrm{sleep,radio}}$ & \SI{0.2}{uA} & \statusData{} & SX1276, mode Sleep, valeur typique \cite[Sec.~2.5.1, Tab.~6]{sx1276ds} & Plancher de veille \\
+Courant CPU actif & $I_{\mathrm{cpu}}$ & \SI{5.92}{mA} & \statusData{}/\statusDer{} & STM32L151xC-A : \SI{185}{uA/MHz} en mode Run, soit $185\times32=\SI{5.92}{mA}$ \cite{stml1ds} & Énergie par cycle \\
+Fréquence CPU & $f_{\mathrm{CPU}}$ & \SI{32}{MHz} & \statusData{} & Fréquence maximale du STM32L151xC-A \cite{stml1ds} & Temps de calcul \\
+Sommeil MCU + RTC & $I_{\mathrm{sleep,MCU}}$ & \SI{1.4}{uA} & \statusData{} & STM32L151xC, mode Stop avec RTC, valeur typique \cite{stml1ds} & Plancher de veille \\
+Fuite équivalente pile & $I_{\mathrm{leak}}$ & \SI{2.7}{uA} & \statusDer{} & Dérivé d'une capacité de \SI{2400}{mAh} et d'une auto-décharge de 1\%/an : $0{,}01\times2400/8760\simeq\SI{2.74}{uA}$ & Auto-décharge \\
+Fréquence radio & $f_c$ & \SI{868}{MHz} & \statusLit{} & Bande européenne employée dans les expérimentations LoRaWAN de Ruotsalainen \emph{et al.} \cite{ruotsalainen2020} & Cas d'étude \\
+Bande passante & $BW$ & \SI{125}{kHz} & \statusLit{} & Configuration longue portée de Ruotsalainen \emph{et al.} \cite[Sec.~V-C]{ruotsalainen2020} & ToA et bruit \\
+Spreading factor & $SF$ & 12 & \statusLit{} & Configuration de l'étude de rafraîchissement AES-128 \cite[Sec.~V-C]{ruotsalainen2020} & ToA et portée \\
+Coding rate & $CR$ & 4/5 & \statusScen{} & Configuration LoRa nominale compatible avec la formule Semtech, $CR_{\mathrm{idx}}=1$ \cite[Sec.~4.1.1.6]{sx1276ds} & ToA \\
+Préambule & $N_{\mathrm{pre}}$ & 8 symboles & \statusData{}/\statusScen{} & Valeur programmée de référence utilisée dans le calcul de paquet LoRa Semtech \cite[Sec.~4.1.1.6]{sx1276ds} & ToA \\
+Duty-cycle & $\delta_{\mathrm{duty}}$ & 1\% & \statusLit{}/\statusScen{} & Cas EU868 à 1\% utilisé dans l'étude de Ruotsalainen ; la sous-bande doit rester explicitée \cite[Sec.~V-C]{ruotsalainen2020} & Temps d'antenne admissible \\
+Figure de bruit & $NF$ & \SI{6}{dB} & \statusLit{} & Valeur de référence Semtech utilisée dans le bilan de sensibilité LoRa \cite{sx1276ds} & Plancher de bruit \\
+Charge utile données & $M_{\mathrm{data}}$ & 32 octets & \statusLit{} & Charge utile utilisée dans l'étude de renouvellement AES-128 \cite[Sec.~V-C]{ruotsalainen2020} & Énergie normale \\
+Tag MAC & $M_{\mathrm{tag}}$ & 8 octets & \statusPol{} & Tag tronqué à 64 bits conservé comme choix de sécurité du modèle & Robustesse et surcharge \\
+Sondage & $M_{\mathrm{probe}}$ & 32 octets & \statusLit{}/\statusScen{} & Aligné sur la charge utile de 32 octets de l'expérience LoRaWAN de référence \cite[Sec.~V-C]{ruotsalainen2020} & Coût SKG \\
+Défi/réponse & $M_{\mathrm{chal}},M_{\mathrm{resp}}$ & 8/8 octets & \statusPol{} & Format compact conservé pour le repli hybride de Haenel \emph{et al.}; tailles propres au modèle \cite{haenel2021} & Coût $A_2$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Paramètres du canal, de l'authentification et de la SKG}
+\label{tab:params-phy}
+\centering\scriptsize
+\begin{tabularx}{\textwidth}{@{}l l l l Y Y@{}}
+\toprule
+Paramètre & Symbole & Valeur & Statut & Source/provenance & Rôle \\
+\midrule
+Délai réciproque & $\Delta t$ & \SI{1}{s} & \statusLit{}/\statusScen{} & Délai nominal de la fenêtre RX1 en LoRaWAN Classe~A \cite{lorawan104} & Décorrélation \\
+Doppler nominal & $f_d$ & \SI{0}{Hz} & \statusLit{}/\statusScen{} & Cas statique utilisé dans les campagnes LoRa de Ruotsalainen \emph{et al.} \cite{ruotsalainen2018,ruotsalainen2020} & Cas de base \\
+Plage Doppler & -- & \SIrange{0}{2.89}{Hz} & \statusDer{}/\statusScen{} & Dérivé de $f_d=v f_c/c$ avec $f_c=\SI{868}{MHz}$ et $v\in[0,\SI{1}{m/s}]$ & Domaine de validité \\
+Plafond de réciprocité & $\rho_{\mathrm{HW}}$ & 0,9582 & \statusCal{} & Corrélation extérieure mesurée par Zhang \emph{et al.}, utilisée ici comme ancrage de calibration du plafond composite \cite{zhang2018} & Asymétrie matérielle \\
+Seuil de réciprocité & $\rho_{\min}$ & 0,588 & \statusDer{}/\statusPol{} & $\rho_{\min}=\cos(0{,}30\pi)=0{,}588$ pour $\KDR_{\max}=0{,}30$ & Faisabilité d'accord \\
+Longueur de clé & $\ell_K$ & 128 bits & \statusLit{} & Cible AES-128 de Ruotsalainen \emph{et al.} \cite[Sec.~V-C]{ruotsalainen2020} & Nombre de mesures \\
+Facteur bande de garde & $\kappa_{\mathrm{gb}}$ & 1,00 & \statusDer{} & Valeur neutre retenue pour ne pas attribuer à la littérature un facteur multiplicatif inexistant ; la littérature fournit plutôt $gb=0{,}25$ en extérieur \cite{ruotsalainen2020} & KDR effectif \\
+Bits conservés/mesure & $\eta_{\mathrm{samp}}$ & 0,70 & \statusLit{}/\statusScen{} & Cas expérimental $\mathrm{KPM}=70\,\%$ de Ruotsalainen \emph{et al.} \cite[Sec.~V-C]{ruotsalainen2020} & Rendement SKG \\
+Intervalle sondage dédié & $T_s$ & \SI{181.04}{s} & \statusDer{} & Dérivé du temps d'antenne d'une charge de 32 octets à $SF=12$, $BW=\SI{125}{kHz}$ et du duty-cycle de 1\% \cite[Sec.~4.1.1.6]{sx1276ds} & Délai $K_{1b}$ \\
+Composantes RFF & $n_f$ & 3 & \statusLit{} & CFO, DCO et PO \cite{alla2024} & Loi $\chi^2_3$ \\
+Séparation Mallory & $d_M$ & 2,0 & \statusScen{} & Valeur centrale conservée pour le balayage normalisé $[0{,}5;5]$ ; aucun auteur ne fixe une valeur universelle & FAR \\
+Seuil RFF & $\theta$ & 7,815 & \statusDer{} & Quantile à 95\% de la loi $\chi^2_3$ & FRR nominale 5\% \\
+Temps RFF chez Bob & $T_{\mathrm{RFF,Bob}}$ & \SI{1.84}{ms} & \statusLit{}/\statusScen{} & TinyRFNet sur Raspberry Pi, Tableau~1 de Owusu \emph{et al.} \cite{owusu2025} & Latence $A_2$ \\
+Énergie RFF chez Alice & $E_{\mathrm{RFF,Alice}}$ & 0 J incrémental & \statusLit{}/\statusDer{} & Extraction RFF exécutée chez Bob ; la transmission normale reste comptée dans $E_{\mathrm{base}}$ \cite{haenel2021} & Coût $A_2$ \\
+Séparation Ève (symétrique) & $d_{\mathrm{eve}}$ & 0,10 m & \statusScen{} & Valeur centrale exploratoire pour le balayage $d_{BE}=d_{AE}$ ; aucune distance universellement sûre & Corrélation d'Ève \\
+Marge de secret minimale & $m_{\min}$ & 0,10 & \statusPol{} & Critère exploratoire pré-enregistré ; sensibilité $\{0{,}05;0{,}10;0{,}15\}$ & Sécurité de $K_{1a}/K_{1b}$ \\
+Fenêtre de variabilité & -- & 10 périodes & \statusPol{} & Taille de fenêtre glissante pour $\phi_t^{\mathrm{var}}$ & Faisabilité PHY complète \\
+Écart-type minimal & -- & 0,05 & \statusPol{} & Seuil de dispersion de $\rho_{AB}$ sur la fenêtre & $\phi_t^{\mathrm{var}}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\caption{Paramètres cryptographiques, de politique et de mission}
+\label{tab:params-policy}
+\centering\scriptsize
+\begin{tabularx}{\textwidth}{@{}l l l l Y Y@{}}
+\toprule
+Paramètre & Symbole & Valeur & Statut & Source/provenance & Rôle \\
+\midrule
+Cycles AES-CMAC & $C_{\mathrm{MAC}}$ & à profiler & \statusVal{} & Aucune valeur universelle compatible avec le STM32L1 et l'implémentation AES-CMAC retenue n'est fournie par les références du modèle ; mesure obligatoire avant résultats énergétiques définitifs & Coût $A_1$/repli \\
+Énergie signature ECC & $E_{\mathrm{ECC,sign}}$ & \SI{0.019}{J} & \statusLit{} & Signature secp192r1 sur CC2538, Tableau~VI de Mössinger \emph{et al.} \cite{mossinger2016} & Ancrage externe, pas protocole complet \\
+Temps signature ECC & $T_{\mathrm{ECC,sign}}$ & \SI{0.218}{s} & \statusLit{} & Signature secp192r1 sur CC2538, Tableau~VII de Mössinger \emph{et al.} \cite{mossinger2016} & Ancrage externe, pas protocole complet \\
+Cycles réconciliation & $C_{\mathrm{rec/bit}}$ & à profiler & \statusVal{} & Ruotsalainen utilise une réconciliation BCH, mais ne publie pas un coût universel en cycles/bit pour STM32L1 \cite[Sec.~III-A]{ruotsalainen2020} & Coût SKG \\
+Cycles amplification & $C_{\mathrm{PA}}$ & à profiler & \statusVal{} & Ruotsalainen utilise SHA-256 tronqué à 128 bits, sans coût universel en cycles pour STM32L1 \cite[Sec.~III-A]{ruotsalainen2020} & Coût SKG \\
+Âge maximal clé & $\tau_{\max}$ & \SI{86400}{s} & \statusPol{} & Politique de 24 h ; le NIST fournit les critères de choix mais aucune durée universelle \cite[Sec.~5.3]{nist80057} & Vieillissement \\
+Messages max par clé & $N_{\max}$ & 1000 & \statusPol{} & Politique d'usage du modèle ; aucune valeur universelle n'est fixée par le NIST & Vieillissement \\
+Seuil anticipé & $q_{\mathrm{trig}}$ & 0,60 & \statusPol{} & Politique conservée pour déclencher le renouvellement avant expiration & Déclenchement \\
+Capacité pile & $C_B$ & \SI{2400}{mAh} & \statusLit{}/\statusScen{} & Capacité utilisée dans l'évaluation énergétique de Haenel \emph{et al.} \cite{haenel2021} & Énergie initiale \\
+Énergie initiale & $B_0$ & \SI{28512}{J} & \statusDer{} & $B_0=\SI{3.3}{V}\times\SI{2.4}{Ah}\times3600=\SI{28512}{J}$ & Mission \\
+Réserve & $B_{\min}$ & 5\% de $B_0$ & \statusPol{} & Marge de sécurité conservée dans le modèle & Arrêt mission \\
+Délai critique & $L_{\max}(1)$ & \SI{5}{s} & \statusPol{} & Exigence applicative conservée ; aucun article ne fixe ce budget pour le scénario & QoS \\
+Délai normal & $L_{\max}(0)$ & \SI{600}{s} & \statusPol{} & Exigence applicative conservée & QoS \\
+FAR critique max & $\FAR_{\max}(1)$ & 1\% & \statusPol{} & Plancher de sécurité propre au DM ; analyse de sensibilité requise & Plancher sécurité \\
+FAR normale max & $\FAR_{\max}(0)$ & 5\% & \statusLit{}/\statusPol{} & Cible cohérente avec les performances inférieures à 5\% rapportées par Alla \emph{et al.}, adoptée comme politique du DM \cite{alla2024} & Plancher sécurité \\
+Période message & $T_{\mathrm{msg}}$ & \SI{60}{s} & \statusScen{} & Périodicité applicative conservée ; valeur paramétrable & Mission/K1a \\
+Messages critiques & $p_C$ & 0,10 & \statusScen{} & Distribution de mission conservée ; balayage requis & Mission \\
+Tentatives Mallory & $p_M$ & 0,15 par période & \statusScen{} & Pression adverse conservée ; balayage requis & Mission \\
+Shadowing & $\sigma_{\mathrm{sh}}$ & \SI{3}{dB} & \statusScen{} & Valeur nominale d'un shadowing modéré dans le modèle log-normal \cite[Chap.~4]{rappaport2002} & Mission \\
+Quantification SNR & $\Delta_{\Gamma}$ & \SI{0.25}{dB} & \statusScen{} & Résolution numérique conservée pour l'estimateur simulé & Robustesse à l'erreur \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Correspondance entre la modélisation et l'implémentation}
+\label{ann:implementation}
+Cette annexe relie chaque sous-modèle scientifique au module logiciel qui devra l'implémenter après validation.
+
+\begin{table}[H]
+\caption{Correspondance entre modèle et futurs modules logiciels}
+\label{tab:implementation-map}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}l Y Y Y@{}}
+\toprule
+Module futur & Entrées & Sorties & Responsabilité scientifique \\
+\midrule
+\texttt{parameters} & table validée & constantes typées + métadonnées source & empêcher toute constante cachée \\
+\texttt{channel} & SNR/distance, $f_d$, $\Delta t$ & $\gamma_t$, $\rho_{AB,t}$ & équations~\eqref{eq:snr-linear}--\eqref{eq:rho-composite} \\
+\texttt{authentication} & $\gamma_t,d_M,\theta$ & FAR, FRR, $\Rauth$, repli & équations~\eqref{eq:frr}--\eqref{eq:rauth-a2} \\
+\texttt{key\_generation} & $\rho_{AB},\kappa_{\mathrm{gb}},\ell_K$ & KDR, rendement, $N_{\mathrm{meas}}$, $\Rkey$ & équations~\eqref{eq:kdr-arcsine}--\eqref{eq:qkey-k2} \\
+\texttt{energy\_latency} & action, tailles, plateforme & énergie, délais, ToA & équations~\eqref{eq:toa}--\eqref{eq:normalized-latency} \\
+\texttt{decision\_maker} & contexte + métriques & admissibilité, Pareto, décision & Algorithme~\ref{alg:dm} \\
+\texttt{mission} & traces radio, trafic, attaques & trajectoires et compteurs & Algorithme~\ref{alg:mission} \\
+\texttt{validation} & cas tests + références & rapports d'écart & tests unitaires et reproduction littérature \\
+\texttt{campaign} & grille de scénarios & figures, tableaux, fichiers de résultats & balayages, Monte Carlo, sensibilité \\
+\texttt{eve\_validation} & $\rho_{AB,t}$, $\gamma_t$, distances $d_{BE},d_{AE}$ & $\rho_{AE,t}$, $\KDR_{E,t}^\star$, marge de secret & équations~\eqref{eq:eve-spatial}--\eqref{eq:eve-secure} ; jamais appelé par \texttt{decision\_maker} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Variables du modèle de réciprocité du canal}
+\label{tab:variables-reciprocite}
+\renewcommand{\arraystretch}{1.15}
+\scriptsize
+
+\begin{tabularx}{\textwidth}{
+@{}l
+l
+l
+Y
+Y@{}}
+\toprule
+\textbf{Symbole} &
+\textbf{Unité/domaine} &
+\textbf{Nature} &
+\textbf{Définition} &
+\textbf{Provenance ou utilisation} \\
+\midrule
+
+$t$
+& entier
+& index
+& Numéro de la période ou de l'événement de décision.
+& Index temporel du contexte et des observations. \\
+
+$z_{A,t}$
+& selon la mesure
+& observée
+& Estimation du canal obtenue par Alice au temps $t$.
+& Entrée de la génération de clé. \\
+
+$z_{B,t}$
+& selon la mesure
+& observée
+& Estimation du canal obtenue par Bob après le délai $\Delta t$.
+& Comparée à $z_{A,t}$. \\
+
+$h(t)$
+& selon la mesure
+& variable aléatoire
+& Réponse réelle du canal à l'instant $t$.
+& Modèle d'observation bruitée. \\
+
+$n_{A,t}$
+& selon la mesure
+& bruit
+& Bruit et erreur d'estimation chez Alice.
+& Dégrade la réciprocité observée. \\
+
+$n_{B,t}$
+& selon la mesure
+& bruit
+& Bruit et erreur d'estimation chez Bob.
+& Dégrade la réciprocité observée. \\
+
+$\Delta t$
+& s
+& scénario/protocole
+& Délai entre les observations réciproques d'Alice et de Bob.
+& Entre dans le modèle temporel de Clarke--Jakes. \\
+
+$f_{d,t}$
+& Hz
+& observée/scénario
+& Fréquence Doppler effective au temps $t$.
+& Représente la vitesse de variation du canal. \\
+
+$v_t$
+& m/s
+& observée/scénario
+& Vitesse relative associée à la mobilité.
+& Permet de calculer $f_{d,t}$. \\
+
+$f_c$
+& Hz
+& plateforme
+& Fréquence porteuse de la transmission radio.
+& Calcul du Doppler. \\
+
+$c$
+& m/s
+& constante
+& Vitesse de propagation de l'onde électromagnétique.
+& Environ $3\times10^8$ m/s. \\
+
+$J_0(\cdot)$
+& --
+& fonction
+& Fonction de Bessel de première espèce et d'ordre zéro.
+& Modèle temporel de Clarke--Jakes. \\
+
+$\rho_{\mathrm{time},t}$
+& $[-1,1]$
+& dérivée
+& Corrélation temporelle du canal entre les deux observations.
+& Calculée par $J_0(2\pi f_{d,t}\Delta t)$. \\
+
+$\Gamma_t$
+& dB
+& observée/dérivée
+& SNR instantané exprimé en décibels.
+& Qualité de l'estimation du canal. \\
+
+$\gamma_t$
+& $[0,+\infty[$
+& dérivée
+& SNR linéaire obtenu à partir de $\Gamma_t$.
+& $\gamma_t=10^{\Gamma_t/10}$. \\
+
+$\rho_{\mathrm{noise},t}$
+& $[0,1]$
+& dérivée
+& Facteur de corrélation associé au bruit.
+& $\gamma_t/(1+\gamma_t)$. \\
+
+$\rho_{\mathrm{HW}}$
+& $[0,1]$
+& calibrée
+& Plafond de réciprocité dû aux asymétries matérielles.
+& Mesure, calibration ou sensibilité. \\
+
+$\rho_{AB,t}$
+& $[-1,1]$
+& dérivée
+& Réciprocité globale observée entre Alice et Bob.
+& Entrée du modèle de KDR et du filtre SKG. \\
+
+$\rho_{\min}$
+& $[0,1]$
+& seuil
+& Valeur minimale de réciprocité exigée.
+& Condition de faisabilité de l'accord. \\
+
+$\phi_t^{\mathrm{agree}}$
+& $\{0,1\}$
+& dérivée
+& Indicateur indiquant si la réciprocité minimale est respectée.
+& Autorise ou interdit les actions SKG. \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Registre synthétique de traçabilité}
+\label{ann:traceabilite}
+
+\begin{table}[H]
+\caption{Traçabilité des principaux sous-modèles}
+\label{tab:traceability-main}
+\centering\scriptsize
+\begin{tabularx}{\textwidth}{@{}l Y Y Y Y@{}}
+\toprule
+Élément & Source exacte ou dérivation & Statut & Hypothèses principales & Utilisation Python \\
+\midrule
+$T_{\mathrm{sym}},T_{\mathrm{pre}},N_{\mathrm{pl}},\ToA$ & Semtech SX1276, Sec.~4.1.1.6 & \statusData{} & conventions $CR_{\mathrm{idx}},CRC,IH,DE$ identiques & \texttt{energy\_latency.lora\_toa} \\
+$\overline{PL}(d)$ & Rappaport, modèle log-distance, Chap.~4 & \statusLit{} & environnement comparable, paramètres calibrés & \texttt{channel.path\_loss} \\
+$P_N$ & Johnson--Nyquist $kTBW$ + figure de bruit & \statusDer{} & température proche de 290 K, $BW$ en Hz & \texttt{channel.noise\_power} \\
+$J_0(2\pi f_d\Delta t)$ & Clarke--Jakes & \statusLit{} & diffusion isotrope, stationnarité locale & \texttt{channel.temporal} \\
+$\gamma/(1+\gamma)$ & dérivation observation signal+bruit & \statusDer{} & bruits indépendants, SNR identiques & \texttt{channel.noise\_factor} \\
+$\rho_{AB}$ composite & produit Jakes, bruit, matériel & \statusCal{}/\statusDer{} & indépendance approximative des facteurs & \texttt{channel.reciprocity} \\
+CFO--DCO--PO & Alla \emph{et al.}, Sec.~III & \statusLit{} & trois attributs retenus, stabilité suffisante & \texttt{authentication.features} \\
+Mahalanobis, $\chi^2$, $\chi'^2$ & adaptation de Forssell \emph{et al.}, Eqs.~(2)--(6) & \statusLit{}/\statusDer{} & erreur gaussienne, covariance connue & \texttt{authentication.rates} \\
+$\lambda=d_M^2\gamma_M$ & dérivé de $\sigma_w^2=\sigma_0^2/\gamma_M$ & \statusDer{}/\statusScen{} & loi variance--SNR à valider & \texttt{auth.noncentrality} \\
+$\arccos(\rho)/\pi$ & Van Vleck--Middleton & \statusLit{} & gaussianité, quantification par signe & \texttt{key.kdr} \\
+Quantification avec bande de garde & Ruotsalainen Eq.~(8); Zhang quantification différentielle & \statusLit{} & protocole de quantification fixé & \texttt{key\_generation.quantize} \\
+$y_{\mathrm{rec}}$ et $N_{\mathrm{meas}}^{\mathrm{online}}$ & surrogate motivé par Slepian--Wolf & \statusDer{}/\statusCal{} & le rendement en ligne ne modélise pas Eve (voir \texttt{eve\_validation} pour l'évaluation a posteriori) & \texttt{key.yield} \\
+Eqs.~(12)--(14) de Ruotsalainen & reproduction hors ligne avec $\KDR_{\mathrm{Eve}}$ connu & \statusLit{} & statistiques d'Eve disponibles & \texttt{validation.ruotsalainen} \\
+$q_t,r_t,e_t,T_t^{\mathrm{deadline}}$ & cryptopériode NIST + politique proposée & \statusPol{}/\statusDer{} & trafic périodique pour $T^{\mathrm{msg}}$ & \texttt{key\_policy} \\
+Coûts $A_1,A_2,K_{1a},K_{1b},K_2$ & bilans du protocole & \statusDer{} & tailles, opérations et échanges explicités & \texttt{energy\_latency.costs} \\
+Pareto et Tchebychev & Miettinen; Wierzbicki & \statusLit{}/\statusPol{} & normalisation et poids documentés & \texttt{decision\_maker} \\
+$\rho_{AE}$ spatiale, $\KDR_E^\star$, marge de secret & construction de cette étude à partir de Clarke--Jakes (spatial) et de l'arc-sinus & \statusDer{}/\statusPol{} & diffusion isotrope ; jamais transmis au DM & \texttt{eve\_validation} \\
+$\phi_t^{\mathrm{var}}$ (écart-type, autocorrélation, transitions, mesures valides) & construction de cette étude & \statusDer{}/\statusPol{} & fenêtre glissante ; ne modélise pas Eve & \texttt{channel.temporal\_variability} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Règle de codage.}
+Chaque constante numérique du module \texttt{parameters} doit porter les champs \texttt{value}, \texttt{unit}, \texttt{status}, \texttt{source}, \texttt{source\_location} et \texttt{sensitivity\_range}. Une valeur \statusVal{} ne peut servir qu'à une simulation exploratoire et doit être exclue de toute affirmation d'autonomie absolue.
+
+\clearpage
+\twocolumn
+\balance
+
+
+
+
+
+
+
+\balance
+\begin{thebibliography}{99}
+
+\bibitem{alla2024}
+I. Alla, S. Yahia, V. Loscri, and H. Eldeeb, ``Robust device authentication in multi-node networks: ML-assisted hybrid PLA exploiting hardware impairments,'' in \emph{Proc. ACSAC}, 2024, pp. 1172--1185.
+
+\bibitem{ruotsalainen2020}
+H. Ruotsalainen, J. Zhang, and S. Grebeniuk, ``Experimental investigation on wireless key generation for low-power wide-area networks,'' \emph{IEEE Internet of Things Journal}, vol. 7, no. 3, pp. 1745--1755, 2020.
+
+\bibitem{ruotsalainen2018}
+H. Ruotsalainen and S. Grebeniuk, ``Towards wireless secret key agreement with LoRa physical layer,'' in \emph{Proc. ARES}, 2018, pp. 1--6.
+
+\bibitem{mossinger2016}
+M. Mössinger \emph{et al.}, ``Towards quantifying the cost of a secure IoT: Overhead and energy consumption of ECC signatures on an ARM-based device,'' in \emph{Proc. IEEE WoWMoM}, 2016, pp. 1--6.
+
+\bibitem{fang2018}
+H. Fang, X. Wang, and L. Hanzo, ``Learning-aided physical layer authentication as an intelligent process,'' \emph{IEEE Transactions on Communications}, vol. 67, no. 3, pp. 2260--2273, 2019.
+
+\bibitem{haenel2021}
+A. Haenel, Y. Haddad, M. Laurent, and Z. Zhang, ``Practical cross-layer radio frequency-based authentication scheme for Internet of Things,'' \emph{Sensors}, vol. 21, no. 12, Art. no. 4034, 2021.
+
+\bibitem{zhang2018}
+J. Zhang, A. Marshall, and L. Hanzo, ``Channel-envelope differencing eliminates secret key correlation: LoRa-based key generation in low power wide area networks,'' \emph{IEEE Transactions on Vehicular Technology}, vol. 67, no. 12, pp. 12462--12466, 2018.
+
+\bibitem{saideh2025}
+M. Saideh, J.-P. Jamont, and L. Vercouter, ``Sélection adaptative des facteurs d'authentification dans l'Internet des objets : une approche d'optimisation multi-objectifs basée sur la confiance,'' in \emph{JFSMA}, 2025.
+
+\bibitem{ardizzon2024}
+F. Ardizzon, D. Salvaterra, M. Piana, and S. Tomasin, ``Energy-based optimization of physical-layer challenge-response authentication with drones,'' in \emph{Proc. IEEE GLOBECOM Workshops}, 2024, pp. 1--6.
+
+\bibitem{jakes1974}
+W. C. Jakes, \emph{Microwave Mobile Communications}. New York, NY, USA: Wiley, 1974.
+
+\bibitem{zeng2015}
+K. Zeng, ``Physical layer key generation in wireless networks: Challenges and opportunities,'' \emph{IEEE Communications Magazine}, vol. 53, no. 6, pp. 33--39, 2015.
+
+\bibitem{owusu2025}
+E. O. Owusu \emph{et al.}, ``Energy-aware RF fingerprinting for device identification in ultra-low-power IoT systems,'' \emph{Engineering Reports}, vol. 7, no. 7, 2025.
+
+\bibitem{semtech2013}
+Semtech Corporation, ``LoRa modem designer's guide,'' Application Note AN1200.13, 2013.
+
+\bibitem{vanvleck1966}
+J. H. Van Vleck and D. Middleton, ``The spectrum of clipped noise,'' \emph{Proceedings of the IEEE}, vol. 54, no. 1, pp. 2--19, 1966.
+
+\bibitem{slepian1973}
+D. Slepian and J. K. Wolf, ``Noiseless coding of correlated information sources,'' \emph{IEEE Transactions on Information Theory}, vol. 19, no. 4, pp. 471--480, 1973.
+
+\bibitem{tinysec2004}
+C. Karlof, N. Sastry, and D. Wagner, ``TinySec: A link layer security architecture for wireless sensor networks,'' in \emph{Proc. SenSys}, 2004, pp. 162--175.
+
+\bibitem{miettinen1999}
+K. Miettinen, \emph{Nonlinear Multiobjective Optimization}. Boston, MA, USA: Kluwer, 1999.
+
+\bibitem{wierzbicki1982}
+A. P. Wierzbicki, ``A mathematical basis for satisficing decision making,'' \emph{Mathematical Modelling}, vol. 3, no. 5, pp. 391--405, 1982.
+
+\bibitem{sx1276ds}
+Semtech Corporation, ``SX1276/77/78/79 -- 137 MHz to 1020 MHz low power long range transceiver,'' product datasheet, version and table line to be frozen before implementation.
+
+\bibitem{stml1ds}
+STMicroelectronics, ``STM32L151xC/C-A and STM32L152xC/C-A ultra-low-power 32-bit MCU datasheet,'' DS10262, Rev. 8, 2017.
+
+\bibitem{lorawan104}
+LoRa Alliance, ``LoRaWAN Link Layer Specification v1.0.4,'' TS001-1.0.4, 2020.
+
+\bibitem{etsi}
+ETSI, ``Short Range Devices operating in the 25 MHz to 1000 MHz frequency range,'' EN 300 220, version applicable to the deployment to be specified.
+
+
+\bibitem{forssell2018}
+H. Forssell, R. Thobaben, H. Al-Zubaidy, and J. Gross,
+``Physical layer authentication in mission-critical MTC networks:
+A security and delay performance analysis,''
+arXiv preprint arXiv:1806.10387, 2018.
+
+\bibitem{johnson1928}
+J. B. Johnson, ``Thermal agitation of electricity in conductors,'' 
+\emph{Physical Review}, vol. 32, no. 1, pp. 97--109, 1928,
+doi: 10.1103/PhysRev.32.97.
+
+\bibitem{nyquist1928}
+H. Nyquist, ``Thermal agitation of electric charge in conductors,'' 
+\emph{Physical Review}, vol. 32, no. 1, pp. 110--113, 1928,
+doi: 10.1103/PhysRev.32.110.
+
+
+\bibitem{nist80057}
+E. Barker, \emph{Recommendation for Key Management: Part 1---General},
+NIST Special Publication 800-57 Part 1, Revision 5,
+National Institute of Standards and Technology,
+Gaithersburg, MD, USA, May 2020,
+doi: 10.6028/NIST.SP.800-57pt1r5.
+
+\end{thebibliography}
+
+\end{document}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references_verified}
+
+\end{document}

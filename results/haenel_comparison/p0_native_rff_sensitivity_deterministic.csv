@@ -1,0 +1,3 @@
+case,frr,deterministic,n_a1,n_a2,total_energy_mJ,mean_energy_per_message_mJ
+HYBRID_FRR_05,0.05,True,100,0,564.743,5.647430000000001
+HYBRID_FRR_10,0.1,True,100,0,564.743,5.647430000000001

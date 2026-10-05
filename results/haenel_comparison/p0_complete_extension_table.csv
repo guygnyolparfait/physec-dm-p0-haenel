@@ -1,0 +1,2 @@
+method,energy,latency,rauth_or_far,service_pct,decision,q_key,note
+EXPLORATORY EXTENSION -- P0_COMPLETE (K1a/K1b/K2 réactivés),"198.957 mJ (échelle LoRa/Semtech NATIVE, PAS comparable à Haenel et al.)","0.5122 (normalisée, modèle natif)",Rauth=1.000000,100%,A1-K1a,0.3576,Hors périmètre de comparaison directe à Haenel et al. (gestion de clé physique absente de leur article) -- ne jamais comparer terme à terme avec les lignes A/B/C du tableau principal.

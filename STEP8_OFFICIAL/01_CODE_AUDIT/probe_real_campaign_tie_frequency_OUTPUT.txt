@@ -1,0 +1,21 @@
+S1-REMOTE-AGRICULTURAL-SENSOR termine.
+S2-INDUSTRIAL-CRITICAL-ALARM termine.
+S3-MOBILE-VEHICLE termine.
+S4-DENSE-URBAN-NETWORK termine.
+S5-CRITICAL-INFRASTRUCTURE-ATTACK termine.
+
+======================================================================
+RESULTATS SONDE (S1-S5 v2, poids EQUAL, 3 graines/scenario, 1500 pas)
+======================================================================
+periods_total = 22500
+periods_pareto_front_gt1 = 8521
+periods_tie_current = 8521
+periods_winner_differs = 7249
+max_score_gap_seen_in_tie = 9.932220795816349e-09
+
+Exemples de divergence (max 5) :
+{'scenario': 'S1-REMOTE-AGRICULTURAL-SENSOR', 'seed': 9500, 'n_pareto': 2, 'n_tied_current': 1, 'n_tied_proposed': 2, 'winner_current': 'A2-K0', 'winner_proposed': 'A1-K0', 'scores_current': [0.24999999998, 0.2499999994856569], 'scores_proposed': [0.25, 0.25]}
+{'scenario': 'S1-REMOTE-AGRICULTURAL-SENSOR', 'seed': 9500, 'n_pareto': 2, 'n_tied_current': 1, 'n_tied_proposed': 2, 'winner_current': 'A2-K0', 'winner_proposed': 'A1-K0', 'scores_current': [0.24999999997276492, 0.24995384032509615], 'scores_proposed': [0.25, 0.25]}
+{'scenario': 'S1-REMOTE-AGRICULTURAL-SENSOR', 'seed': 9500, 'n_pareto': 2, 'n_tied_current': 1, 'n_tied_proposed': 2, 'winner_current': 'A2-K0', 'winner_proposed': 'A1-K0', 'scores_current': [0.24999999997276492, 0.24997327258285507], 'scores_proposed': [0.25, 0.25]}
+{'scenario': 'S1-REMOTE-AGRICULTURAL-SENSOR', 'seed': 9500, 'n_pareto': 2, 'n_tied_current': 1, 'n_tied_proposed': 2, 'winner_current': 'A2-K0', 'winner_proposed': 'A1-K0', 'scores_current': [0.24999999997276492, 0.24141966222745925], 'scores_proposed': [0.25, 0.25]}
+{'scenario': 'S1-REMOTE-AGRICULTURAL-SENSOR', 'seed': 9500, 'n_pareto': 2, 'n_tied_current': 1, 'n_tied_proposed': 2, 'winner_current': 'A2-K0', 'winner_proposed': 'A1-K0', 'scores_current': [0.24999999997276492, 0.23596539011740592], 'scores_proposed': [0.25, 0.25]}

@@ -1,0 +1,917 @@
+{
+  "S1-REMOTE-AGRICULTURAL-SENSOR": {
+    "seed_count": 30,
+    "all_converged": true,
+    "mallory_separation": 4.0,
+    "cost_profile_id": "LOW",
+    "per_policy": {
+      "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_energy_j": {
+            "mean": 0.18871954052490383,
+            "half_width": 5.173768070705548e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_latency_objective": {
+            "mean": 0.0014839448985185188,
+            "half_width": 5.78871466334003e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9999999999999756,
+            "half_width": 9.458693720353038e-16,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_key_quality": {
+            "mean": 0.7299646299122249,
+            "half_width": 1.9294895720295487e-05,
+            "converged": true,
+            "sample_size": 30
+          }
+        },
+        "all_converged": true
+      },
+      "B1-CONVENTIONAL": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_energy_j": {
+            "mean": 0.1941465162811733,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_latency_objective": {
+            "mean": 0.0018898430466666692,
+            "half_width": 7.021933166081319e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          }
+        },
+        "all_converged": true
+      },
+      "B2-NAIVE-PHYSEC-NO-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_energy_j": {
+            "mean": 0.1847716053488633,
+            "half_width": 9.962132010079638e-10,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_latency_objective": {
+            "mean": 0.001171118509629628,
+            "half_width": 4.351427976352196e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9999615391714888,
+            "half_width": 7.689715854849821e-06,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_key_quality": {
+            "mean": 0.7299646299122249,
+            "half_width": 1.9294895720295487e-05,
+            "converged": true,
+            "sample_size": 30
+          }
+        },
+        "all_converged": true
+      },
+      "B3-HYBRID-FIXED": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.9999333333333333,
+            "half_width": 7.279257256540843e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_energy_j": {
+            "mean": 0.18477160565130876,
+            "half_width": 1.0575653956306654e-09,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_latency_objective": {
+            "mean": 0.0011711855826669615,
+            "half_width": 4.351519897556922e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9999659493669504,
+            "half_width": 5.701288778252052e-06,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_key_quality": {
+            "mean": 0.7299666204831159,
+            "half_width": 1.9744210196570415e-05,
+            "converged": true,
+            "sample_size": 30
+          }
+        },
+        "all_converged": true
+      },
+      "B4-DM-NO-FAR-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_energy_j": {
+            "mean": 0.18871954052490383,
+            "half_width": 5.173768070705548e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_latency_objective": {
+            "mean": 0.0014839448985185188,
+            "half_width": 5.78871466334003e-05,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9999999999999756,
+            "half_width": 9.458693720353038e-16,
+            "converged": true,
+            "sample_size": 30
+          },
+          "mean_key_quality": {
+            "mean": 0.7299646299122249,
+            "half_width": 1.9294895720295487e-05,
+            "converged": true,
+            "sample_size": 30
+          }
+        },
+        "all_converged": true
+      }
+    }
+  },
+  "S2-INDUSTRIAL-CRITICAL-ALARM": {
+    "seed_count": 120,
+    "all_converged": true,
+    "mallory_separation": 2.0,
+    "cost_profile_id": "HIGH",
+    "per_policy": {
+      "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_energy_j": {
+            "mean": 0.20899992037461465,
+            "half_width": 6.540558999046403e-06,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_latency_objective": {
+            "mean": 0.005034486791851858,
+            "half_width": 3.157849301976636e-05,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_key_quality": {
+            "mean": 0.7300005385143932,
+            "half_width": 3.69686932986082e-05,
+            "converged": true,
+            "sample_size": 120
+          }
+        },
+        "all_converged": true
+      },
+      "B1-CONVENTIONAL": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_energy_j": {
+            "mean": 0.20917582028117332,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_latency_objective": {
+            "mean": 0.005034169940000007,
+            "half_width": 3.1581950475555935e-05,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          }
+        },
+        "all_converged": true
+      },
+      "B2-NAIVE-PHYSEC-NO-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_energy_j": {
+            "mean": 0.20113197085240236,
+            "half_width": 9.953597278171408e-06,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_latency_objective": {
+            "mean": 0.005370607606666673,
+            "half_width": 3.120427855160824e-05,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.8720908152767646,
+            "half_width": 0.0008295843052199124,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_key_quality": {
+            "mean": 0.7300005385143932,
+            "half_width": 3.69686932986082e-05,
+            "converged": true,
+            "sample_size": 120
+          }
+        },
+        "all_converged": true
+      },
+      "B3-HYBRID-FIXED": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.3877888888888889,
+            "half_width": 0.0029309468941694492,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_energy_j": {
+            "mean": 0.19978585571650515,
+            "half_width": 7.868234491574925e-07,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_latency_objective": {
+            "mean": 0.11047505342783033,
+            "half_width": 0.005428143856182841,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9888423156844208,
+            "half_width": 0.00011397842076351729,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_key_quality": {
+            "mean": 0.6829698866313311,
+            "half_width": 0.0038479805636133972,
+            "converged": true,
+            "sample_size": 120
+          }
+        },
+        "all_converged": true
+      },
+      "B4-DM-NO-FAR-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_energy_j": {
+            "mean": 0.20899992037461465,
+            "half_width": 6.540558999046403e-06,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_latency_objective": {
+            "mean": 0.005034486791851858,
+            "half_width": 3.157849301976636e-05,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 120
+          },
+          "mean_key_quality": {
+            "mean": 0.7300005385143932,
+            "half_width": 3.69686932986082e-05,
+            "converged": true,
+            "sample_size": 120
+          }
+        },
+        "all_converged": true
+      }
+    }
+  },
+  "S3-MOBILE-VEHICLE": {
+    "seed_count": 40,
+    "all_converged": true,
+    "mallory_separation": 2.0,
+    "cost_profile_id": "CENTRAL",
+    "per_policy": {
+      "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_energy_j": {
+            "mean": 0.1991202954934373,
+            "half_width": 4.450821608313539e-06,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_latency_objective": {
+            "mean": 0.0018770782077777801,
+            "half_width": 5.638129540917379e-05,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          }
+        },
+        "all_converged": true
+      },
+      "B1-CONVENTIONAL": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_energy_j": {
+            "mean": 0.1991562842811733,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_latency_objective": {
+            "mean": 0.0018756136244444468,
+            "half_width": 5.638681533482577e-05,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          }
+        },
+        "all_converged": true
+      },
+      "B2-NAIVE-PHYSEC-NO-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_energy_j": {
+            "mean": 0.18996765762517331,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_latency_objective": {
+            "mean": 0.0023279368291970457,
+            "half_width": 8.09227725124545e-05,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9898743790347059,
+            "half_width": 0.0002586118177079179,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_key_quality": {
+            "mean": 0.7308907034555301,
+            "half_width": 1.0012976379487565e-05,
+            "converged": true,
+            "sample_size": 40
+          }
+        },
+        "all_converged": true
+      },
+      "B3-HYBRID-FIXED": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.44125,
+            "half_width": 0.0024329652806770715,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_energy_j": {
+            "mean": 0.18976873974399996,
+            "half_width": 1.947865692516049e-18,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_latency_objective": {
+            "mean": 0.07160439496246723,
+            "half_width": 0.003217606434937687,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9972816769401585,
+            "half_width": 0.00010181701758151447,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_key_quality": {
+            "mean": 0.672945191051318,
+            "half_width": 0.0014782091215257886,
+            "converged": true,
+            "sample_size": 40
+          }
+        },
+        "all_converged": true
+      },
+      "B4-DM-NO-FAR-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_energy_j": {
+            "mean": 0.1991202954934373,
+            "half_width": 4.450821608313539e-06,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_latency_objective": {
+            "mean": 0.0018770782077777801,
+            "half_width": 5.638129540917379e-05,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 40
+          }
+        },
+        "all_converged": true
+      }
+    }
+  },
+  "S4-DENSE-URBAN-NETWORK": {
+    "seed_count": 90,
+    "all_converged": true,
+    "mallory_separation": 1.0,
+    "cost_profile_id": "CENTRAL",
+    "per_policy": {
+      "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_energy_j": {
+            "mean": 0.19912276783046806,
+            "half_width": 9.621771310605795e-06,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_latency_objective": {
+            "mean": 0.00204921340279741,
+            "half_width": 7.377483818059934e-05,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_key_quality": {
+            "mean": 0.7306736934883149,
+            "half_width": 5.7002713358503806e-05,
+            "converged": true,
+            "sample_size": 90
+          }
+        },
+        "all_converged": true
+      },
+      "B1-CONVENTIONAL": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_energy_j": {
+            "mean": 0.19915628428117332,
+            "half_width": 5.7664868569408825e-18,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_latency_objective": {
+            "mean": 0.0018810625022222247,
+            "half_width": 3.999477563401939e-05,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_key_quality": {
+            "mean": 0.7308979999999999,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          }
+        },
+        "all_converged": true
+      },
+      "B2-NAIVE-PHYSEC-NO-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_energy_j": {
+            "mean": 0.18994523559035642,
+            "half_width": 8.953128301782242e-06,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_latency_objective": {
+            "mean": 0.0024709115385998736,
+            "half_width": 7.758703586646425e-05,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.28531904541041214,
+            "half_width": 0.001271008486500259,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_key_quality": {
+            "mean": 0.7306736934883149,
+            "half_width": 5.7002713358503806e-05,
+            "converged": true,
+            "sample_size": 90
+          }
+        },
+        "all_converged": true
+      },
+      "B3-HYBRID-FIXED": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.024555555555555556,
+            "half_width": 0.0008711722824963985,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_energy_j": {
+            "mean": 0.18976873974399996,
+            "half_width": 8.596171068985944e-19,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_latency_objective": {
+            "mean": 0.26342947236052117,
+            "half_width": 0.012569513596283359,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.989931100291906,
+            "half_width": 0.00048539697408874063,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_key_quality": {
+            "mean": 0.6136777396482561,
+            "half_width": 0.004392645396449516,
+            "converged": true,
+            "sample_size": 90
+          }
+        },
+        "all_converged": true
+      },
+      "B4-DM-NO-FAR-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_energy_j": {
+            "mean": 0.19912276783046806,
+            "half_width": 9.621771310605795e-06,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_latency_objective": {
+            "mean": 0.00204921340279741,
+            "half_width": 7.377483818059934e-05,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 90
+          },
+          "mean_key_quality": {
+            "mean": 0.7306736934883149,
+            "half_width": 5.7002713358503806e-05,
+            "converged": true,
+            "sample_size": 90
+          }
+        },
+        "all_converged": true
+      }
+    }
+  },
+  "S5-CRITICAL-INFRASTRUCTURE-ATTACK": {
+    "seed_count": 150,
+    "all_converged": false,
+    "mallory_separation": 0.5,
+    "cost_profile_id": "HIGH",
+    "per_policy": {
+      "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_energy_j": {
+            "mean": 0.20899096102323725,
+            "half_width": 1.299638212660727e-06,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_latency_objective": {
+            "mean": 0.05284904263064897,
+            "half_width": 0.0001504387599708063,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_key_quality": {
+            "mean": 0.6686210790419878,
+            "half_width": 7.618021759204068e-05,
+            "converged": true,
+            "sample_size": 150
+          }
+        },
+        "all_converged": true
+      },
+      "B1-CONVENTIONAL": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.948,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_energy_j": {
+            "mean": 0.2245042475548805,
+            "half_width": 4.456697689273813e-18,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_latency_objective": {
+            "mean": 0.003528705370839199,
+            "half_width": 4.087462692946288e-05,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_key_quality": {
+            "mean": 0.7453571261134553,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          }
+        },
+        "all_converged": true
+      },
+      "B2-NAIVE-PHYSEC-NO-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_energy_j": {
+            "mean": 0.2006951228836771,
+            "half_width": 1.1087288429718522e-05,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_latency_objective": {
+            "mean": 0.05315042337138971,
+            "half_width": 0.00015034082746421648,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.44410164514228817,
+            "half_width": 0.0008982459439571691,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_key_quality": {
+            "mean": 0.6686210790419878,
+            "half_width": 7.618021759204068e-05,
+            "converged": true,
+            "sample_size": 150
+          }
+        },
+        "all_converged": true
+      },
+      "B3-HYBRID-FIXED": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 0.0004622222222222222,
+            "half_width": 9.649749184592561e-05,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_energy_j": {
+            "mean": 0.19976971654399997,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 73
+          },
+          "mean_latency_objective": {
+            "mean": 0.2817454091717226,
+            "half_width": 0.064360975686885,
+            "converged": false,
+            "sample_size": 73
+          },
+          "mean_authentication_robustness": {
+            "mean": 0.9694079466488403,
+            "half_width": 0.0025672405320651564,
+            "converged": true,
+            "sample_size": 73
+          },
+          "mean_key_quality": {
+            "mean": 0.645658319266744,
+            "half_width": 0.03208090533853711,
+            "converged": false,
+            "sample_size": 73
+          }
+        },
+        "all_converged": false
+      },
+      "B4-DM-NO-FAR-FLOOR": {
+        "per_metric": {
+          "service_rate": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_energy_j": {
+            "mean": 0.20899096102323725,
+            "half_width": 1.299638212660727e-06,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_latency_objective": {
+            "mean": 0.05284904263064897,
+            "half_width": 0.0001504387599708063,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_authentication_robustness": {
+            "mean": 1.0,
+            "half_width": 0.0,
+            "converged": true,
+            "sample_size": 150
+          },
+          "mean_key_quality": {
+            "mean": 0.6686210790419878,
+            "half_width": 7.618021759204068e-05,
+            "converged": true,
+            "sample_size": 150
+          }
+        },
+        "all_converged": true
+      }
+    }
+  }
+}

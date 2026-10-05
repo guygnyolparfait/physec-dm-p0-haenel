@@ -1,0 +1,13 @@
+parameter,needed_for,available_in_Haenel,source_needed,unit
+I_TX (courant d'émission CC110L),E_tx = V * I_TX * t_tx (coût par message émis),NO,Datasheet Texas Instruments CC110L (courant tx en fonction de la puissance de sortie configurée),mA
+I_RX (courant de réception CC110L),E_rx = V * I_RX * t_rx (coût par message reçu),NO,Datasheet Texas Instruments CC110L,mA
+I_idle / I_sleep (courant de veille MSP430),E_idle = V * I_idle * t_idle (coût pendant les 3 s - temps de communication effectif entre deux messages),NO,Datasheet MSP430G2x / MSP430FR5994,µA ou mA (mode LPM)
+I_cpu_active (courant CPU en calcul actif),E_cpu = V * I_cpu * t_cpu (coût de calcul du MAC Chaskey-12 et de l'extraction RFF),NO,Datasheet MSP430 (courant par MHz d'horloge),mA/MHz
+t_tx (durée d'émission d'un message),E_tx,NO,Dérivable de la taille de trame CC110L (débit symbole configuré) -- non donnée dans l'article,ms
+t_rx (durée d'écoute/réception),E_rx,NO,Idem t_tx,ms
+Cycles Chaskey-12 (calcul du MAC),t_cpu du calcul cryptographique,NO,"Mouha et al., 'Chaskey: An Efficient MAC Algorithm for 32-bit Microcontrollers', SAC 2014 (benchmark cycles/octet sur Cortex-M ou architectures proches -- PAS un MSP430 16 bits, à documenter comme approximation si utilisé)",cycles/octet
+"Taille de trame (Message{ID,Payload})","t_tx, t_rx (temps proportionnel à la taille)",NO,"Non donnée numériquement -- seule la structure logique du message est décrite (Section 4.5, Fig. 3-4)",octets
+Taille de trame (Challenge / ResponseToChallenge),"t_tx, t_rx du repli MAC",NO,Idem,octets
+Coût d'extraction des features RFF (3 RSSI),t_cpu du test RFF côté GW,NO,"Non donné -- extraction RSSI généralement fournie nativement par le registre du CC110L (coût potentiellement quasi nul, mais à confirmer, pas à supposer)",ms ou cycles
+Tension d'alimentation V,E = V * I * t (toutes les composantes),YES,"Déjà publié : 3 V, 2400 mAh (Table 1, profil batterie)",V
+Énergie totale mesurée (référence de calibration),Validation croisée d'Option B contre Option A,YES,"Déjà utilisé (Table 1, p.15)",mJ

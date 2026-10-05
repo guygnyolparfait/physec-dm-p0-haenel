@@ -1,0 +1,2786 @@
+                                                                                                                        MSP430G2231-EP
+
+www.ti.com                                                                                                                    SLAS862 – JUNE 2012
+
+
+                                                  MIXED SIGNAL MICROCONTROLLER
+1FEATURES
+•     Low Supply-Voltage Range: 1.8 V to 3.6 V                              •     On-Chip Emulation Logic With Spy-Bi-Wire
+•     Ultra-Low Power Consumption                                                 Interface
+      – Active Mode: 220 µA at 1 MHz, 2.2 V                                 •     For Family Members Details, See Table 1 and
+      – Standby Mode: 0.5 µA                                                •     Available in a 14-Pin Plastic Small-Outline Thin
+      – Off Mode (RAM Retention): 0.1 µA                                          Package (TSSOP) (PW)
+•     Five Power-Saving Modes                                               •     For Complete Module Descriptions, See the
+                                                                                  MSP430x2xx Family User’s Guide (SLAU144)
+•     Ultra-Fast Wake-Up From Standby Mode in
+      Less Than 1 µs                                                        SUPPORTS DEFENSE, AEROSPACE,
+•     16-Bit RISC Architecture, 62.5-ns Instruction                         AND MEDICAL APPLICATIONS
+      Cycle Time
+                                                                            •     Controlled Baseline
+•     Basic Clock Module Configurations
+                                                                            •     One Assembly/Test Site
+      – Internal Frequencies up to 16 MHz With
+                                                                            •     One Fabrication Site
+         One Calibrated Frequency
+                                                                            •     Available in Extended (–40°C/125°C)
+      – Internal Very Low Power Low-Frequency
+                                                                                  Temperature Range (2)
+         (LF) Oscillator
+                                                                            •     Extended Product Life Cycle
+      – 32-kHz Crystal (1)
+                                                                            •     Extended Product-Change Notification
+      – External Digital Clock Source
+                                                                            •     Product Traceability
+•     16-Bit Timer_A With Two Capture/Compare
+      Registers
+•     Universal Serial Interface (USI) Supporting SPI
+      and I2C (See Table 1)
+•     Brownout Detector
+•     10-Bit 200-ksps A/D Converter With Internal
+      Reference, Sample-and-Hold, and Autoscan
+      (See Table 1)
+•     Serial Onboard Programming,
+      No External Programming Voltage Needed,
+      Programmable Code Protection by Security
+      Fuse
+(1)   Crystal oscillator cannot be operated beyond 105°C                    (2)   Custom temperature ranges available
+
+
+DESCRIPTION
+The MSP430G2231 is an ultra-low-power microcontroller consisting of several devices featuring different sets of
+peripherals targeted for various applications. The architecture, combined with five low-power modes, is optimized
+to achieve extended battery life in portable measurement applications. The device features a powerful 16-bit
+RISC CPU, 16-bit registers, and constant generators that contribute to maximum code efficiency. The digitally
+controlled oscillator (DCO) allows wake-up from low-power modes to active mode in less than 1 µs.
+The MSP430G2231 has a 10-bit A/D converter and built-in communication capability using synchronous
+protocols (SPI or I2C). For configuration details, see Table 1.
+Typical applications include low-cost sensor systems that capture analog signals, convert them to digital values,
+and then process the data for display or for transmission to a host system.
+
+
+
+1
+
+
+
+
+          Please be aware that an important notice concerning availability, standard warranty, and use in critical applications of
+          Texas Instruments semiconductor products and disclaimers thereto appears at the end of this data sheet.
+PRODUCTION DATA information is current as of publication date.                                      Copyright © 2012, Texas Instruments Incorporated
+Products conform to specifications per the terms of the Texas
+Instruments standard warranty. Production processing does not
+necessarily include testing of all parameters.
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                              www.ti.com
+
+                                                     Table 1. Available Options
+                                               Flash      RAM                          ADC10                                     Package
+           Device             BSL     EEM                          Timer_A     USI                     Clock            I/O
+                                               (KB)        (B)                         Channel                                    Type
+MSP430G2231                     -       1        2         128      1x TA2       1        8        LF, DCO, VLO         10      14-TSSOP
+
+
+                                            Table 2. ORDERING INFORMATION (1)
+         TA                PACKAGE            ORDERABLE PART NUMBER                  TOP-SIDE MARKING                 VID NUMBER
+    –40°C to 125°C        TSSOP - PW             MSP430G2231QPW1EP                       G2231EP                     V62/12621-01XE
+
+(1)   For the most current package and ordering information, see the Package Option Addendum at the end of this document, or see the TI
+      Web site at www.ti.com.
+
+
+
+
+2        Submit Documentation Feedback                                                        Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                         MSP430G2231-EP
+
+www.ti.com                                                                                                                  SLAS862 – JUNE 2012
+
+Device Pinout
+
+
+                                                                     PW PACKAGE
+                                                                      (TOP VIEW)
+
+
+                                          DVCC                   1                      14      DVSS
+                            P1.0/TA0CLK/ACLK/A0                  2                      13      XIN/P2.6/TA0.1
+                             P1.1/TA0.0/A1                       3                      12      XOUT/P2.7
+                             P1.2/TA0.1/A2                       4                      11      TEST/SBWTCK
+           P1.3/ADC10CLK/A3/VREF-/VEREF-                         5                      10      RST/NMI/SBWTDIO
+        P1.4/SMCLK/A4/VREF+/VEREF+/TCK                           6                      9       P1.7/A7/SDI/SDA/TDO/TDI
+                         P1.5/TA0.0/A5/SCLK/TMS                  7                      8       P1.6/TA0.1/A6/SDO/SCL/TDI/TCLK
+
+   NOTE: See port schematics in Application Information for detailed I/O information.
+
+                                                           Functional Block Diagram
+                          XIN XOUT                       DVCC        DVSS                         P1.x          P2.x
+                                                                                                    8               2
+
+
+                                        ACLK
+                                                                                               Port P1         Port P2
+                             Clock                                             ADC
+                            System      SMCLK         Flash
+                                                                     RAM                         8 I/O           2 I/O
+                                                                               10-Bit
+                                                                                              Interrupt       Interrupt
+                                                         2kB                   8 Ch.
+                                                                     128B                     capability      capability
+                                 MCLK                    1kB                 Autoscan
+                                                                                             pull-up/down    pull-up/down
+                                                                             1 ch DMA
+                                                                                              resistors       resistors
+                          16MHz                    MAB
+                           CPU
+
+                          incl. 16
+                         Registers                 MDB
+
+
+                         Emulation                                                                            USI
+                           2BP                                               Watchdog        Timer0_A2
+                                                    Brownout                  WDT+                          Universal
+                           JTAG                     Protection                                2 CC            Serial
+                         Interface                                             15-Bit        Registers      Interface
+                                                                                                            SPI, I2C
+                           Spy-Bi
+                            Wire
+
+                                                     RST/NMI
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                         Submit Documentation Feedback       3
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                    www.ti.com
+
+                                                       Table 3. Terminal Functions
+          TERMINAL
+                                  I/O                                                DESCRIPTION
+        NAME             NO.
+P1.0/                                    General-purpose digital I/O pin
+TA0CLK/                                  Timer0_A, clock signal TACLK input
+                          2       I/O
+ACLK/                                    ACLK signal output
+A0                                       ADC10 analog input A0 (1)
+P1.1/                                    General-purpose digital I/O pin
+TA0.0/                    3       I/O    Timer0_A, capture: CCI0A input, compare: Out0 output
+A1                                       ADC10 analog input A1 (1)
+P1.2/                                    General-purpose digital I/O pin
+TA0.1/                    4       I/O    Timer0_A, capture: CCI1A input, compare: Out1 output
+A2                                       ADC10 analog input A2 (1)
+P1.3/                                    General-purpose digital I/O pin
+ADC10CLK/                                ADC10, conversion clock output (1)
+                          5       I/O
+A3/                                      ADC10 analog input A3 (1)
+VREF-/VEREF                              ADC10 negative reference voltage (1)
+P1.4/                                    General-purpose digital I/O pin
+SMCLK/                                   SMCLK signal output
+A4/                       6       I/O    ADC10 analog input A4 (1)
+VREF+/VEREF+/                            ADC10 positive reference voltage (1)
+TCK                                      JTAG test clock, input terminal for device programming and test
+P1.5/                                    General-purpose digital I/O pin
+TA0.0/                                   Timer0_A, compare: Out0 output
+A5/                       7       I/O    ADC10 analog input A5 (1)
+SCLK/                                    USI: clock input in I2C mode; clock input/output in SPI mode
+TMS                                      JTAG test mode select, input terminal for device programming and test
+P1.6/                                    General-purpose digital I/O pin
+TA0.1/                                   Timer0_A, capture: CCI1A input, compare: Out1 output
+A6/                                      ADC10 analog input A6 (1)
+                          8       I/O
+SDO/                                     USI: Data output in SPI mode
+SCL/                                     USI: I2C clock in I2C mode
+TDI/TCLK                                 JTAG test data input or test clock input during programming and test
+P1.7/                                    General-purpose digital I/O pin
+A7/                                      ADC10 analog input A7 (1)
+SDI/                      9       I/O    USI: Data input in SPI mode
+SDA/                                     USI: I2C data in I2C mode
+TDO/TDI (2)                              JTAG test data output terminal or test data input during programming and test
+XIN/                                     Input terminal of crystal oscillator
+P2.6/                    13       I/O    General-purpose digital I/O pin
+TA0.1                                    Timer0_A, compare: Out1 output
+XOUT/                                    Output terminal of crystal oscillator (3)
+                         12       I/O
+P2.7                                     General-purpose digital I/O pin
+RST/                                     Reset
+NMI/                     10        I     Nonmaskable interrupt input
+SBWTDIO                                  Spy-Bi-Wire test data input/output during programming and test
+TEST/                                    Selects test mode for JTAG pins on Port 1. The device protection fuse is connected to TEST.
+                         11        I
+SBWTCK                                   Spy-Bi-Wire test clock input during programming and test
+DVCC                      1       NA     Supply voltage
+DVSS                     14       NA     Ground reference
+QFN Pad                   -       NA     QFN package pad connection to VSS recommended.
+
+(1)   MSP430G2x31 only
+(2)   TDO or TDI is selected via JTAG instruction.
+(3)   If XOUT/P2.7 is used as an input, excess current will flow until P2SEL.7 is cleared. This is due to the oscillator output driver connection
+      to this pad after reset.
+
+
+
+
+4        Submit Documentation Feedback                                                              Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                     MSP430G2231-EP
+
+www.ti.com                                                                                                                SLAS862 – JUNE 2012
+
+                                                      SHORT-FORM DESCRIPTION
+
+CPU
+The MSP430 CPU has a 16-bit RISC architecture
+that is highly transparent to the application. All                                         Program Counter                PC/R0
+operations, other than program-flow instructions, are
+performed as register operations in conjunction with                                         Stack Pointer                SP/R1
+seven addressing modes for source operand and four                                          Status Register               SR/CG1/R2
+addressing modes for destination operand.
+The CPU is integrated with 16 registers that provide                                      Constant Generator              CG2/R3
+reduced instruction execution time. The register-to-                                   General-Purpose Register           R4
+register operation execution time is one cycle of the
+CPU clock.                                                                             General-Purpose Register           R5
+Four of the registers, R0 to R3, are dedicated as                                      General-Purpose Register           R6
+program counter, stack pointer, status register, and
+constant generator, respectively. The remaining                                        General-Purpose Register           R7
+registers are general-purpose registers.
+                                                                                       General-Purpose Register           R8
+Peripherals are connected to the CPU using data,
+address, and control buses, and can be handled with                                    General-Purpose Register           R9
+all instructions.
+                                                                                       General-Purpose Register           R10
+The instruction set consists of the original 51
+instructions with three formats and seven address                                      General-Purpose Register           R11
+modes and additional instructions for the expanded
+address range. Each instruction can operate on word                                    General-Purpose Register           R12
+and byte data.                                                                         General-Purpose Register           R13
+
+Instruction Set                                                                        General-Purpose Register           R14
+The instruction set consists of 51 instructions with                                   General-Purpose Register           R15
+three formats and seven address modes. Each
+instruction can operate on word and byte data.
+Table 4 shows examples of the three types of
+instruction formats; Table 5 shows the address
+modes.
+
+                                                     Table 4. Instruction Word Formats
+                INSTRUCTION FORMAT                                        SYNTAX                                 OPERATION
+            Dual operands, source-destination                            ADD R4,R5                             R4 + R5 ---> R5
+            Single operands, destination only                             CALL R8                        PC -->(TOS), R8--> PC
+               Relative jump, un/conditional                               JNE                               Jump-on-equal bit = 0
+
+
+                                                   Table 5. Address Mode Descriptions (1)
+        ADDRESS MODE                 S     D              SYNTAX                        EXAMPLE                        OPERATION
+             Register                ✓     ✓             MOV Rs,Rd                     MOV R10,R11                     R10 -- --> R11
+             Indexed                 ✓     ✓           MOV X(Rn),Y(Rm)                MOV 2(R5),6(R6)             M(2+R5) -- --> M(6+R6)
+      Symbolic (PC relative)         ✓     ✓            MOV EDE,TONI                                               M(EDE) -- --> M(TONI)
+             Absolute                ✓     ✓         MOV &MEM,&TCDAT                                             M(MEM) -- --> M(TCDAT)
+             Indirect                ✓                 MOV @Rn,Y(Rm)                 MOV @R10,Tab(R6)             M(R10) -- --> M(Tab+R6)
+                                                                                                                     M(R10) -- --> R11
+      Indirect autoincrement         ✓                  MOV @Rn+,Rm                   MOV @R10+,R11
+                                                                                                                     R10 + 2-- --> R10
+           Immediate                 ✓                  MOV #X,TONI                    MOV #45,TONI                  #45 -- --> M(TONI)
+
+(1)   S = source, D = destination
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                   Submit Documentation Feedback            5
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                        www.ti.com
+
+Operating Modes
+The MSP430 has one active mode and five software selectable low-power modes of operation. An interrupt
+event can wake up the device from any of the low-power modes, service the request, and restore back to the
+low-power mode on return from the interrupt program.
+The following six operating modes can be configured by software:
+• Active mode (AM)
+   – All clocks are active
+• Low-power mode 0 (LPM0)
+   – CPU is disabled
+   – ACLK and SMCLK remain active, MCLK is disabled
+• Low-power mode 1 (LPM1)
+   – CPU is disabled
+   – ACLK and SMCLK remain active, MCLK is disabled
+   – DCO's dc generator is disabled if DCO not used in active mode
+• Low-power mode 2 (LPM2)
+   – CPU is disabled
+   – MCLK and SMCLK are disabled
+   – DCO's dc generator remains enabled
+   – ACLK remains active
+• Low-power mode 3 (LPM3)
+   – CPU is disabled
+   – MCLK and SMCLK are disabled
+   – DCO's dc generator is disabled
+   – ACLK remains active
+• Low-power mode 4 (LPM4)
+   – CPU is disabled
+   – ACLK is disabled
+   – MCLK and SMCLK are disabled
+   – DCO's dc generator is disabled
+   – Crystal oscillator is stopped
+
+
+
+
+6      Submit Documentation Feedback                                    Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                         MSP430G2231-EP
+
+www.ti.com                                                                                                                 SLAS862 – JUNE 2012
+
+Interrupt Vector Addresses
+The interrupt vectors and the power-up starting address are located in the address range 0FFFFh to 0FFC0h.
+The vector contains the 16-bit address of the appropriate interrupt handler instruction sequence.
+If the reset vector (located at address 0FFFEh) contains 0FFFFh (for example, flash is not programmed) the
+CPU goes into LPM4 immediately after power-up.
+
+                                           Table 6. Interrupt Sources, Flags, and Vectors
+                                                                                           SYSTEM              WORD
+         INTERRUPT SOURCE                              INTERRUPT FLAG                                                           PRIORITY
+                                                                                         INTERRUPT            ADDRESS
+                Power-Up                                     PORIFG
+              External Reset                                 RSTIFG
+            Watchdog Timer+                                  WDTIFG                         Reset              0FFFEh          31, highest
+            Flash key violation                              KEYV (2)
+            PC out-of-range (1)
+                  NMI                                       NMIIFG                      (non)-maskable
+             Oscillator fault                               OFIFG                       (non)-maskable         0FFFCh               30
+      Flash memory access violation                       ACCVIFG (2) (3)               (non)-maskable
+                                                                                                               0FFFAh               29
+                                                                                                                0FFF8h              28
+                                                                                                                0FFF6h              27
+            Watchdog Timer+                                  WDTIFG                       maskable              0FFF4h              26
+                                                                              (4)
+                Timer_A2                               TACCR0 CCIFG                       maskable              0FFF2h              25
+                Timer_A2                           TACCR1 CCIFG, TAIFG (2) (4)            maskable              0FFF0h              24
+                                                                                                               0FFEEh               23
+                                                                                                               0FFECh               22
+                                                                        (4)
+                  ADC10                                   ADC10IFG                        maskable             0FFEAh               21
+                    USI                             USIIFG, USISTTIFG (2) (4)             maskable             0FFE8h               20
+          I/O Port P2 (two flags)                    P2IFG.6 to P2IFG.7 (2) (4)           maskable             0FFE6h               19
+                                                                              (2) (4)
+         I/O Port P1 (eight flags)                   P1IFG.0 to P1IFG.7                   maskable             0FFE4h               18
+                                                                                                               0FFE2h               17
+                                                                                                               0FFE0h               16
+                        (5)
+                  See                                                                                         0FFDEh to
+                                                                                                                              15 to 0, lowest
+                                                                                                               0FFC0h
+
+(1)   A reset is generated if the CPU tries to fetch instructions from within the module register memory address range (0h to 01FFh) or from
+      within unused address ranges.
+(2)   Multiple source flags
+(3)   (non)-maskable: the individual interrupt-enable bit can disable an interrupt event, but the general interrupt enable cannot.
+(4)   Interrupt flags are located in the module.
+(5)   The interrupt vectors at addresses 0FFDEh to 0FFC0h are not used in this device and can be used for regular program code if
+      necessary.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                         Submit Documentation Feedback          7
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                www.ti.com
+
+Special Function Registers (SFRs)
+Most interrupt and module enable bits are collected into the lowest address space. Special function register bits
+not allocated to a functional purpose are not physically present in the device. Simple software access is provided
+with this arrangement.
+Legend        rw:            Bit can be read and written.
+              rw-0,1:        Bit can be read and written. It is reset or set by PUC.
+              rw-(0,1):      Bit can be read and written. It is reset or set by POR.
+                             SFR bit is not present in device.
+
+
+                                           Table 7. Interrupt Enable Register 1 and 2
+    Address           7               6                5               4                 3           2               1                 0
+      00h                                          ACCVIE           NMIIE                                          OFIE            WDTIE
+                                                     rw-0            rw-0                                           rw-0             rw-0
+WDTIE                 Watchdog Timer interrupt enable. Inactive if watchdog mode is selected. Active if Watchdog Timer is configured in
+                      interval timer mode.
+OFIE                  Oscillator fault interrupt enable
+NMIIE                 (Non)maskable interrupt enable
+ACCVIE                Flash access violation interrupt enable
+
+    Address           7               6                5               4                 3           2               1                 0
+      01h
+
+
+                                             Table 8. Interrupt Flag Register 1 and 2
+    Address           7               6                5               4                 3           2               1                 0
+      02h                                                           NMIIFG             RSTIFG    PORIFG           OFIFG           WDTIFG
+                                                                     rw-0              rw-(0)     rw-(1)            rw-1             rw-(0)
+WDTIFG                Set on watchdog timer overflow (in watchdog mode) or security key violation.
+                      Reset on VCC power-on or a reset condition at the RST/NMI pin in reset mode.
+OFIFG                 Flag set on oscillator fault.
+PORIFG                Power-On Reset interrupt flag. Set on VCC power-up.
+RSTIFG                External reset interrupt flag. Set on a reset condition at RST/NMI pin in reset mode. Reset on VCC power-up.
+NMIIFG                Set via RST/NMI pin
+
+    Address           7               6                5               4                 3           2               1                 0
+      03h
+
+
+
+
+8       Submit Documentation Feedback                                                           Copyright © 2012, Texas Instruments Incorporated
+                                                                                                MSP430G2231-EP
+
+www.ti.com                                                                                             SLAS862 – JUNE 2012
+
+Memory Organization
+
+                                                   Table 9. Memory Organization
+                                                                                       MSP430G2231
+Memory                                                 Size                                2kB
+Main: interrupt vector                                 Flash                         0xFFFF to 0xFFC0
+Main: code memory                                      Flash                         0xFFFF to 0xF800
+Information memory                                     Size                              256 Byte
+                                                       Flash                         010FFh to 01000h
+RAM                                                    Size                               128B
+                                                                                      027Fh to 0200h
+Peripherals                                            16-bit                         01FFh to 0100h
+                                                       8-bit                           0FFh to 010h
+                                                       8-bit SFR                        0Fh to 00h
+
+
+Flash Memory
+The flash memory can be programmed via the Spy-Bi-Wire/JTAG port or in-system by the CPU. The CPU can
+perform single-byte and single-word writes to the flash memory. Features of the flash memory include:
+• Flash memory has n segments of main memory and four segments of information memory (A to D) of
+   64 bytes each. Each segment in main memory is 512 bytes in size.
+• Segments 0 to n may be erased in one step, or each segment may be individually erased.
+• Segments A to D can be erased individually or as a group with segments 0 to n. Segments A to D are also
+   called information memory.
+• Segment A contains calibration data. After reset segment A is protected against programming and erasing. It
+   can be unlocked but care should be taken not to erase this segment if the device-specific calibration data is
+   required.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                  Submit Documentation Feedback         9
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                 www.ti.com
+
+Peripherals
+Peripherals are connected to the CPU through data, address, and control buses and can be handled using all
+instructions. For complete module descriptions, see the MSP430x2xx Family User's Guide (SLAU144).
+
+Oscillator and System Clock
+The clock system is supported by the basic clock module that includes support for a 32768-Hz watch crystal
+oscillator, an internal very-low-power low-frequency oscillator and an internal digitally controlled oscillator (DCO).
+The basic clock module is designed to meet the requirements of both low system cost and low power
+consumption. The internal DCO provides a fast turn-on clock source and stabilizes in less than 1µs. The basic
+clock module provides the following clock signals:
+• Auxiliary clock (ACLK), sourced either from a 32768-Hz watch crystal or the internal LF oscillator.
+• Main clock (MCLK), the system clock used by the CPU.
+• Sub-Main clock (SMCLK), the sub-system clock used by the peripheral modules.
+
+                                          Table 10. DCO Calibration Data
+                          (Provided From Factory In Flash Information Memory Segment A)
+                                         CALIBRATION
+                      DCO FREQUENCY                                 SIZE                  ADDRESS
+                                          REGISTER
+                                         CALBC1_1MHZ                byte                    010FFh
+                          1 MHz
+                                         CALDCO_1MHZ                byte                   010FEh
+
+Brownout
+The brownout circuit is implemented to provide the proper internal reset signal to the device during power on and
+power off.
+
+Digital I/O
+There is one 8-bit I/O port implemented—port P1—and two bits of I/O port P2:
+• All individual I/O bits are independently programmable.
+• Any combination of input, output, and interrupt condition is possible.
+• Edge-selectable interrupt input capability for all the eight bits of port P1 and the two bits of port P2.
+• Read/write access to port-control registers is supported by all instructions.
+• Each I/O has an individually programmable pull-up/pull-down resistor.
+
+WDT+ Watchdog Timer
+The primary function of the watchdog timer (WDT+) module is to perform a controlled system restart after a
+software problem occurs. If the selected time interval expires, a system reset is generated. If the watchdog
+function is not needed in an application, the module can be disabled or configured as an interval timer and can
+generate interrupts at selected time intervals.
+
+
+
+
+10     Submit Documentation Feedback                                             Copyright © 2012, Texas Instruments Incorporated
+                                                                                                 MSP430G2231-EP
+
+www.ti.com                                                                                           SLAS862 – JUNE 2012
+
+Timer_A2
+Timer_A2 is a 16-bit timer/counter with two capture/compare registers. Timer_A2 can support multiple
+capture/compares, PWM outputs, and interval timing. Timer_A2 also has extensive interrupt capabilities.
+Interrupts may be generated from the counter on overflow conditions and from each of the capture/compare
+registers.
+
+                                Table 11. Timer_A2 Signal Connections – Device With ADC10
+                             DEVICE INPUT          MODULE INPUT                  MODULE OUTPUT         OUTPUT PIN
+ INPUT PIN NUMBER                                                 MODULE BLOCK
+                               SIGNAL                 NAME                          SIGNAL              NUMBER
+        2 - P1.0                  TACLK               TACLK
+                                   ACLK               ACLK
+                                                                      Timer            NA
+                                  SMCLK               SMCLK
+        2 - P1.0                  TACLK               INCLK
+        3 - P1.1                    TA0               CCI0A                                              3 - P1.1
+                             ACLK (internal)          CCI0B                                              7 - P1.5
+                                                                      CCR0            TA0
+                                   VSS                 GND
+                                   VCC                 VCC
+        4 - P1.2                    TA1               CCI1A                                              4 - P1.2
+        8 - P1.6                    TA1               CCI1B                                              8 - P1.6
+                                                                      CCR1            TA1
+                                   VSS                 GND                                               13 - P2.6
+                                   VCC                 VCC
+
+
+USI
+The universal serial interface (USI) module is used for serial data communication and provides the basic
+hardware for synchronous communication protocols like SPI and I2C.
+
+ADC10 (MSP430G2x31 only)
+The ADC10 module supports fast, 10-bit analog-to-digital conversions. The module implements a 10-bit SAR
+core, sample select control, reference generator and data transfer controller, or DTC, for automatic conversion
+result handling, allowing ADC samples to be converted and stored without any CPU intervention.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                   Submit Documentation Feedback     11
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                   www.ti.com
+
+Peripheral File Map
+
+                                          Table 12. Peripherals With Word Access
+                                                                                            REGISTER
+              MODULE                                      REGISTER DESCRIPTION                                     OFFSET
+                                                                                              NAME
+ADC10                                   ADC data transfer start address                      ADC10SA                 1BCh
+                                        ADC control 0                                      ADC10CTL0                01B0h
+                                        ADC control 1                                      ADC10CTL0                01B2h
+                                        ADC memory                                          ADC10MEM                01B4h
+Timer_A                                 Capture/compare register                             TACCR1                 0174h
+                                        Capture/compare register                             TACCR0                 0172h
+                                        Timer_A register                                        TAR                 0170h
+                                        Capture/compare control                              TACCTL1                0164h
+                                        Capture/compare control                              TACCTL0                0162h
+                                        Timer_A control                                       TACTL                 0160h
+                                        Timer_A interrupt vector                                TAIV                012Eh
+Flash Memory                            Flash control 3                                        FCTL3                012Ch
+                                        Flash control 2                                        FCTL2                012Ah
+                                        Flash control 1                                        FCTL1                0128h
+Watchdog Timer+                         Watchdog/timer control                               WDTCTL                 0120h
+
+
+                                          Table 13. Peripherals With Byte Access
+                                                                                            REGISTER
+              MODULE                                      REGISTER DESCRIPTION                                     OFFSET
+                                                                                              NAME
+ADC10                                   ADC analog enable                                   ADC10AE0                 04Ah
+                                        ADC data transfer control 1                        ADC10DTC1                 049h
+                                        ADC data transfer control 0                        ADC10DTC0                 048h
+USI                                     USI control 0                                        USICTL0                 078h
+                                        USI control 1                                        USICTL1                 079h
+                                        USI clock control                                   USICKCTL                 07Ah
+                                        USI bit counter                                       USICNT                 07Bh
+                                        USI shift register                                     USISR                 07Ch
+Basic Clock System+                     Basic clock system control 3                         BCSCTL3                 053h
+                                        Basic clock system control 2                         BCSCTL2                 058h
+                                        Basic clock system control 1                         BCSCTL1                 057h
+                                        DCO clock frequency control                          DCOCTL                  056h
+Port P2                                 Port P2 resistor enable                               P2REN                  02Fh
+                                        Port P2 selection                                      P2SEL                 02Eh
+                                        Port P2 interrupt enable                                P2IE                 02Dh
+                                        Port P2 interrupt edge select                          P2IES                 02Ch
+                                        Port P2 interrupt flag                                 P2IFG                 02Bh
+                                        Port P2 direction                                      P2DIR                 02Ah
+                                        Port P2 output                                        P2OUT                  029h
+                                        Port P2 input                                           P2IN                 028h
+
+
+
+
+12      Submit Documentation Feedback                                              Copyright © 2012, Texas Instruments Incorporated
+                                                                                                     MSP430G2231-EP
+
+www.ti.com                                                                                             SLAS862 – JUNE 2012
+
+                                       Table 13. Peripherals With Byte Access (continued)
+                                                                                            REGISTER
+                MODULE                                        REGISTER DESCRIPTION                          OFFSET
+                                                                                              NAME
+Port P1                                      Port P1 resistor enable                         P1REN            027h
+                                             Port P1 selection                               P1SEL            026h
+                                             Port P1 interrupt enable                         P1IE            025h
+                                             Port P1 interrupt edge select                   P1IES            024h
+                                             Port P1 interrupt flag                          P1IFG            023h
+                                             Port P1 direction                               P1DIR            022h
+                                             Port P1 output                                  P1OUT            021h
+                                             Port P1 input                                    P1IN            020h
+Special Function                             SFR interrupt flag 2                             IFG2            003h
+                                             SFR interrupt flag 1                             IFG1            002h
+                                             SFR interrupt enable 2                           IE2             001h
+                                             SFR interrupt enable 1                           IE1             000h
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                     Submit Documentation Feedback     13
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                                       www.ti.com
+
+Absolute Maximum Ratings (1)
+Voltage applied at VCC to VSS                                                                                                               –0.3 V to 4.1 V
+Voltage applied to any pin (2)                                                                                                          –0.3 V to VCC + 0.3 V
+Diode current at any device pin                                                                                                                 ±2 mA
+                                                                                              Unprogrammed device                           –55°C to 150°C
+Storage temperature range, Tstg (3)
+                                                                                              Programmed device                             –55°C to 150°C
+
+(1)    Stresses beyond those listed under "absolute maximum ratings" may cause permanent damage to the device. These are stress ratings
+       only, and functional operation of the device at these or any other conditions beyond those indicated under "recommended operating
+       conditions" is not implied. Exposure to absolute-maximum-rated conditions for extended periods may affect device reliability.
+(2)    All voltages referenced to VSS. The JTAG fuse-blow voltage, VFB, is allowed to exceed the absolute maximum rating. The voltage is
+       applied to the TEST pin when blowing the JTAG fuse.
+(3)    Higher temperature may be applied during board soldering according to the current JEDEC J-STD-020 specification with peak reflow
+       temperatures not higher than classified on the device label on the shipping boxes or reels.
+
+Recommended Operating Conditions
+                                                                                                                                     MIN      NOM       MAX    UNIT
+                                                                                                   During program execution           1.8                3.6
+VCC                                    Supply voltage                                                                                                            V
+                                                                                                   During flash programming           2.2                3.6
+VSS                                    Supply voltage                                                                                             0              V
+TA                                     Operating free-air temperature                                                                 –40               125     °C
+                                                                                                   VCC = 1.8 V,
+                                                                                                                                       dc                  6
+                                                                                                   Duty cycle = 50% ± 10%
+                                                                                                   VCC = 2.7 V,
+fSYSTEM                                Processor frequency (maximum MCLK frequency) (1) (2)                                            dc                 12    MHz
+                                                                                                   Duty cycle = 50% ± 10%
+                                                                                                   VCC = 3.3 V,
+                                                                                                                                       dc                 16
+                                                                                                   Duty cycle = 50% ± 10%
+
+(1)    The MSP430 CPU is clocked directly with MCLK. Both the high and low phase of MCLK must not exceed the pulse width of the
+       specified maximum frequency.
+(2)    Modules might have a different maximum input clock specification. See the specification of the respective module in this data sheet.
+
+
+
+                                                                                                            Legend :
+                                       16 MHz
+                                                                                                                               Supply voltage range,
+              System Frequency - MHz
+
+
+
+
+                                                                                                                               during flash memory
+                                                                                                                               programming
+                                       12 MHz
+
+                                                                                                                               Supply voltage range,
+                                                                                                                               during program execution
+
+                                        6 MHz
+
+
+
+
+                                                        1.8 V    2.2 V       2.7 V        3.3 V 3.6 V
+                                                                     Supply Voltage - V
+
+      Note:        Minimum processor frequency is defined by system clock. Flash program or erase operations require a minimum VCC
+                   of 2.2 V.
+
+                                                                        Figure 1. Safe Operating Area
+
+
+
+
+14        Submit Documentation Feedback                                                                                Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                           MSP430G2231-EP
+
+www.ti.com                                                                                                                   SLAS862 – JUNE 2012
+
+
+
+
+         A.   See data sheet for absolute maximum and minimum recommended operating conditions.
+         B.   Silicon operating life design goal is 10 years at 110°C junction temperature (does not include package interconnect
+              life).
+         C.   The predicted operating lifetime vs. junction temperature is based on reliability modeling using electromigration as the
+              dominant failure mechanism affecting device wearout for the specific device process and design characteristics.
+
+                                               Figure 2. Operating Life Derating Chart
+
+
+THERMAL INFORMATION
+                                                                                                              MSP430G2231
+                                           THERMAL METRIC (1)                                                       PW                   UNITS
+                                                                                                                  14 PINS
+θJA                Junction-to-ambient thermal resistance (2)                                                      102.5
+θJCtop             Junction-to-case (top) thermal resistance (3)                                                    31.4
+                                                          (4)
+θJB                Junction-to-board thermal resistance                                                             45.0
+                                                                                                                                         °C/W
+ψJT                Junction-to-top characterization parameter (5)                                                   1.8
+ψJB                Junction-to-board characterization parameter (6)                                                 44.4
+                                                                    (7)
+θJCbot             Junction-to-case (bottom) thermal resistance                                                     N/A
+
+(1)   For more information about traditional and new thermal metrics, see the IC Package Thermal Metrics application report, SPRA953.
+(2)   The junction-to-ambient thermal resistance under natural convection is obtained in a simulation on a JEDEC-standard, high-K board, as
+      specified in JESD51-7, in an environment described in JESD51-2a.
+(3)   The junction-to-case (top) thermal resistance is obtained by simulating a cold plate test on the package top. No specific JEDEC-
+      standard test exists, but a close description can be found in the ANSI SEMI standard G30-88.
+(4)   The junction-to-board thermal resistance is obtained by simulating in an environment with a ring cold plate fixture to control the PCB
+      temperature, as described in JESD51-8.
+(5)   The junction-to-top characterization parameter, ψJT, estimates the junction temperature of a device in a real system and is extracted
+      from the simulation data for obtaining θJA, using a procedure described in JESD51-2a (sections 6 and 7).
+(6)   The junction-to-board characterization parameter, ψJB, estimates the junction temperature of a device in a real system and is extracted
+      from the simulation data for obtaining θJA , using a procedure described in JESD51-2a (sections 6 and 7).
+(7)   The junction-to-case (bottom) thermal resistance is obtained by simulating a cold plate test on the exposed (power) pad. No specific
+      JEDEC standard test exists, but a close description can be found in the ANSI SEMI standard G30-88.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                       Submit Documentation Feedback             15
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                                                                 www.ti.com
+
+Electrical Characteristics
+
+Active Mode Supply Current Into VCC Excluding External Current
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted) (1)
+                                       PARAMETER                            TEST CONDITIONS                                              VCC              MIN        TYP          MAX   UNIT
+                                                                fDCO = fMCLK = fSMCLK = 1 MHz,                                          2.2 V                        220
+                                                                fACLK = 32768 Hz,
+                                                                Program executes in flash,
+                                          Active mode (AM)
+IAM,1MHz                                                        BCSCTL1 = CALBC1_1MHZ,                                                                                                     µA
+                                          current (1 MHz)                                                                                3V                          300          390
+                                                                DCOCTL = CALDCO_1MHZ,
+                                                                CPUOFF = 0, SCG0 = 0, SCG1 = 0,
+                                                                OSCOFF = 0
+
+(1)                All inputs are tied to 0 V or to VCC. Outputs do not source or sink any current.
+
+
+
+                                                 Typical Characteristics – Active Mode Supply Current (Into VCC)
+                                 5.0                                                                                       4.0
+
+
+
+                                 4.0                                 f DCO = 16 MHz                                                                                          TA = 85 °C
+                                                                                                                           3.0
+
+                                                                                                Active Mode Current − mA
+      Active Mode Current − mA
+
+
+
+
+                                                                                                                                                                              TA = 25 °C
+                                 3.0
+                                                                                                                                                VCC = 3 V
+                                                                                                                           2.0
+                                                         f DCO = 12 MHz
+                                 2.0                                                                                                                            TA = 85 °C
+
+                                                                                                                                                                TA = 25 °C
+                                               f DCO = 8 MHz                                                               1.0
+                                 1.0
+                                                                          f DCO = 1 MHz                                                         VCC = 2.2 V
+
+                                 0.0                                                                                       0.0
+                                    1.5         2.0       2.5       3.0      3.5          4.0                                 0.0          4.0              8.0            12.0         16.0
+                                                      VCC − Supply Voltage − V                                                                 f DCO − DCO Frequency − MHz
+                                       Figure 3. Active Mode Current vs VCC, TA = 25°C                                           Figure 4. Active Mode Current vs DCO Frequency
+
+
+
+
+16                               Submit Documentation Feedback                                                                                  Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                                                                         MSP430G2231-EP
+
+www.ti.com                                                                                                                                                                                     SLAS862 – JUNE 2012
+
+Low-Power Mode Supply Currents (Into VCC) Excluding External Current
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted) (1)
+                                             PARAMETER                            TEST CONDITIONS                                                          TA          VCC         MIN    TYP         MAX       UNIT
+                                                                       fMCLK = 0 MHz,
+                                                                       fSMCLK = fDCO = 1 MHz,
+                                                                       fACLK = 32768 Hz,
+                                                Low-power mode 0
+ILPM0,1MHz                                                             BCSCTL1 = CALBC1_1MHZ,                                                           25°C           2.2 V                  65                    µA
+                                                (LPM0) current (2)
+                                                                       DCOCTL = CALDCO_1MHZ,
+                                                                       CPUOFF = 1, SCG0 = 0, SCG1 = 0,
+                                                                       OSCOFF = 0
+                                                                       fMCLK = fSMCLK = 0 MHz,                                                          25°C                                  22
+                                                                       fDCO = 1 MHz,
+                                                                       fACLK = 32768 Hz,
+                                                Low-power mode 2
+ILPM2                                                                  BCSCTL1 = CALBC1_1MHZ,                                                                          2.2 V                                        µA
+                                                (LPM2) current (3)                                                                                     125°C                                             46
+                                                                       DCOCTL = CALDCO_1MHZ,
+                                                                       CPUOFF = 1, SCG0 = 0, SCG1 = 1,
+                                                                       OSCOFF = 0
+                                                                       fDCO = fMCLK = fSMCLK = 0 MHz,                                                   25°C                                  0.7        1.5
+                                                Low-power mode 3       fACLK = 32768 Hz,
+ILPM3,LFXT1                                                                                                                                                            2.2 V                                        µA
+                                                (LPM3) current (3)     CPUOFF = 1, SCG0 = 1, SCG1 = 1,                                                 125°C                                   3         21
+                                                                       OSCOFF = 0
+                                                                       fDCO = fMCLK = fSMCLK = 0 MHz,                                                   25°C                                  0.5        0.7
+                                                Low-power mode 3       fACLK from internal LF oscillator (VLO),
+ILPM3,VLO                                                                                                                                                              2.2 V                                        µA
+                                                current, (LPM3) (3)    CPUOFF = 1, SCG0 = 1, SCG1 = 1,                                                 125°C                                   2         9.3
+                                                                       OSCOFF = 0
+                                                                       fDCO = fMCLK = fSMCLK = 0 MHz,                                                   25°C                                  0.1        0.5
+                                                Low-power mode 4       fACLK = 0 Hz,
+ILPM4                                                                                                                                                   85°C           2.2 V                  0.8        1.5        µA
+                                                (LPM4) current (4)     CPUOFF = 1, SCG0 = 1, SCG1 = 1,
+                                                                       OSCOFF = 1                                                                      125°C                                   2         7.1
+
+(1)                        All inputs are tied to 0 V or to VCC. Outputs do not source or sink any current.
+(2)                        Current for brownout and WDT clocked by SMCLK included.
+(3)                        Current for brownout and WDT clocked by ACLK included.
+(4)                        Current for brownout included.
+
+
+
+                                                               Typical Characteristics Low-Power Mode Supply Currents
+                                              over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                                            3.00                                                                                                    2.50
+
+                                            2.75                                                                                                    2.25
+                                                                                                              ILPM4 – Low-Power Mode Current – µA
+      ILPM3 – Low-Power Mode Current – µA
+
+
+
+
+                                            2.50
+                                                                                                                                                    2.00
+                                            2.25
+                                                                                                                                                    1.75
+                                            2.00
+                                            1.75                                                                                                    1.50
+
+                                            1.50                                                                                                    1.25                  Vcc = 3.6 V
+                                                                 Vcc = 3.6 V
+                                            1.25                                                                                                    1.00
+                                                                  Vcc = 3 V                                                                                               Vcc = 3 V
+                                            1.00
+                                                                                                                                                    0.75                  Vcc = 2.2 V
+                                                                 Vcc = 2.2 V
+                                            0.75
+                                                                                                                                                    0.50
+                                            0.50
+                                                                                         Vcc = 1.8 V                                                0.25
+                                            0.25
+                                                                                                                                                                                                    Vcc = 1.8 V
+                                            0.00                                                                                                    0.00
+                                                -40      -20     0      20      40        60     80                                                     -40      -20      0      20      40         60         80
+
+                                                                 TA – Temperature – °C                                                                                   TA – Temperature – °C
+
+                                                      Figure 5. LPM3 Current vs Temperature                                                                   Figure 6. LPM4 Current vs Temperature
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                                                                        Submit Documentation Feedback                    17
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                        www.ti.com
+
+Schmitt-Trigger Inputs – Ports Px
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+                       PARAMETER                                TEST CONDITIONS                 VCC               MIN      TYP            MAX    UNIT
+                                                                                                             0.45 VCC                 0.75 VCC
+VIT+         Positive-going input threshold voltage                                                                                               V
+                                                                                                3V                1.35                    2.25
+                                                                                                             0.25 VCC                 0.55 VCC
+VIT–         Negative-going input threshold voltage                                                                                               V
+                                                                                                3V                0.75                    1.65
+Vhys         Input voltage hysteresis (VIT+ – VIT–)                                             3V                 0.3                      1     V
+                                                           For pullup: VIN = VSS
+RPull        Pullup/pulldown resistor                                                           3V                 20          35          50    kΩ
+                                                           For pulldown: VIN = VCC
+CI           Input capacitance                             VIN = VSS or VCC                                                     5                 pF
+
+
+Leakage Current – Ports Px
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                              PARAMETER                                              TEST CONDITIONS               VCC              MIN   MAX    UNIT
+                                                                          TA = -40°C to 105°C                      3V                     ±50
+Ilkg(Px.y)       High-impedance leakage current (1) (2)                                                                                          nA
+                                                                          TA = 125°C                               3V                     ±120
+
+(1)     The leakage current is measured with VSS or VCC applied to the corresponding pin(s), unless otherwise noted.
+(2)     The leakage of the digital port pins is measured individually. The port pin is selected for input and the pullup/pulldown resistor is
+        disabled.
+
+Outputs – Ports Px
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                   PARAMETER                                  TEST CONDITIONS                         VCC         MIN           TYP       MAX    UNIT
+VOH          High-level output voltage            I(OHmax) = –6 mA (1)                                3V                   VCC – 0.3              V
+                                                                    (1)
+VOL          Low-level output voltage             I(OLmax) = 6 mA                                     3V                   VSS + 0.3              V
+
+(1)     The maximum total current, I(OHmax) and I(OLmax), for all outputs combined should not exceed ±48 mA to hold the maximum voltage drop
+        specified.
+
+Output Frequency – Ports Px
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                PARAMETER                                     TEST CONDITIONS                               VCC          MIN        TYP   MAX    UNIT
+                 Port output frequency                                     (1) (2)
+fPx.y                                        Px.y, CL = 20 pF, RL = 1 kΩ                                    3V                       12          MHz
+                 (with load)
+fPort_CLK        Clock output frequency      Px.y, CL = 20 pF (2)                                           3V                       16          MHz
+
+(1)     A resistive divider with 2 × 0.5 kΩ between VCC and VSS is used as load. The output is connected to the center tap of the divider.
+(2)     The output voltage reaches at least 10% and 90% VCC at the specified toggle frequency.
+
+
+
+
+18           Submit Documentation Feedback                                                              Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                                                                                                 MSP430G2231-EP
+
+www.ti.com                                                                                                                                                                                                         SLAS862 – JUNE 2012
+
+                                                                                                Typical Characteristics – Outputs
+                                                      over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+
+                                                              TYPICAL LOW-LEVEL OUTPUT CURRENT                                                                                   TYPICAL LOW-LEVEL OUTPUT CURRENT
+                                                                             vs                                                                                                                 vs
+                                                                  LOW-LEVEL OUTPUT VOLTAGE                                                                                           LOW-LEVEL OUTPUT VOLTAGE
+                                                    30                                                                                                                 50
+                                                              VCC = 2.2 V                                                                                                        VCC = 3 V
+                                                                                                                                                                                                                        TA = 25°C
+    I OL − Typical Low-Level Output Current − mA
+
+
+
+
+                                                                                                     TA = 25°C
+
+
+
+
+                                                                                                                       I OL − Typical Low-Level Output Current − mA
+                                                              P1.7                                                                                                               P1.7
+                                                    25
+                                                                                                                                                                       40
+
+                                                                                                     TA = 85°C                                                                                                          TA = 85°C
+                                                    20
+                                                                                                                                                                       30
+
+                                                    15
+
+                                                                                                                                                                       20
+                                                    10
+
+
+                                                                                                                                                                       10
+                                                     5
+
+
+                                                     0                                                                                                                  0
+                                                          0        0.5        1           1.5        2           2.5                                                         0      0.5      1       1.5     2    2.5       3       3.5
+                                                                  VOL − Low-Level Output Voltage − V                                                                                 VOL − Low-Level Output Voltage − V
+                                                                              Figure 7.                                                                                                             Figure 8.
+
+                                                              TYPICAL HIGH-LEVEL OUTPUT CURRENT                                                                                  TYPICAL HIGH-LEVEL OUTPUT CURRENT
+                                                                              vs                                                                                                                 vs
+                                                                  HIGH-LEVEL OUTPUT VOLTAGE                                                                                          HIGH-LEVEL OUTPUT VOLTAGE
+                                                      0                                                                                                                 0
+                                                              VCC = 2.2 V                                                                                                        VCC = 3 V
+    I OH − Typical High-Level Output Current − mA
+
+
+
+
+                                                                                                                       I OH − Typical High-Level Output Current − mA
+
+
+
+
+                                                              P1.7                                                                                                               P1.7
+
+                                                    −5                                                                                                                 −10
+
+
+
+                                                    −10                                                                                                                −20
+
+
+
+                                                    −15                                                                                                                −30
+                                                                                                                                                                                 TA = 85°C
+                                                               TA = 85°C
+                                                    −20                                                                                                                −40
+
+                                                                                                                                                                                 TA = 25°C
+                                                               TA = 25°C
+                                                    −25                                                                                                                −50
+                                                          0        0.5        1           1.5        2           2.5                                                         0      0.5      1       1.5     2    2.5       3       3.5
+                                                                  VOH − High-Level Output Voltage − V                                                                                VOH − High-Level Output Voltage − V
+                                                                              Figure 9.                                                                                                             Figure 10.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                                                                                                 Submit Documentation Feedback            19
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                 www.ti.com
+
+POR/Brownout Reset (BOR) (1)
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+                       PARAMETER                                  TEST CONDITIONS               VCC          MIN       TYP       MAX     UNIT
+VCC(start)      See Figure 11                               dVCC/dt ≤ 3 V/s                                     0.7 × V(B_IT–)             V
+V(B_IT–)        See Figure 11 through Figure 13             dVCC/dt ≤ 3 V/s                                            1.35                V
+Vhys(B_IT–)     See Figure 11                               dVCC/dt ≤ 3 V/s                                             130               mV
+td(BOR)         See Figure 11                                                                                                    2000      µs
+                Pulse length needed at RST/NMI pin to
+t(reset)                                                                                     2.2 V/3 V          2                          µs
+                accepted reset internally
+
+(1)   The current consumption of the brownout module is already included in the ICC current consumption data. The voltage level V(B_IT–) +
+      Vhys(B_IT–)is ≤ 1.8 V.
+
+
+
+                         VCC
+
+                                  Vhys(B_IT−)
+
+
+                       V(B_IT−)
+
+                   VCC(start)
+
+
+
+
+                           1
+
+
+
+
+                           0
+
+                                                             t d(BOR)
+
+                                  Figure 11. POR/Brownout Reset (BOR) vs Supply Voltage
+
+
+
+
+20         Submit Documentation Feedback                                                         Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                            MSP430G2231-EP
+
+www.ti.com                                                                                                                                     SLAS862 – JUNE 2012
+
+                                                        Typical Characteristics – POR/Brownout Reset (BOR)
+                                                                                               VCC                             t pw
+                               2
+                                        VCC = 3 V                                              3V
+                                        Typical Conditions
+                              1.5
+   VCC(drop) − V
+
+
+
+
+                               1
+
+                                                                                         VCC(drop)
+                              0.5
+
+
+                                0
+                               0.001                           1                1000
+                                                                                                            1 ns                              1 ns
+                                                     t pw − Pulse Width − µs                                            t pw − Pulse Width − µs
+                                                Figure 12. VCC(drop) Level With a Square Voltage Drop to Generate a POR/Brownout Signal
+
+                                                                                             VCC                           t pw
+                                    2                                                        3V
+                                         VCC = 3 V
+              VCC(drop) − V
+
+
+
+
+                               1.5       Typical Conditions
+
+
+                                    1
+                                                                                       VCC(drop)
+                               0.5
+
+                                                                                                                            t f = tr
+                                    0
+                                    0.001                      1                1000                               tf                  tr
+                                                     t pw − Pulse Width − µs                                       t pw − Pulse Width − µs
+                                                Figure 13. VCC(drop) Level With a Triangle Voltage Drop to Generate a POR/Brownout Signal
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                          Submit Documentation Feedback        21
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                   www.ti.com
+
+Main DCO Characteristics
+•     All ranges selected by RSELx overlap with RSELx + 1: RSELx = 0 overlaps RSELx = 1, ... RSELx = 14
+      overlaps RSELx = 15.
+•     DCO control bits DCOx have a step size as defined by parameter SDCO.
+•     Modulation control bits MODx select how often fDCO(RSEL,DCO+1) is used within the period of 32 DCOCLK
+      cycles. The frequency fDCO(RSEL,DCO) is used for the remaining cycles. The frequency is an average equal to:
+                          32 × fDCO(RSEL,DCO) × fDCO(RSEL,DCO+1)
+      faverage =
+                   MOD × fDCO(RSEL,DCO) + (32 – MOD) × fDCO(RSEL,DCO+1)
+
+
+DCO Frequency
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+              PARAMETER                                TEST CONDITIONS              VCC          MIN      TYP      MAX     UNIT
+                                         RSELx < 14                                               1.8                3.6     V
+VCC           Supply voltage             RSELx = 14                                               2.2                3.6     V
+                                         RSELx = 15                                                 3                3.6     V
+fDCO(0,0)     DCO frequency (0, 0)       RSELx = 0, DCOx = 0, MODx = 0              3V                   0.096             MHz
+fDCO(0,3)     DCO frequency (0, 3)       RSELx = 0, DCOx = 3, MODx = 0              3V                    0.12             MHz
+fDCO(1,3)     DCO frequency (1, 3)       RSELx = 1, DCOx = 3, MODx = 0              3V                    0.15             MHz
+fDCO(2,3)     DCO frequency (2, 3)       RSELx = 2, DCOx = 3, MODx = 0              3V                    0.21             MHz
+fDCO(3,3)     DCO frequency (3, 3)       RSELx = 3, DCOx = 3, MODx = 0              3V                    0.30             MHz
+fDCO(4,3)     DCO frequency (4, 3)       RSELx = 4, DCOx = 3, MODx = 0              3V                    0.41             MHz
+fDCO(5,3)     DCO frequency (5, 3)       RSELx = 5, DCOx = 3, MODx = 0              3V                    0.58             MHz
+fDCO(6,3)     DCO frequency (6, 3)       RSELx = 6, DCOx = 3, MODx = 0              3V                    0.80             MHz
+fDCO(7,3)     DCO frequency (7, 3)       RSELx = 7, DCOx = 3, MODx = 0              3V            0.8                1.5   MHz
+fDCO(8,3)     DCO frequency (8, 3)       RSELx = 8, DCOx = 3, MODx = 0              3V                     1.6             MHz
+fDCO(9,3)     DCO frequency (9, 3)       RSELx = 9, DCOx = 3, MODx = 0              3V                     2.3             MHz
+fDCO(10,3)    DCO frequency (10, 3)      RSELx = 10, DCOx = 3, MODx = 0             3V                     3.4             MHz
+fDCO(11,3)    DCO frequency (11, 3)      RSELx = 11, DCOx = 3, MODx = 0             3V                    4.25             MHz
+fDCO(12,3)    DCO frequency (12, 3)      RSELx = 12, DCOx = 3, MODx = 0             3V            4.3                7.3   MHz
+fDCO(13,3)    DCO frequency (13, 3)      RSELx = 13, DCOx = 3, MODx = 0             3V                     7.8             MHz
+fDCO(14,3)    DCO frequency (14, 3)      RSELx = 14, DCOx = 3, MODx = 0             3V            8.6              13.9    MHz
+fDCO(15,3)    DCO frequency (15, 3)      RSELx = 15, DCOx = 3, MODx = 0             3V                   15.25             MHz
+fDCO(15,7)    DCO frequency (15, 7)      RSELx = 15, DCOx = 7, MODx = 0             3V                      21             MHz
+              Frequency step between
+SRSEL                                    SRSEL = fDCO(RSEL+1,DCO)/fDCO(RSEL,DCO)    3V                    1.35             ratio
+              range RSEL and RSEL+1
+              Frequency step between
+SDCO                                     SDCO = fDCO(RSEL,DCO+1)/fDCO(RSEL,DCO)     3V                    1.08             ratio
+              tap DCO and DCO+1
+Duty cycle                               Measured at SMCLK output                   3V                      50               %
+
+
+
+
+22      Submit Documentation Feedback                                              Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                             MSP430G2231-EP
+
+www.ti.com                                                                                                                                         SLAS862 – JUNE 2012
+
+Calibrated DCO Frequencies – Tolerance
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+          PARAMETER                           TEST CONDITIONS                                      TA                  VCC            MIN     TYP      MAX    UNIT
+                                     BCSCTL1= CALBC1_1MHz,
+1-MHz tolerance over
+                                     DCOCTL = CALDCO_1MHz,                                    -40°C to 105°C           3V              -3     ±0.5       +3     %
+temperature (1)
+                                     calibrated at 30°C and 3 V
+                                     BCSCTL1= CALBC1_1MHz,
+1-MHz tolerance over VCC             DCOCTL = CALDCO_1MHz,                                         30°C          1.8 V to 3.6 V        -3         ±2     +3     %
+                                     calibrated at 30°C and 3 V
+                                     BCSCTL1= CALBC1_1MHz,
+1-MHz tolerance overall              DCOCTL = CALDCO_1MHz,                                    -40°C to 105°C     1.8 V to 3.6 V        -6         ±3     +6     %
+                                     calibrated at 30°C and 3 V
+
+(1)   This is the frequency change from the measured frequency at 30°C over temperature.
+
+Wake-Up From Lower-Power Modes (LPM3/4) – Electrical Characteristics
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                      PARAMETER                                                     TEST CONDITIONS                VCC          MIN         TYP        MAX    UNIT
+                 DCO clock wake-up time from                                  BCSCTL1= CALBC1_1MHz,
+tDCO,LPM3/4                                                                                                        3V                       1.5                 µs
+                 LPM3/4 (1)                                                   DCOCTL = CALDCO_1MHz
+                                                                                                                                       1/fMCLK +
+tCPU,LPM3/4      CPU wake-up time from LPM3/4 (2)
+                                                                                                                                      tClock,LPM3/4
+
+(1)   The DCO clock wake-up time is measured from the edge of an external wake-up signal (for example, port interrupt) to the first clock
+      edge observable externally on a clock pin (MCLK or SMCLK).
+(2)   Parameter applicable only if DCOCLK is used for MCLK.
+
+
+
+                        Typical Characteristics – DCO Clock Wake-Up Time From LPM3/4
+
+
+
+                                                                10.00
+                                           DCO Wake Time − µs
+
+
+
+
+                                                                           RSELx = 0...11
+                                                                 1.00                                     RSELx = 12...15
+
+
+
+
+                                                                 0.10
+                                                                    0.10                    1.00               10.00
+                                                                                      DCO Frequency − MHz
+                                             Figure 14. DCO Wake-Up Time From LPM3 vs DCO Frequency
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                             Submit Documentation Feedback           23
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                   www.ti.com
+
+Crystal Oscillator, XT1, Low-Frequency Mode (1)
+over recommended ranges of supply voltage and operating free-air temperature, TA = 105°C (unless otherwise noted)
+                     PARAMETER                               TEST CONDITIONS                    VCC           MIN           TYP     MAX     UNIT
+                      LFXT1 oscillator crystal
+fLFXT1,LF                                           XTS = 0, LFXT1Sx = 0 or 1              1.8 V to 3.6 V                 32768             Hz
+                      frequency, LF mode 0, 1
+                      LFXT1 oscillator logic level
+fLFXT1,LF,logic       square wave input frequency, XTS = 0, XCAPx = 0, LFXT1Sx = 3         1.8 V to 3.6 V    10000        32768     50000   Hz
+                      LF mode
+                      LFXT1 oscillator logic level
+                                                   XTS = 0, XCAPx = 0, LFXT1Sx = 3,
+fLFXT1,LF,logic       square wave input frequency,                                         1.8 V to 3.6 V                 32768             Hz
+                                                   TA = -40°C to 125°C
+                      LF mode
+                                                    XTS = 0, LFXT1Sx = 0,
+                                                                                                                            500
+                      Oscillation allowance for     fLFXT1,LF = 32768 Hz, CL,eff = 6 pF
+OALF                                                                                                                                        kΩ
+                      LF crystals                   XTS = 0, LFXT1Sx = 0,
+                                                                                                                            200
+                                                    fLFXT1,LF = 32768 Hz, CL,eff = 12 pF
+                                                    XTS = 0, XCAPx = 0                                                          1
+                      Integrated effective load     XTS = 0, XCAPx = 1                                                       5.5
+CL,eff                                                                                                                                       pF
+                      capacitance, LF mode (2)      XTS = 0, XCAPx = 2                                                       8.5
+                                                    XTS = 0, XCAPx = 3                                                        11
+                                                    XTS = 0, Measured at P2.0/ACLK,
+                      Duty cycle, LF mode                                                      2.2 V            30            50      70     %
+                                                    fLFXT1,LF = 32768 Hz
+                      Oscillator fault frequency,
+fFault,LF                                           XTS = 0, XCAPx = 0, LFXT1Sx = 3 (4)        2.2 V            10                  10000   Hz
+                      LF mode (3)
+
+(1)    To improve EMI on the XT1 oscillator, the following guidelines should be observed.
+       (a) Keep the trace between the device and the crystal as short as possible.
+       (b) Design a good ground plane around the oscillator pins.
+       (c) Prevent crosstalk from other clock or data lines into oscillator pins XIN and XOUT.
+       (d) Avoid running PCB traces underneath or adjacent to the XIN and XOUT pins.
+       (e) Use assembly materials and praxis to avoid any parasitic load on the oscillator XIN and XOUT pins.
+       (f) If conformal coating is used, ensure that it does not induce capacitive/resistive leakage between the oscillator pins.
+       (g) Do not route the XOUT line to the JTAG header to support the serial programming adapter as shown in other documentation. This
+           signal is no longer required for the serial programming adapter.
+(2)    Includes parasitic bond and package capacitance (approximately 2 pF per pin).
+       Since the PCB adds additional capacitance, it is recommended to verify the correct load by measuring the ACLK frequency. For a
+       correct setup, the effective load capacitance should always match the specification of the used crystal.
+(3)    Frequencies below the MIN specification set the fault flag. Frequencies above the MAX specification do not set the fault flag.
+       Frequencies in between might set the flag.
+(4)    Measured with logic-level input frequency but also applies to operation with crystals.
+
+Internal Very-Low-Power Low-Frequency Oscillator (VLO)
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                              PARAMETER                                         TA               VCC            MIN         TYP      MAX    UNIT
+                                                                          -40°C to 85°C                              4        12       20
+fVLO              VLO frequency                                                                  3V                                         kHz
+                                                                              125°C                                                    23
+dfVLO/dT          VLO frequency temperature drift                        -40°C to 125°C          3V                          0.5            %/°C
+dfVLO/dVCC VLO frequency supply voltage drift                                 25°C          1.8 V to 3.6 V                      4           %/V
+
+
+Timer_A
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                       PARAMETER                                 TEST CONDITIONS                  VCC         MIN         TYP       MAX     UNIT
+                                                        Internal: SMCLK, ACLK
+fTA               Timer_A input clock frequency         External: TACLK, INCLK                                           fSYSTEM            MHz
+                                                        Duty cycle = 50% ± 10%
+tTA,cap           Timer_A capture timing                TA0, TA1                                  3V            20                           ns
+
+
+
+
+24          Submit Documentation Feedback                                                        Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                                                                        MSP430G2231-EP
+
+www.ti.com                                                                                                                                                                                    SLAS862 – JUNE 2012
+
+USI, Universal Serial Interface
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                                                         PARAMETER                                  TEST CONDITIONS                                                 VCC         MIN         TYP     MAX       UNIT
+                                                                                             External: SCLK,
+fUSI                                            USI clock frequency                          Duty cycle = 50% ±10%,                                                                    fSYSTEM                MHz
+                                                                                             SPI slave mode
+                                                                                             USI module in I2C mode,                                                                                 VSS
+VOL,I2C                                         Low-level output voltage on SDA and SCL                                                                             3V          VSS                            V
+                                                                                             I(OLmax) = 1.5 mA                                                                                      + 0.4
+
+
+
+                                                   Typical Characteristics – USI Low-Level Output Voltage on SDA and SCL
+                                          5.0                                                                                                  5.0
+                                                   VCC = 2.2 V                                                                                          VCC = 3 V                                 TA = 25°C
+
+                                                                                      TA = 25°C
+   I OL − Low-Level Output Current − mA
+
+
+
+
+                                                                                                         IOL − Low-Level Output Current − mA
+                                          4.0                                                                                                  4.0
+
+
+
+                                                                                                                                                                                                  TA = 85°C
+                                          3.0                                                                                                  3.0
+                                                                                      TA = 85°C
+
+
+                                          2.0                                                                                                  2.0
+
+
+
+                                          1.0                                                                                                  1.0
+
+
+
+                                          0.0                                                                                                  0.0
+                                             0.0        0.2       0.4       0.6      0.8          1.0                                             0.0        0.2          0.4         0.6         0.8         1.0
+                                                       VOL − Low-Level Output Voltage − V                                                                   VOL − Low-Level Output Voltage − V
+                                           Figure 15. USI Low-Level Output Voltage vs Output                                                    Figure 16. USI Low-Level Output Voltage vs Output
+                                                                Current                                                                                              Current
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                                                                     Submit Documentation Feedback                  25
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                 www.ti.com
+
+10-Bit ADC, Power Supply and Input Range Conditions
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted) (1)
+               PARAMETER                               TEST CONDITIONS                  TA         VCC         MIN      TYP      MAX     UNIT
+VCC           Analog supply voltage           VSS = 0 V                                                         2.2                3.6     V
+                                     (2)      All Ax terminals, Analog inputs
+VAx           Analog input voltage                                                                 3V             0               VCC      V
+                                              selected in ADC10AE register
+                                              fADC10CLK = 5.0 MHz,
+                                       (3)    ADC10ON = 1, REFON = 0,                -40°C to
+IADC10        ADC10 supply current                                                                 3V                     0.6     1.64    mA
+                                              ADC10SHT0 = 1, ADC10SHT1 = 0,           125°C
+                                              ADC10DIV = 0
+                                              fADC10CLK = 5.0 MHz,
+                                              ADC10ON = 0, REF2_5V = 0,                                                 0.25      0.84
+              Reference supply current,       REFON = 1, REFOUT = 0                  -40°C to
+IREF+                                                                                              3V                                     mA
+              reference buffer disabled (4)   fADC10CLK = 5.0 MHz,                    125°C
+                                              ADC10ON = 0, REF2_5V = 1,                                                 0.25      0.84
+                                              REFON = 1, REFOUT = 0
+                                              fADC10CLK = 5.0 MHz,                   -40°C to
+                                                                                                                          1.1      1.4
+              Reference buffer supply         ADC10ON = 0, REFON = 1,                  85°C
+IREFB,0                                                                                            3V                                     mA
+              current with ADC10SR = 0 (4)    REF2_5V = 0, REFOUT = 1,               -40°C to
+                                              ADC10SR = 0                                                                          3.8
+                                                                                      125°C
+                                              fADC10CLK = 5.0 MHz,                   -40°C to
+                                                                                                                          0.5      0.7
+              Reference buffer supply         ADC10ON = 0, REFON = 1,                  85°C
+IREFB,1                                                                                            3V                                     mA
+              current with ADC10SR = 1 (4)    REF2_5V = 0, REFOUT = 1,               -40°C to
+                                              ADC10SR = 1                                                                          0.9
+                                                                                      125°C
+                                              Only one terminal Ax can be selected   -40°C to
+CI            Input capacitance                                                                    3V                               27    pF
+                                              at one time                             125°C
+                                                                                     -40°C to
+RI            Input MUX ON resistance         0 V ≤ VAx ≤ VCC                                      3V                   1000     2000      Ω
+                                                                                      125°C
+
+(1)   The leakage current is defined in the leakage current table with Px.y/Ax parameter.
+(2)   The analog input voltage range must be within the selected reference voltage range VR+ to VR– for valid conversion results.
+(3)   The internal reference supply current is not included in current consumption parameter IADC10.
+(4)   The internal reference current is supplied via terminal VCC. Consumption is independent of the ADC10ON control bit, unless a
+      conversion is active. The REFON bit enables the built-in reference to settle before starting an A/D conversion.
+
+
+
+
+26        Submit Documentation Feedback                                                          Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                   MSP430G2231-EP
+
+www.ti.com                                                                                                           SLAS862 – JUNE 2012
+
+10-Bit ADC, Built-In Voltage Reference
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                  PARAMETER                                           TEST CONDITIONS             VCC        MIN    TYP    MAX     UNIT
+
+                   Positive built-in reference         IVREF+ ≤ 1 mA, REF2_5V = 0                            2.2
+VCC,REF+                                                                                                                            V
+                   analog supply voltage range         IVREF+ ≤ 1 mA, REF2_5V = 1                              3
+
+                   Positive built-in reference         IVREF+ ≤ IVREF+max, REF2_5V = 0                       1.4     1.5   1.59
+VREF+                                                                                             3V                                V
+                   voltage                             IVREF+ ≤ IVREF+max, REF2_5V = 1                      2.34     2.5   2.65
+                   Maximum VREF+ load
+ILD,VREF+                                                                                         3V                         ±1    mA
+                   current (1) (2)
+                                                       IVREF+ = 500 µA ± 100 µA,
+                                                       Analog input voltage VAx ≉ 0.75 V,                                    ±2
+                                           (1)
+                                                       REF2_5V = 0
+                   VREF+ load regulation                                                          3V                               LSB
+                                                       IVREF+ = 500 µA ± 100 µA,
+                                                       Analog input voltage VAx ≉ 1.25 V,                                    ±2
+                                                       REF2_5V = 1
+                                                       IVREF+ = 100 µA→900 µA,
+                   VREF+ load regulation response      VAx ≉ 0.5 × VREF+,
+                                                                                                  3V                        400     ns
+                   time (1) (2)                        Error of conversion result ≤ 1 LSB,
+                                                       ADC10SR = 0
+                   Maximum capacitance at pin
+CVREF+                                                 IVREF+ ≤ ±1 mA, REFON = 1, REFOUT = 1      3V                        100    pF
+                   VREF+ (1) (2)
+                                                                                                                                   ppm/
+TCREF+             Temperature coefficient             IVREF+ = const with 0 mA ≤ IVREF+ ≤ 1 mA   3V                       ±190
+                                                                                                                                    °C
+                   Settling time of internal
+                                                       IVREF+ = 0.5 mA, REF2_5V = 0,
+tREFON             reference voltage to 99.9%                                                     3.6 V                      30     µs
+                                                       REFON = 0 → 1
+                   VREF (1) (2)
+                                                       IVREF+ = 0.5 mA,
+                   Settling time of reference buffer
+tREFBURST                                              REF2_5V = 1, REFON = 1,                    3V                          2     µs
+                   to 99.9% VREF (1) (2)
+                                                       REFBURST = 1, ADC10SR = 0
+
+(1)   Minimum and maximum parameters are characterized up to TA = 105°C, unless otherwise noted.
+(2)   Characterized at TA = -40°C to 105°C only.
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                   Submit Documentation Feedback         27
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                    www.ti.com
+
+10-Bit ADC, External Reference (1)
+over recommended ranges of supply voltage and operating free-air temperature, TA = 105°C (unless otherwise noted)
+                   PARAMETER                                   TEST CONDITIONS                        VCC         MIN      TYP       MAX    UNIT
+                                                    VEREF+ > VEREF–,
+                                                                                                                   1.4               VCC
+               Positive external reference input    SREF1 = 1, SREF0 = 0
+VEREF+                                                                                                                                        V
+               voltage range (2)                    VEREF– ≤ VEREF+ ≤ VCC – 0.15 V,
+                                                                                                                   1.4                  3
+                                                    SREF1 = 1, SREF0 = 1 (3)
+               Negative external reference input
+VEREF–                                              VEREF+ > VEREF–                                                  0                1.2     V
+               voltage range (4)
+               Differential external reference
+ΔVEREF         input voltage range,                 VEREF+ > VEREF– (5)                                            1.4               VCC      V
+               ΔVEREF = VEREF+ – VEREF–
+                                                    0 V ≤ VEREF+ ≤ VCC,
+                                                                                                      3V                     ±1
+                                                    SREF1 = 1, SREF0 = 0
+IVEREF+        Static input current into VEREF+                                                                                              µA
+                                                    0 V ≤ VEREF+ ≤ VCC – 0.15 V ≤ 3 V,
+                                                                                                      3V                       0
+                                                    SREF1 = 1, SREF0 = 1 (3)
+IVEREF–        Static input current into VEREF–     0 V ≤ VEREF– ≤ VCC                                3V                     ±1              µA
+
+(1)   The external reference is used during conversion to charge and discharge the capacitance array. The input capacitance, CI, is also the
+      dynamic load for an external reference during conversion. The dynamic impedance of the reference supply should follow the
+      recommendations on analog-source impedance to allow the charge to settle for 10-bit accuracy.
+(2)   The accuracy limits the minimum positive external reference voltage. Lower reference voltage levels may be applied with reduced
+      accuracy requirements.
+(3)   Under this condition the external reference is internally buffered. The reference buffer is active and requires the reference buffer supply
+      current IREFB. The current consumption can be limited to the sample and conversion period with REBURST = 1.
+(4)   The accuracy limits the maximum negative external reference voltage. Higher reference voltage levels may be applied with reduced
+      accuracy requirements.
+(5)   The accuracy limits the minimum external differential reference voltage. Lower differential reference voltage levels may be applied with
+      reduced accuracy requirements.
+
+10-Bit ADC, Timing Parameters
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+              PARAMETER                                     TEST CONDITIONS                            VCC         MIN     TYP       MAX    UNIT
+                     ADC10 input clock       For specified performance of       ADC10SR = 0                        0.45               6.3
+fADC10CLK                                                                                              3V                                   MHz
+                     frequency               ADC10 linearity parameters         ADC10SR = 1                        0.45               1.5
+                     ADC10 built-in          ADC10DIVx = 0, ADC10SSELx = 0,
+fADC10OSC                                                                                              3V           3.7               6.3   MHz
+                     oscillator frequency    fADC10CLK = fADC10OSC
+                                             ADC10 built-in oscillator, ADC10SSELx = 0,
+                                                                                                       3V          2.06              3.51
+                                             fADC10CLK = fADC10OSC
+tCONVERT             Conversion time                                                                                       13 ×               µs
+                                             fADC10CLK from ACLK, MCLK, or SMCLK,
+                                                                                                                      ADC10DIV ×
+                                             ADC10SSELx ≠ 0
+                                                                                                                       1/fADC10CLK
+                     Turn-on settling time    (1)
+tADC10ON                                                                                                                             100      ns
+                     of the ADC
+
+(1)   The condition is that the error in a conversion started after tADC10ON is less than ±0.5 LSB. The reference and input signal are already
+      settled.
+
+10-Bit ADC, Linearity Parameters
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+                PARAMETER                                 TEST CONDITIONS                          VCC             MIN     TYP       MAX    UNIT
+EI        Integral linearity error                                                                 3V                                  ±1    LSB
+ED        Differential linearity error                                                             3V                                  ±1    LSB
+EO        Offset error                          Source impedance RS < 100 Ω                        3V                                  ±1    LSB
+EG        Gain error                                                                               3V                      ±1.1        ±2    LSB
+ET        Total unadjusted error                                                                   3V                        ±2        ±5    LSB
+
+
+
+
+28        Submit Documentation Feedback                                                             Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                       MSP430G2231-EP
+
+www.ti.com                                                                                                                    SLAS862 – JUNE 2012
+
+10-Bit ADC, Temperature Sensor and Built-In VMID
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+                     PARAMETER                                   TEST CONDITIONS                       VCC      MIN      TYP       MAX         UNIT
+                    Temperature sensor supply            REFON = 0, INCHx = 0Ah,
+ISENSOR                                                                                                3V                 60                    µA
+                    current (1)                          TA = 25°C
+                                                                                       (2)
+TCSENSOR                                                 ADC10ON = 1, INCHx = 0Ah                      3V                3.55                  mV/°C
+                    Sample time required if channel      ADC10ON = 1, INCHx = 0Ah,
+tSensor(sample)                                                                                        3V         30                             µs
+                    10 is selected (3)                   Error of conversion result ≤ 1 LSB
+                                                                                                                                        (4)
+IVMID               Current into divider at channel 11   ADC10ON = 1, INCHx = 0Bh                      3V                                       µA
+                                                         ADC10ON = 1, INCHx = 0Bh,
+VMID                VCC divider at channel 11                                                          3V                 1.5                    V
+                                                         VMID ≉ 0.5 × VCC
+                    Sample time required if channel      ADC10ON = 1, INCHx = 0Bh,
+tVMID(sample)                                                                                          3V      1220                              ns
+                    11 is selected (5)                   Error of conversion result ≤ 1 LSB
+
+(1)    The sensor current ISENSOR is consumed if (ADC10ON = 1 and REFON = 1) or (ADC10ON = 1 and INCH = 0Ah and sample signal is
+       high). When REFON = 1, ISENSOR is included in IREF+. When REFON = 0, ISENSOR applies during conversion of the temperature sensor
+       input (INCH = 0Ah).
+(2)    The following formula can be used to calculate the temperature sensor output voltage:
+       VSensor,typ = TCSensor (273 + T [°C] ) + VOffset,sensor [mV] or
+       VSensor,typ = TCSensor T [°C] + VSensor(TA = 0°C) [mV]
+(3)    The typical equivalent impedance of the sensor is 51 kΩ. The sample time required includes the sensor-on time tSENSOR(on).
+(4)    No additional current is needed. The VMID is used during sampling.
+(5)    The on-time tVMID(on) is included in the sampling time tVMID(sample); no additional on time is needed.
+
+
+
+Flash Memory
+over recommended ranges of supply voltage and up to operating free-air temperature, TA = 105°C (unless otherwise noted)
+                              PARAMETER                                     TEST
+                                                                                                 VCC          MIN      TYP      MAX           UNIT
+                                                                         CONDITIONS
+VCC(PGM/ERASE)      Program and erase supply voltage                                                           2.2                3.6           V
+fFTG                Flash timing generator frequency                                                          257                 476          kHz
+IPGM                Supply current from VCC during program                                       3V                      1          5          mA
+IERASE              Supply current from VCC during erase                                         3V                      1          7          mA
+                                                   (1)
+tCPT                Cumulative program time                                                   2.2 V/3.6 V                          10          ms
+tCMErase            Cumulative mass erase time                                                2.2 V/3.6 V       20                             ms
+                                                                        -40°C ≤ TJ ≤
+                    Program/erase endurance                                                                    104      105                   cycles
+                                                                        105°C
+tRetention          Data retention duration                             TJ = 25°C                               15                            years
+                                                                        (2)
+tWord               Word or byte program time                                                                            30                    tFTG
+                                                                        (2)
+tBlock, 0           Block program time for first byte or word                                                            25                    tFTG
+                    Block program time for each additional byte or      (2)
+tBlock, 1-63                                                                                                             18                    tFTG
+                    word
+                                                                        (2)
+tBlock, End         Block program end-sequence wait time                                                                 6                     tFTG
+                                                                        (2)
+tMass Erase         Mass erase time                                                                                  10593                     tFTG
+                                                                        (2)
+tSeg Erase          Segment erase time                                                                                 4819                    tFTG
+
+(1)    The cumulative program time must not be exceeded when writing to a 64-byte flash block. This parameter applies to all programming
+       methods: individual word/byte write and block write modes.
+(2)    These values are hardwired into the Flash Controller's state machine (tFTG = 1/fFTG).
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                       Submit Documentation Feedback                   29
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                      www.ti.com
+
+RAM
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                                PARAMETER                                          TEST CONDITIONS                   MIN       MAX          UNIT
+                                                    (1)
+V(RAMh)              RAM retention supply voltage                           CPU halted                                 1.6                   V
+
+(1)    This parameter defines the minimum supply voltage VCC when the data in RAM remains unchanged. No program execution should
+       happen during this supply voltage condition.
+
+JTAG and Spy-Bi-Wire Interface
+over recommended ranges of supply voltage and operating free-air temperature (unless otherwise noted)
+                           PARAMETER                                 TEST CONDITIONS            VCC          MIN      TYP      MAX          UNIT
+fSBW           Spy-Bi-Wire input frequency                                                   2.2 V/3 V          0                20         MHz
+tSBW,Low       Spy-Bi-Wire low clock pulse length                                            2.2 V/3 V     0.025                 15          µs
+               Spy-Bi-Wire enable time
+tSBW,En                                                                                      2.2 V/3 V                               1       µs
+               (TEST high to acceptance of first clock edge (1))
+tSBW,Ret       Spy-Bi-Wire return to normal operation time         TA = -40°C to 105°C       2.2 V/3 V         15               100          µs
+                                                                                               2.2 V            0                    5      MHz
+fTCK           TCK input frequency (2)
+                                                                                                3V              0                10         MHz
+RInternal      Internal pulldown resistance on TEST                TA = -40°C to 105°C       2.2 V/3 V         25         60     90          kΩ
+
+(1)    Tools accessing the Spy-Bi-Wire interface need to wait for the maximum tSBW,En time after pulling the TEST/SBWCLK pin high before
+       applying the first SBWCLK clock edge.
+(2)    fTCK may be restricted to meet the timing requirements of the module selected.
+
+JTAG Fuse (1)
+TA = 25°C, over recommended ranges of supply voltage (unless otherwise noted)
+                                  PARAMETER                                         TEST CONDITIONS                 MIN        MAX         UNIT
+VCC(FB)           Supply voltage during fuse-blow condition                                                         2.5                      V
+VFB               Voltage level on TEST for fuse blow                                                                 6          7           V
+IFB               Supply current into TEST during fuse blow                                                                    100          mA
+tFB               Time to blow fuse                                                                                              1          ms
+
+(1)    Once the fuse is blown, no further access to the JTAG/Test, Spy-Bi-Wire, and emulation feature is possible, and JTAG is switched to
+       bypass mode.
+
+
+
+
+30          Submit Documentation Feedback                                                        Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                      MSP430G2231-EP
+
+www.ti.com                                                                                                                 SLAS862 – JUNE 2012
+
+                                                                APPLICATION INFORMATION
+
+Port P1 Pin Schematic: P1.0 to P1.2, Input/Output With Schmitt Trigger
+
+               To ADC10
+
+                  INCHx
+
+
+             ADC10AE0.y
+                                   PxSEL.y
+
+                 PxDIR.y             1           Direction
+                                     0           0: Input
+                                                 1: Output
+
+
+                PxREN.y
+
+
+
+                                                                               DVSS     0
+                                         PxSEL.y
+                                                                               DVCC     1      1
+
+
+                PxOUT.y                  0
+
+                   ACLK                  1
+                                                                                                                P1.0/TA0CLK/ACLK/A0
+                                                                                       Bus
+                                                                                      Keeper                    P1.1/TA0.0/A1
+                                                                                       EN                       P1.2/TA0.1/A2
+
+
+
+                  PxIN.y
+
+
+
+
+               To Module
+
+
+                                             PxIE.y
+
+                 PxIRQ.y                                    EN
+                                                      Q
+                                                          Set
+                                         PxIFG.y
+
+                PxSEL.y                               Interrupt
+                                                        Edge
+                 PxIES.y                               Select
+
+
+
+                                                 Table 14. Port P1 (P1.0 to P1.2) Pin Functions
+                                                                                                           CONTROL BITS / SIGNALS
+     PIN NAME (P1.x)           x                                    FUNCTION                                                     ADC10AE.x
+                                                                                                   P1DIR.x         P1SEL.x
+                                                                                                                                 (INCH.y = 1)
+P1.0/                               P1.x (I/O)                                                     I: 0; O: 1          0                 0
+TA0CLK/                             TA0.TACLK                                                          0               1                 0
+                               0
+ACLK/                               ACLK                                                               1               1                 0
+A0                                  A0                                                                 X               X              1 (y = 0)
+P1.1/                               P1.x (I/O)                                                     I: 0; O: 1          0                 0
+TA0.0/                              TA0.0                                                              1               1                 0
+                               1
+                                    TA0.CCI0A                                                          0               1                 0
+A1                                  A1                                                                 X               X              1 (y = 1)
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                     Submit Documentation Feedback                31
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                              www.ti.com
+
+                              Table 14. Port P1 (P1.0 to P1.2) Pin Functions (continued)
+                                                                                       CONTROL BITS / SIGNALS
+      PIN NAME (P1.x)     x                     FUNCTION                                                      ADC10AE.x
+                                                                               P1DIR.x         P1SEL.x
+                                                                                                              (INCH.y = 1)
+P1.2/                         P1.x (I/O)                                       I: 0; O: 1          0                0
+TA0.1/                        TA0.1                                                1               1                0
+                          2
+                              TA0.CCI1A                                            0               1                0
+A2/                           A2                                                   X               X            1 (y = 2)
+
+
+
+
+32       Submit Documentation Feedback                                        Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                               MSP430G2231-EP
+
+www.ti.com                                                                                                                           SLAS862 – JUNE 2012
+
+Port P1 Pin Schematic: P1.3, Input/Output With Schmitt Trigger
+                            SREF2
+
+                                              0          VSS
+                    To ADC10 VREF-
+                                              1
+
+
+                         To ADC10
+
+                         INCHx = y
+
+
+
+                       ADC10AE0.y
+                                           PxSEL.y
+
+
+                          PxDIR.y            1          Direction
+                                              0         0: Input
+                                                        1: Output
+
+
+                          PxREN.y
+
+
+
+                                                                                      DVSS     0
+                                                  PxSEL.y
+                                                                                      DVCC     1      1
+
+
+                          PxOUT.y                 0
+                       ADC10CLK                   1
+                                                                                                          P1.3/ADC10CLK/A3/VREF-/VEREF-
+                                                                                              Bus
+                                                                                             Keeper
+                                                                                               EN
+
+
+                           PxIN.y
+
+
+                                                          EN
+
+
+                        To Module                         D
+
+
+                                                      PxIE.y
+
+                          PxIRQ.y                                    EN
+                                                               Q
+                                                                   Set
+                                                  PxIFG.y
+
+                          PxSEL.y                              Interrupt
+                                                                 Edge
+                           PxIES.y                              Select
+
+
+
+
+                                                               Table 15. Port P1 (P1.3) Pin Functions
+                                                                                                                  CONTROL BITS / SIGNALS
+   PIN NAME (P1.x)           x                                             FUNCTION                                                       ADC10AE.x
+                                                                                                          P1DIR.x         P1SEL.x
+                                                                                                                                          (INCH.x = 1)
+P1.3/                                P1.x (I/O)                                                           I: 0; O: 1           0               0
+ADC10CLK/                            ADC10CLK                                                                 1                1               0
+A3/                          3       A3                                                                       X               X             1 (y = 3)
+VREF-/                               VREF-                                                                    X               X                1
+VEREF-                               VEREF-                                                                   X               X                1
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                           Submit Documentation Feedback                 33
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                        www.ti.com
+
+
+
+Port P1 Pin Schematic: P1.4, Input/Output With Schmitt Trigger
+     To ADC10 VREF+
+
+
+          To ADC10
+
+          INCHx = y
+
+
+
+        ADC10AE0.y
+                       PxSEL.y
+
+
+           PxDIR.y          1          Direction
+                            0          0: Input
+                                       1: Output
+
+
+
+           PxREN.y
+
+
+
+                                                                          DVSS      0
+                                PxSEL.y
+                                                                          DV CC     1              1
+
+
+           PxOUT.y              0
+
+            SMCLK               1
+                                                                                   Bus                           P1.4/SMCLK/A4/VREF+/VEREF+/TCK
+                                                                                  Keeper
+                                                                                   EN
+
+
+
+
+             PxIN.y
+
+
+
+
+          To Module
+
+
+                                    PxIE.y
+
+           PxIRQ.y                                 EN
+                                             Q
+                                                 Set
+                                PxIFG.y
+
+           PxSEL.y                           Interrupt
+                                               Edge
+            PxIES.y                           Select
+
+
+           From JTAG
+
+
+             To JTAG
+
+
+
+
+                                                         Table 16. Port P1 (P1.4) Pin Functions
+                                                                                                        CONTROL BITS / SIGNALS
+     PIN NAME (P1.x)    x                                   FUNCTION                                                    ADC10AE.x            JTAG
+                                                                                           P1DIR.x       P1SEL.x
+                                                                                                                        (INCH.x = 1)         Mode
+P1.4/                           P1.x (I/O)                                                 I: 0; O: 1        0                0                0
+SMCLK/                          SMCLK                                                          1             1                0                0
+A4/                             A4                                                             X             X            1 (y = 4)            0
+                        4
+VREF+/                          VREF+                                                          X             X                1                0
+VEREF+/                         VEREF+                                                         X             X                1                0
+TCK                             TCK                                                            X             X                0                1
+
+
+34       Submit Documentation Feedback                                                                  Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                            MSP430G2231-EP
+
+www.ti.com                                                                                                                       SLAS862 – JUNE 2012
+
+Port P1 Pin Schematic: P1.5, Input/Output With Schmitt Trigger
+
+                 To ADC10
+
+                    INCHx
+              ADC10AE0.y
+                                    PxSEL.y
+
+
+                   PxDIR.y              1          Direction
+                                        0          0: Input
+                                                   1: Output
+
+
+                  PxREN.y
+
+
+
+                                                                                   DVSS     0
+                                            PxSEL.y
+                                                                                   DVCC     1            1
+
+
+                  PxOUT.y                   0
+
+              From Module                   1
+                                                                                           Bus
+                                                                                          Keeper                       P1.5/TA0.0/A5/TMS
+                                                                                           EN
+
+
+
+
+                     PxIN.y
+
+
+
+
+                 To Module
+
+
+                                                PxIE.y
+
+                    PxIRQ.y                                    EN
+                                                         Q
+                                                             Set
+                                            PxIFG.y
+
+                   PxSEL.y                               Interrupt
+                                                           Edge
+                   PxIES.y                                 Select
+
+
+                 From JTAG
+
+
+                   To JTAG
+
+
+
+
+                                                         Table 17. Port P1 (P1.5) Pin Functions
+                                                                                                    CONTROL BITS / SIGNALS
+   PIN NAME (P1.x)            x                      FUNCTION                                                          ADC10AE.x           JTAG
+                                                                           P1DIR.x         P1SEL.x           USIP.x
+                                                                                                                       (INCH.x = 1)        Mode
+P1.5/                             P1.x (I/O)                               I: 0; O: 1           0              0             0               0
+TA0.0/                            TA0.0                                        1                1              0             0               0
+A5/                           5   A5                                           X                X              X          1 (y = 5)          0
+SCLK/                             SCLK                                         X                X              1             0               0
+TMS                               TMS                                          X                X              0             0               1
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                             Submit Documentation Feedback        35
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                             www.ti.com
+
+
+
+Port P1 Pin Schematic: P1.6, Input/Output With Schmitt Trigger
+
+            To ADC10
+
+               INCHx
+          ADC10AE0.y
+                               USIPE6
+
+
+             PxDIR.y              1           Direction
+               from USI           0           0: Input
+                                              1: Output
+
+
+             PxREN.y
+
+
+
+                               PxSEL.y or                                        DVSS      0
+                                USIP E6
+                                                                                 DV CC     1             1
+
+
+             PxOUT.y                  0
+                                      1
+             From USI                                                                     Bus
+                                                                                         Keeper                         P1.6/TA0.1/SDO/SCL/A6/TDI
+                                                                                           EN
+                                                       PxSEL.y
+
+
+               PxIN.y
+
+
+
+
+            To Module
+
+
+                                          PxIE.y
+
+              PxIRQ.y                                     EN
+                                                   Q
+                                                       Set
+                                      PxIFG.y
+
+             PxSEL.y                               Interrupt
+                                                     Edge
+              PxIES.y                               Select
+
+
+            From JTAG
+
+
+              To JTAG
+
+
+
+             USI in I2C mode: Output driver drives low level only. Driver is disabled in JTAG mode.
+
+
+                                                        Table 18. Port P1 (P1.6) Pin Functions
+                                                                                                      CONTROL BITS / SIGNALS
+     PIN NAME (P1.x)       x                        FUNCTION                                                                 ADC10AE.x              JTAG
+                                                                              P1DIR.x          P1SEL.x         USIP.x
+                                                                                                                             (INCH.x = 1)           Mode
+P1.6/                          P1.x (I/O)                                     I: 0; O: 1          0               0                0                 0
+TA0.1/                         TA0.1                                              1               1               0                0                 0
+                               TA0.CCR1B                                          0               1               0                0                 0
+                           6
+A6/                            A6                                                 X               X               0            1 (y = 6)             0
+SDO/                           SDO                                                X               X               1                0                 0
+TDI/TCLK                       TDI/TCLK                                           X               X               0                0                 1
+
+
+
+
+36       Submit Documentation Feedback                                                                       Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                                 MSP430G2231-EP
+
+www.ti.com                                                                                                                            SLAS862 – JUNE 2012
+
+Port P1 Pin Schematic: P1.7, Input/Output With Schmitt Trigger
+
+             To ADC10
+
+                INCHx
+          ADC10AE0.y
+                                USIPE7
+
+
+               PxDIR.y             1           Direction
+                                   0           0: Input
+               from USI                        1: Output
+
+                                PxSEL.y
+              PxREN.y
+
+
+
+                                PxSEL.y or                                        DVSS      0
+                                 USIPE7
+                                                                                  DVCC      1                1
+
+
+              PxOUT.y                  0
+
+              From USI                 1
+                                                                                          Bus
+                                                                                         Keeper                           P1.7/SDI/SDA/A7/TDO/TDI
+                                                                                           EN
+                                                        PxSEL.y
+
+
+                 PxIN.y
+
+
+
+
+             To Module
+
+
+                                           PxIE.y
+
+              PxIRQ.y                                      EN
+                                                    Q
+                                                        Set
+                                       PxIFG.y
+
+               PxSEL.y                              Interrupt
+                                                      Edge
+               PxIES.y                               Select
+
+
+             From JTAG
+
+
+               To JTAG
+
+
+             From JTAG
+
+
+               To JTAG
+
+
+
+
+              USI in I2C mode: Output driver drives low level only. Driver is disabled in JTAG mode.
+
+
+                                                         Table 19. Port P1 (P1.7) Pin Functions
+                                                                                                           CONTROL BITS / SIGNALS
+   PIN NAME (P1.x)          x                        FUNCTION                                                               ADC10AE.x               JTAG
+                                                                               P1DIR.x          P1SEL.x          USIP.x
+                                                                                                                            (INCH.x = 1)            Mode
+P1.7/                            P1.x (I/O)                                    I: 0; O: 1              0           0              0                  0
+A7/                              A7                                                X               X               0          1 (y = 7)              0
+                            7
+SDI/SDO                          SDI/SDO                                           X               X               1              0                  0
+TDO/TDI                          TDO/TDI                                           X               X               0              0                  1
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                                  Submit Documentation Feedback            37
+MSP430G2231-EP
+
+SLAS862 – JUNE 2012                                                                                                                           www.ti.com
+
+Port P2 Pin Schematic: P2.6, Input/Output With Schmitt Trigger
+
+
+                                                                                                                               XOUT/P2.7
+                          LF off
+                        PxSEL.6
+                        PxSEL.7
+
+
+
+
+             BCSCTL3.LFXT1Sx = 11
+
+
+                        LFXT1CLK                                0
+                                                                1
+                                                PxSEL.6
+
+
+                        PxDIR.y                   1        Direction
+                                                  0        0: Input
+                                                           1: Output
+
+
+
+                        PxREN.y
+
+
+
+                                                                                      DV SS     0
+                                                  PxSEL.6
+                                                                                      DV CC     1           1
+
+
+                        PxOUT.y                   0
+                    from Module                   1
+                                                                                               Bus                           XIN/P2.6/TA0.1
+                                                                                              Keeper
+                                                                                               EN
+
+
+                                PxIN.y
+
+
+
+
+                          To Module
+
+
+
+                                                      PxIE.y
+                            PxIRQ.y
+                                                                      EN
+                                                               Q
+                                                                    Set
+                                                  PxIFG.y
+
+                        PxSEL.y                                Interrupt
+                                                                 Edge
+                         PxIES.y                                Select
+
+
+
+                                                       Table 20. Port P2 (P2.6) Pin Functions
+                                                                                                                CONTROL BITS / SIGNALS
+      PIN NAME (P2.x)       x                                              FUNCTION
+                                                                                                            P2DIR.x        P2SEL.6            P2SEL.7
+XIN                                XIN                                                                          0              1                 1
+P2.6                        6      P2.x (I/O)                                                               I: 0; O: 1         0                 X
+TA0.1                              TA0.1 (1)                                                                    1              1                 X
+
+(1)    BCSCTL3.LFXT1Sx = 11 is required.
+
+
+
+
+38        Submit Documentation Feedback                                                                Copyright © 2012, Texas Instruments Incorporated
+                                                                                                                          MSP430G2231-EP
+
+www.ti.com                                                                                                                       SLAS862 – JUNE 2012
+
+Port P2 Pin Schematic: P2.7, Input/Output With Schmitt Trigger
+
+
+                                                                                                                            XIN/P2.6/TA0.1
+                        LF off
+                      PxSEL.6
+                      PxSEL.7
+
+
+
+
+          BCSCTL3.LFXT1Sx = 11
+
+
+                      LFXT1CLK                               0
+                                                             1          from P2.6/XIN
+                                         PxSEL.7
+
+
+                      PxDIR.y                  1             Direction
+                                               0             0: Input
+                                                             1: Output
+
+
+
+                      PxREN.y
+
+
+
+                                                                                        DVSS      0
+                                               PxSEL.7
+                                                                                        DV CC     1      1
+
+
+                      PxOUT.y                  0
+                    from Module                1
+                                                                                                 Bus                       XOUT/P2.7
+                                                                                                Keeper
+                                                                                                  EN
+
+
+                            PxIN.y
+
+
+
+
+                        To Module
+
+
+
+                                                   PxIE.y
+                          PxIRQ.y
+                                                                   EN
+                                                            Q
+                                                                 Set
+                                               PxIFG.y
+
+                      PxSEL.y                               Interrupt
+                                                              Edge
+                       PxIES.y                               Select
+
+
+
+                                                       Table 21. Port P2 (P2.7) Pin Functions
+                                                                                                                 CONTROL BITS / SIGNALS
+   PIN NAME (P2.x)          x                                             FUNCTION
+                                                                                                             P2DIR.x      P2SEL.6        P2SEL.7
+XOUT                              XOUT                                                                           1           1               1
+                            7
+P2.7                              P2.x (I/O)                                                                 I: 0; O: 1     X                0
+
+
+
+
+Copyright © 2012, Texas Instruments Incorporated                                                         Submit Documentation Feedback             39
+                                                                                                                                                                      PACKAGE OPTION ADDENDUM
+
+       www.ti.com                                                                                                                                                                                                   11-Nov-2025
+
+
+
+
+PACKAGING INFORMATION
+
+       Orderable part number          Status     Material type      Package | Pins      Package qty | Carrier        RoHS             Lead finish/              MSL rating/               Op temp (°C)          Part marking
+                                        (1)            (2)                                                             (3)            Ball material             Peak reflow                                           (6)
+                                                                                                                                            (4)                      (5)
+
+      MSP430G2231QPW1EP               Active      Production       TSSOP (PW) | 14            90 | TUBE               Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+      MSP430G2231QPW1EP.A             Active      Production       TSSOP (PW) | 14            90 | TUBE               Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+      MSP430G2231QPW1REP              Active      Production       TSSOP (PW) | 14       2000 | LARGE T&R             Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+  MSP430G2231QPW1REP.A                Active      Production       TSSOP (PW) | 14       2000 | LARGE T&R             Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+          V62/12621-01XE              Active      Production       TSSOP (PW) | 14       2000 | LARGE T&R             Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+         V62/12621-01XE-T             Active      Production       TSSOP (PW) | 14            90 | TUBE               Yes                NIPDAU            Level-3-260C-168 HR             -40 to 125             G2231EP
+
+(1)
+      Status: For more details on status, see our product life cycle.
+
+(2)
+   Material type: When designated, preproduction parts are prototypes/experimental devices, and are not yet approved or released for full production. Testing and final process, including without limitation quality assurance,
+reliability performance testing, and/or process qualification, may not yet be complete, and this item is subject to further changes or possible discontinuation. If available for ordering, purchases will be subject to an additional
+waiver at checkout, and are intended for early internal evaluation purposes only. These items are sold without warranties of any kind.
+
+(3)
+      RoHS values: Yes, No, RoHS Exempt. See the TI RoHS Statement for additional information and value definition.
+
+(4)
+   Lead finish/Ball material: Parts may have multiple material finish options. Finish options are separated by a vertical ruled line. Lead finish/Ball material values may wrap to two lines if the finish value exceeds the maximum
+column width.
+
+(5)
+  MSL rating/Peak reflow: The moisture sensitivity level ratings and peak solder (reflow) temperatures. In the event that a part has multiple moisture sensitivity ratings, only the lowest level per JEDEC standards is shown.
+Refer to the shipping label for the actual reflow temperature that will be used to mount the part to the printed circuit board.
+
+(6)
+      Part marking: There may be an additional marking, which relates to the logo, the lot trace code information, or the environmental category of the part.
+
+Multiple part markings will be inside parentheses. Only one part marking contained in parentheses and separated by a "~" will appear on a part. If a line is indented then it is a continuation of the previous line and the two
+combined represent the entire part marking for that device.
+
+Important Information and Disclaimer:The information provided on this page represents TI's knowledge and belief as of the date that it is provided. TI bases its knowledge and belief on information provided by third parties, and
+makes no representation or warranty as to the accuracy of such information. Efforts are underway to better integrate information from third parties. TI has taken and continues to take reasonable steps to provide representative
+and accurate information but may not have conducted destructive testing or chemical analysis on incoming materials and chemicals. TI and TI suppliers consider certain information to be proprietary, and thus CAS numbers
+and other limited information may not be available for release.
+
+In no event shall TI's liability arising out of such information exceed the total purchase price of the TI part(s) at issue in this document sold by TI to Customer on an annual basis.
+
+
+
+                                                                                                          Addendum-Page 1
+                                                                                                                          PACKAGE OPTION ADDENDUM
+
+   www.ti.com                                                                                                                               11-Nov-2025
+
+
+
+
+OTHER QUALIFIED VERSIONS OF MSP430G2231-EP :
+
+• Catalog : MSP430G2231
+• Automotive : MSP430G2231-Q1
+
+NOTE: Qualified Version Definitions:
+
+       • Catalog - TI's standard catalog product
+       • Automotive - Q100 devices qualified for high-reliability automotive applications targeting zero defects
+
+
+
+
+                                                                                                        Addendum-Page 2
+                                                                              PACKAGE MATERIALS INFORMATION
+
+www.ti.com                                                                                                                                   10-Aug-2026
+
+
+
+TAPE AND REEL INFORMATION
+
+       REEL DIMENSIONS                                                                     TAPE DIMENSIONS
+                                                                                      K0       P1
+
+
+
+                                                                                                                     B0 W
+                                       Reel
+                                     Diameter
+                                                                                   Cavity           A0
+                                                               A0   Dimension designed to accommodate the component width
+                                                               B0   Dimension designed to accommodate the component length
+                                                               K0   Dimension designed to accommodate the component thickness
+                                                               W    Overall width of the carrier tape
+                                                               P1   Pitch between successive cavity centers
+
+
+                                      Reel Width (W1)
+                              QUADRANT ASSIGNMENTS FOR PIN 1 ORIENTATION IN TAPE
+
+                                                                                                    Sprocket Holes
+
+
+                                                Q1        Q2          Q1    Q2
+
+                                                Q3        Q4          Q3    Q4                  User Direction of Feed
+
+
+
+                                                           Pocket Quadrants
+
+
+*All dimensions are nominal
+             Device           Package Package Pins             SPQ       Reel   Reel   A0                  B0         K0     P1     W     Pin1
+                               Type Drawing                            Diameter Width (mm)                (mm)       (mm)   (mm)   (mm) Quadrant
+                                                                         (mm) W1 (mm)
+MSP430G2231QPW1REP TSSOP                PW           14        2000        330.0        12.4        6.9    5.6       1.6    8.0    12.0    Q1
+
+
+
+
+                                                                     Pack Materials-Page 1
+                                                                PACKAGE MATERIALS INFORMATION
+
+www.ti.com                                                                                                              10-Aug-2026
+
+
+
+ TAPE AND REEL BOX DIMENSIONS
+
+
+
+
+                                                               Width (mm)
+                                                                              H
+                      W
+
+
+
+
+                                                          L
+
+
+
+
+*All dimensions are nominal
+             Device           Package Type   Package Drawing   Pins         SPQ    Length (mm)   Width (mm)   Height (mm)
+MSP430G2231QPW1REP              TSSOP              PW           14          2000      353.0        353.0         32.0
+
+
+
+
+                                                        Pack Materials-Page 2
+                                                               PACKAGE MATERIALS INFORMATION
+
+www.ti.com                                                                                                   10-Aug-2026
+
+
+
+TUBE
+
+       T - Tube
+        height                                                     L - Tube length
+
+
+                      W - Tube
+                       width
+
+
+         B - Alignment groove width
+
+*All dimensions are nominal
+             Device           Package Name   Package Type   Pins       SPQ     L (mm)   W (mm)   T (µm)   B (mm)
+ MSP430G2231QPW1EP                PW           TSSOP         14         90      530      10.2    3600      3.5
+MSP430G2231QPW1EP.A               PW           TSSOP         14         90      530      10.2    3600      3.5
+    V62/12621-01XE-T              PW           TSSOP         14         90      530      10.2    3600      3.5
+
+
+
+
+                                                       Pack Materials-Page 3
+                                                                                                           PACKAGE OUTLINE
+PW0014A                                                        SCALE 2.500
+                                                                                                    TSSOP - 1.2 mm max height
+                                                                                                                         SMALL OUTLINE PACKAGE
+
+
+
+
+                                                                                                                                        SEATING
+                                                                                                                                        PLANE
+                                       6.6                                                                                C
+                                           TYP
+          A                            6.2
+                                                                                                                                          0.1 C
+                                          PIN 1 INDEX AREA
+                                                                                      12X 0.65
+                                                                              14
+                1
+
+
+
+
+                                                                                      2X
+        5.1                                                                           3.9
+        4.9
+       NOTE 3
+
+
+                                                                                                           4X (0 -12 )
+                7
+                                                                              8
+                                                                                            0.30
+                                                                                      14X
+                                                                                            0.17
+                                        4.5                                                                              1.2 MAX
+                    B                                                                     0.1      C A B
+                                        4.3
+                                       NOTE 4
+
+
+
+
+                                                          (0.15) TYP
+                                     SEE DETAIL A
+
+                                                                                    0.25
+                                                                             GAGE PLANE
+                                                                                                                                          0.15
+                                                                                                                                          0.05
+
+
+
+                                                                                                      0.75
+                                                                                                      0.50
+                                                                                      0 -8
+                                                                                                                    DETAIL A
+                                                                                                                          A 20
+
+
+
+
+                                                                                                                     TYPICAL
+
+                                                                                                                                   4220202/B 12/2023
+
+NOTES:
+
+1. All linear dimensions are in millimeters. Any dimensions in parenthesis are for reference only. Dimensioning and tolerancing
+   per ASME Y14.5M.
+2. This drawing is subject to change without notice.
+3. This dimension does not include mold flash, protrusions, or gate burrs. Mold flash, protrusions, or gate burrs shall not
+   exceed 0.15 mm per side.
+4. This dimension does not include interlead flash. Interlead flash shall not exceed 0.25 mm per side.
+5. Reference JEDEC registration MO-153.
+
+
+
+
+                                                                             www.ti.com
+                                                                                    EXAMPLE BOARD LAYOUT
+PW0014A                                                                                 TSSOP - 1.2 mm max height
+                                                                                                        SMALL OUTLINE PACKAGE
+
+
+
+
+                                            14X (1.5)                  SYMM
+                                                                                                     (R0.05) TYP
+                                       1
+                           14X (0.45)                                                          14
+
+
+
+
+                                                                                                     SYMM
+
+
+
+                          12X (0.65)
+
+
+                                        7                                                      8
+
+
+
+                                                                       (5.8)
+
+
+                                                        LAND PATTERN EXAMPLE
+                                                          EXPOSED METAL SHOWN
+                                                               SCALE: 10X
+
+
+
+
+             SOLDER MASK                                                       METAL UNDER                  SOLDER MASK
+                                METAL                                          SOLDER MASK                  OPENING
+                 OPENING
+
+
+
+     EXPOSED METAL                                                                                                 EXPOSED METAL
+
+                                0.05 MAX                                                       0.05 MIN
+                                ALL AROUND                                                     ALL AROUND
+
+                          NON-SOLDER MASK                                                    SOLDER MASK
+                              DEFINED                                                          DEFINED
+                            (PREFERRED)                  SOLDER MASK DETAILS
+                                                              15.000
+
+
+
+
+                                                                                                                   4220202/B 12/2023
+NOTES: (continued)
+
+6. Publication IPC-7351 may have alternate designs.
+7. Solder mask tolerances between and around signal pads can vary based on board fabrication site.
+
+
+
+
+                                                                       www.ti.com
+                                                                               EXAMPLE STENCIL DESIGN
+PW0014A                                                                                 TSSOP - 1.2 mm max height
+                                                                                                           SMALL OUTLINE PACKAGE
+
+
+
+
+                                            14X (1.5)           SYMM
+                                                                                                      (R0.05) TYP
+                                       1
+                           14X (0.45)                                                           14
+
+
+
+
+                                                                                                    SYMM
+
+
+
+                          12X (0.65)
+
+
+                                        7                                                       8
+
+
+
+                                                                 (5.8)
+
+
+
+                                                        SOLDER PASTE EXAMPLE
+                                                    BASED ON 0.125 mm THICK STENCIL
+                                                              SCALE: 10X
+
+
+
+
+                                                                                                                    4220202/B 12/2023
+NOTES: (continued)
+
+8. Laser cutting apertures with trapezoidal walls and rounded corners may offer better paste release. IPC-7525 may have alternate
+   design recommendations.
+9. Board assembly site may have different recommendations for stencil design.
+
+
+
+
+                                                                 www.ti.com
+                                         IMPORTANT NOTICE AND DISCLAIMER
+TI PROVIDES TECHNICAL AND RELIABILITY DATA (INCLUDING DATASHEETS), DESIGN RESOURCES (INCLUDING REFERENCE
+DESIGNS), APPLICATION OR OTHER DESIGN ADVICE, WEB TOOLS, SAFETY INFORMATION, AND OTHER RESOURCES “AS IS”
+AND WITH ALL FAULTS, AND DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION ANY
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT OF THIRD
+PARTY INTELLECTUAL PROPERTY RIGHTS.
+These resources are intended for skilled developers designing with TI products. You are solely responsible for (1) selecting the appropriate
+TI products for your application, (2) designing, validating and testing your application, and (3) ensuring your application meets applicable
+standards, and any other safety, security, regulatory or other requirements.
+These resources are subject to change without notice. TI grants you permission to use these resources only for development of an
+application that uses the TI products described in the resource. Other reproduction and display of these resources is prohibited. No license
+is granted to any other TI intellectual property right or to any third party intellectual property right. TI disclaims responsibility for, and you fully
+indemnify TI and its representatives against any claims, damages, costs, losses, and liabilities arising out of your use of these resources.
+TI’s products are provided subject to TI’s Terms of Sale, TI’s General Quality Guidelines, or other applicable terms available either on
+ti.com or provided in conjunction with such TI products. TI’s provision of these resources does not expand or otherwise alter TI’s applicable
+warranties or warranty disclaimers for TI products. Unless TI explicitly designates a product as custom or customer-specified, TI products
+are standard, catalog, general purpose devices.
+TI objects to and rejects any additional or different terms you may propose.
+IMPORTANT NOTICE
+
+                                                Copyright © 2026, Texas Instruments Incorporated
+                                                                Last updated 10/2025
+

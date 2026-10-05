@@ -1,0 +1,123 @@
+=== FINAL_TEST_REPORT ===
+Date: ven. 25 sept. 2026 17:58:19 CEST
+
+=== Tests historiques du projet ===
+.....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+----------------------------------------------------------------------
+Ran 469 tests in 4.095s
+
+OK
+Lancement de la campagne courte de vérification.
+Les valeurs provisoires de cette campagne ne sont pas encore des résultats scientifiques finaux.
+
+=== Tests haenel_comparison (complets) ===
+test_energy_ordering_matches_published_ordering (test_energy_option_a.TestEnergyOptionA.test_energy_ordering_matches_published_ordering)
+RFF_ONLY < HYBRID_FRR_05 < HYBRID_FRR_10 < MAC_ONLY, ... ok
+test_mac_only_not_forced_into_the_model (test_energy_option_a.TestEnergyOptionA.test_mac_only_not_forced_into_the_model)
+MAC_ONLY ne doit jamais recevoir de valeur Option A ... ok
+test_no_nan_or_negative_energy (test_energy_option_a.TestEnergyOptionA.test_no_nan_or_negative_energy) ... ok
+test_reproduces_published_values_within_one_percent (test_energy_option_a.TestEnergyOptionA.test_reproduces_published_values_within_one_percent)
+Option A doit reproduire les valeurs publiées à moins ... ok
+test_cpu_current_is_not_fr5994_value (test_energy_option_b.TestEnergyOptionBHardwareCorrection.test_cpu_current_is_not_fr5994_value)
+225 µA/MHz (typ) et 118 µA/MHz (best-case) étaient les ... ok
+test_cpu_current_matches_msp430g2553_datasheet (test_energy_option_b.TestEnergyOptionBHardwareCorrection.test_cpu_current_matches_msp430g2553_datasheet)
+330 µA/MHz (typ, 3V, 1MHz) et 420 µA/MHz (max) viennent du ... ok
+test_fallback_energy_actually_varies_with_cpu_assumption (test_energy_option_b.TestEnergyOptionBHardwareCorrection.test_fallback_energy_actually_varies_with_cpu_assumption)
+Preuve comportementale (pas seulement structurelle) que ... ok
+test_low_high_cpu_bounds_are_wired_into_assumptions (test_energy_option_b.TestEnergyOptionBHardwareCorrection.test_low_high_cpu_bounds_are_wired_into_assumptions)
+Bug trouvé pendant la correction : les bornes LOW/HIGH ... ok
+test_no_lpm_or_sleep_constant_remains (test_energy_option_b.TestEnergyOptionBHardwareCorrection.test_no_lpm_or_sleep_constant_remains)
+Haenel et al. Section 6.3.2 précise que le deep-sleep ... ok
+test_no_nan_or_negative_energy_any_assumption_set (test_energy_option_b.TestEnergyOptionBOrderingAndMagnitude.test_no_nan_or_negative_energy_any_assumption_set) ... ok
+test_ordering_preserved_under_all_three_assumption_sets (test_energy_option_b.TestEnergyOptionBOrderingAndMagnitude.test_ordering_preserved_under_all_three_assumption_sets) ... ok
+test_published_values_are_unchanged_by_this_correction (test_energy_option_b.TestEnergyOptionBOrderingAndMagnitude.test_published_values_are_unchanged_by_this_correction)
+Garde-fou : cette correction touche Option B, jamais les ... ok
+test_residual_calibration_varies_with_assumptions_but_not_by_case (test_energy_option_b.TestEnergyOptionBOrderingAndMagnitude.test_residual_calibration_varies_with_assumptions_but_not_by_case)
+Le résiduel doit dépendre du jeu d'hypothèses matériel ... ok
+test_no_nan_in_p0_complete_result (test_final_checks.TestFinalChecks.test_no_nan_in_p0_complete_result) ... ok
+test_p0_complete_can_use_any_of_the_eight_decisions (test_final_checks.TestFinalChecks.test_p0_complete_can_use_any_of_the_eight_decisions)
+P0_COMPLETE ne doit pas être artificiellement restreint ... ok
+test_protocol_timing_constants (test_final_checks.TestFinalChecks.test_protocol_timing_constants) ... ok
+test_required_result_files_exist (test_final_checks.TestFinalChecks.test_required_result_files_exist) ... ok
+test_s1_s5_case_studies_still_produce_five_cases (test_final_checks.TestFinalChecks.test_s1_s5_case_studies_still_produce_five_cases)
+Garde-fou : les campagnes S1-S5 n'ont pas été modifiées ... ok
+test_haenel_comparison_test_package_imports (test_final_scientific_pass.TestAllHistoricalAndHaenelTestsCanBeCollected.test_haenel_comparison_test_package_imports) ... ok
+test_historical_test_modules_import_without_error (test_final_scientific_pass.TestAllHistoricalAndHaenelTestsCanBeCollected.test_historical_test_modules_import_without_error) ... ok
+test_effective_fixed_hybrid_overhead_exists (test_final_scientific_pass.TestFirstFullAuthenticationDocumented.test_effective_fixed_hybrid_overhead_exists) ... ok
+test_initial_full_auth_overhead_function_exists (test_final_scientific_pass.TestFirstFullAuthenticationDocumented.test_initial_full_auth_overhead_function_exists) ... ok
+test_report_cites_first_full_authentication (test_final_scientific_pass.TestFirstFullAuthenticationDocumented.test_report_cites_first_full_authentication) ... ok
+test_far_status_for_frr10_is_published (test_final_scientific_pass.TestFrr5FarLabeledAssumed.test_far_status_for_frr10_is_published) ... ok
+test_far_status_for_frr5_is_assumed (test_final_scientific_pass.TestFrr5FarLabeledAssumed.test_far_status_for_frr5_is_assumed) ... ok
+test_native_and_principal_csv_outputs_are_distinct_files (test_final_scientific_pass.TestNativeSensitivityIsSeparate.test_native_and_principal_csv_outputs_are_distinct_files) ... ok
+test_native_module_is_distinct_from_principal_module (test_final_scientific_pass.TestNativeSensitivityIsSeparate.test_native_module_is_distinct_from_principal_module) ... ok
+test_b5_litteral_only_appears_in_corrective_context (test_final_scientific_pass.TestNoLiteralB5StringInDeliverables.test_b5_litteral_only_appears_in_corrective_context) ... ok
+test_master_table_no_nan (test_final_scientific_pass.TestNoNaNInRequiredColumns.test_master_table_no_nan) ... ok
+test_option_a_vs_option_b_no_nan (test_final_scientific_pass.TestNoNaNInRequiredColumns.test_option_a_vs_option_b_no_nan) ... ok
+test_mail_has_no_feminine_transparente (test_final_scientific_pass.TestNoRetractedPhrasesInDeliverables.test_mail_has_no_feminine_transparente) ... ok
+test_no_63_89_percent_claim_outside_corrective_context (test_final_scientific_pass.TestNoRetractedPhrasesInDeliverables.test_no_63_89_percent_claim_outside_corrective_context) ... ok
+test_readme_has_no_not_implemented_contradictions (test_final_scientific_pass.TestNoRetractedPhrasesInDeliverables.test_readme_has_no_not_implemented_contradictions) ... ok
+test_central_calib_transition_is_not_240us (test_final_scientific_pass.TestNoSilentDeepSleepTransition.test_central_calib_transition_is_not_240us) ... ok
+test_no_deep_sleep_module_constants_remain (test_final_scientific_pass.TestNoSilentDeepSleepTransition.test_no_deep_sleep_module_constants_remain) ... ok
+test_report_does_not_call_option_a_independent_validation (test_final_scientific_pass.TestOptionANotCalledIndependentValidation.test_report_does_not_call_option_a_independent_validation) ... ok
+test_increment_explained_pct_computed_correctly (test_final_scientific_pass.TestOptionBIncrementalColumns.test_increment_explained_pct_computed_correctly) ... ok
+test_incremental_columns_present_in_csv (test_final_scientific_pass.TestOptionBIncrementalColumns.test_incremental_columns_present_in_csv) ... ok
+test_no_case_claims_more_than_20_percent_explained (test_final_scientific_pass.TestOptionBIncrementalColumns.test_no_case_claims_more_than_20_percent_explained)
+Garde-fou directement lié au Check 12 (pas de '63-89%') : ... ok
+test_every_source_has_nonempty_status (test_final_scientific_pass.TestOptionBSourcesAllHaveStatus.test_every_source_has_nonempty_status) ... ok
+test_extension_table_is_a_separate_file (test_final_scientific_pass.TestP0CompleteMarkedExploratory.test_extension_table_is_a_separate_file) ... ok
+test_extension_table_labeled_exploratory (test_final_scientific_pass.TestP0CompleteMarkedExploratory.test_extension_table_labeled_exploratory) ... ok
+test_master_table_does_not_contain_p0_complete (test_final_scientific_pass.TestP0CompleteMarkedExploratory.test_master_table_does_not_contain_p0_complete) ... ok
+test_far_rff_haenel_constant_is_0_002 (test_final_scientific_pass.TestPrincipalComparisonUsesPublishedFar.test_far_rff_haenel_constant_is_0_002) ... ok
+test_principal_selection_uses_far_rff_haenel_by_default (test_final_scientific_pass.TestPrincipalComparisonUsesPublishedFar.test_principal_selection_uses_far_rff_haenel_by_default) ... ok
+test_boundary_csv_exists_and_crosses_at_0_25 (test_final_scientific_pass.TestWeightBoundarySweep.test_boundary_csv_exists_and_crosses_at_0_25) ... ok
+test_score_matches_theoretical_prediction_exactly (test_final_scientific_pass.TestWeightBoundarySweep.test_score_matches_theoretical_prediction_exactly) ... ok
+test_different_seeds_differ (test_haenel_b5_statistics.TestHaenelB5Statistics.test_different_seeds_differ)
+Deux graines différentes ne doivent (presque toujours) ... ok
+test_frr_005_converges_to_5_percent (test_haenel_b5_statistics.TestHaenelB5Statistics.test_frr_005_converges_to_5_percent) ... ok
+test_frr_010_converges_to_10_percent (test_haenel_b5_statistics.TestHaenelB5Statistics.test_frr_010_converges_to_10_percent) ... ok
+test_frr_none_is_mac_only (test_haenel_b5_statistics.TestHaenelB5Statistics.test_frr_none_is_mac_only)
+frr=None doit forcer A1 pour 100% des messages (MAC_ONLY). ... ok
+test_frr_zero_is_rff_only (test_haenel_b5_statistics.TestHaenelB5Statistics.test_frr_zero_is_rff_only)
+frr=0.0 doit forcer A2 pour 100% des messages (RFF_ONLY, ... ok
+test_no_nan_or_negative_counts (test_haenel_b5_statistics.TestHaenelB5Statistics.test_no_nan_or_negative_counts) ... ok
+test_reproducibility_same_seed_same_events (test_haenel_b5_statistics.TestHaenelB5Statistics.test_reproducibility_same_seed_same_events)
+Deux exécutions avec la même graine doivent produire ... ok
+test_a1_energy_is_deterministic (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_a1_energy_is_deterministic) ... ok
+test_a2_expected_energy_matches_option_a_aggregate (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_a2_expected_energy_matches_option_a_aggregate)
+L'espérance par message * 100, pour FRR=5% et FRR=10%, ... ok
+test_a2_expected_energy_requires_frr (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_a2_expected_energy_requires_frr) ... ok
+test_a2_realized_energy_bounds (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_a2_realized_energy_bounds) ... ok
+test_both_candidates_get_identical_neutral_latency (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_both_candidates_get_identical_neutral_latency) ... ok
+test_energy_values_on_haenel_scale_not_lora_scale (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_energy_values_on_haenel_scale_not_lora_scale)
+L'énergie exposée doit être de l'ordre du mJ Haenel ... ok
+test_latency_is_neutralized_and_documented (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_latency_is_neutralized_and_documented) ... ok
+test_p0_decision_persists_across_frr_cases (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_p0_decision_persists_across_frr_cases)
+Le résultat (A1 systématiquement retenu) ne doit pas ... ok
+test_per_message_constants_match_published_over_n_messages (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_per_message_constants_match_published_over_n_messages) ... ok
+test_rauth_and_qkey_untouched_by_adapter (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_rauth_and_qkey_untouched_by_adapter)
+Rauth et Qkey doivent rester ceux du vrai modèle ... ok
+test_simulate_p0_haenel_scale_no_nan (test_haenel_energy_adapter.TestHaenelEnergyAdapter.test_simulate_p0_haenel_scale_no_nan) ... ok
+test_fallback_message_costs_more_than_direct_rff (test_realized_energy_consistency.TestRealizedEnergyConsistency.test_fallback_message_costs_more_than_direct_rff)
+Un message replié doit coûter STRICTEMENT plus qu'un ... ok
+test_large_sample_converges_to_published_per_message_cost (test_realized_energy_consistency.TestRealizedEnergyConsistency.test_large_sample_converges_to_published_per_message_cost)
+Sur un grand nombre de messages (pour lisser le bruit ... ok
+test_mac_only_uses_flat_cost_every_message (test_realized_energy_consistency.TestRealizedEnergyConsistency.test_mac_only_uses_flat_cost_every_message) ... ok
+test_b5_and_p0_use_independent_random_streams (test_security_monte_carlo.TestSecurityMonteCarlo.test_b5_and_p0_use_independent_random_streams) ... ok
+test_b5_ci_width_is_narrow_enough_to_be_informative (test_security_monte_carlo.TestSecurityMonteCarlo.test_b5_ci_width_is_narrow_enough_to_be_informative)
+L'ancienne campagne (455 tentatives) donnait un IC95% de ... ok
+test_b5_empirical_far_recovers_published_value (test_security_monte_carlo.TestSecurityMonteCarlo.test_b5_empirical_far_recovers_published_value)
+Avec 100 000 tirages à FAR=0.002, l'IC95% empirique doit ... ok
+test_clopper_pearson_ci_handles_all_successes (test_security_monte_carlo.TestSecurityMonteCarlo.test_clopper_pearson_ci_handles_all_successes) ... ok
+test_clopper_pearson_ci_handles_zero_successes (test_security_monte_carlo.TestSecurityMonteCarlo.test_clopper_pearson_ci_handles_zero_successes)
+Cas P0 : 0 acceptation ne doit pas produire un IC dégénéré ... ok
+test_p0_far_is_clearly_labeled_as_theoretical_bound (test_security_monte_carlo.TestSecurityMonteCarlo.test_p0_far_is_clearly_labeled_as_theoretical_bound) ... ok
+test_p0_zero_acceptances_does_not_imply_far_is_actually_zero (test_security_monte_carlo.TestSecurityMonteCarlo.test_p0_zero_acceptances_does_not_imply_far_is_actually_zero)
+Garde-fou explicite demandé par l'utilisateur : '0 ... ok
+test_reproducibility_same_seed_same_result (test_security_monte_carlo.TestSecurityMonteCarlo.test_reproducibility_same_seed_same_result) ... ok
+test_sample_size_meets_minimum_requirement (test_security_monte_carlo.TestSecurityMonteCarlo.test_sample_size_meets_minimum_requirement)
+Au moins 50 000 tentatives exigées, 100 000 visées. ... ok
+
+----------------------------------------------------------------------
+Ran 77 tests in 11.443s
+
+OK

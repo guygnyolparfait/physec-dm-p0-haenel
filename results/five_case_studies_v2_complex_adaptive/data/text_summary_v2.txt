@@ -1,0 +1,50 @@
+=== S1-REMOTE-AGRICULTURAL-SENSOR (n=30 graines) ===
+  mean_energy_j -> -2.8 % — amélioration (diminution)
+  mean_latency_objective -> -21.5 % — amélioration (diminution)
+  mean_authentication_robustness -> -0.0000 pt — stabilité
+  mean_key_quality -> -0.0009 pt — écart faible (diminution)
+  P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS service=1.0 energy=0.188719 latency=0.001483 robust=0.999999 keyq=0.729964 far=0.0
+  B1-CONVENTIONAL service=1.0 energy=0.194146 latency=0.001889 robust=1.0 keyq=0.730897 far=0.0
+  B2-NAIVE-PHYSEC-NO-FLOOR service=1.0 energy=0.184771 latency=0.001171 robust=0.999961 keyq=0.729964 far=0.0
+  B3-HYBRID-FIXED service=0.9999 energy=0.184771 latency=0.001171 robust=0.999965 keyq=0.729966 far=0.0
+  B4-DM-NO-FAR-FLOOR service=1.0 energy=0.188719 latency=0.001483 robust=0.999999 keyq=0.729964 far=0.0
+=== S2-INDUSTRIAL-CRITICAL-ALARM (n=120 graines) ===
+  mean_energy_j -> -0.1 % — écart faible (diminution)
+  mean_latency_objective -> +0.0 % — écart faible (augmentation)
+  mean_authentication_robustness -> +0.0000 pt — différence négligeable (IC95 chevauche zéro)
+  mean_key_quality -> -0.0009 pt — écart faible (diminution)
+  P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS service=1.0 energy=0.208999 latency=0.005034 robust=1.0 keyq=0.730000 far=0.0
+  B1-CONVENTIONAL service=1.0 energy=0.209175 latency=0.005034 robust=1.0 keyq=0.730897 far=0.0
+  B2-NAIVE-PHYSEC-NO-FLOOR service=1.0 energy=0.201131 latency=0.005370 robust=0.872090 keyq=0.730000 far=0.126044
+  B3-HYBRID-FIXED service=0.3877 energy=0.199785 latency=0.110475 robust=0.988842 keyq=0.682969 far=0.004220
+  B4-DM-NO-FAR-FLOOR service=1.0 energy=0.208999 latency=0.005034 robust=1.0 keyq=0.730000 far=0.0
+=== S3-MOBILE-VEHICLE (n=40 graines) ===
+  mean_energy_j -> -0.0 % — écart faible (diminution)
+  mean_latency_objective -> +0.1 % — écart faible (augmentation)
+  mean_authentication_robustness -> +0.0000 pt — différence négligeable (IC95 chevauche zéro)
+  mean_key_quality -> +0.0000 pt — différence négligeable (IC95 chevauche zéro)
+  P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS service=1.0 energy=0.199120 latency=0.001877 robust=1.0 keyq=0.730897 far=0.0
+  B1-CONVENTIONAL service=1.0 energy=0.199156 latency=0.001875 robust=1.0 keyq=0.730897 far=0.0
+  B2-NAIVE-PHYSEC-NO-FLOOR service=1.0 energy=0.189967 latency=0.002327 robust=0.989874 keyq=0.730890 far=0.011185
+  B3-HYBRID-FIXED service=0.4412 energy=0.189768 latency=0.071604 robust=0.997281 keyq=0.672945 far=0.001142
+  B4-DM-NO-FAR-FLOOR service=1.0 energy=0.199120 latency=0.001877 robust=1.0 keyq=0.730897 far=0.0
+=== S4-DENSE-URBAN-NETWORK (n=90 graines) ===
+  mean_energy_j -> -0.0 % — écart faible (diminution)
+  mean_latency_objective -> +8.9 % — dégradation (augmentation)
+  mean_authentication_robustness -> +0.0000 pt — différence négligeable (IC95 chevauche zéro)
+  mean_key_quality -> -0.0002 pt — écart faible (diminution)
+  P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS service=1.0 energy=0.199122 latency=0.002049 robust=1.0 keyq=0.730673 far=0.0
+  B1-CONVENTIONAL service=1.0 energy=0.199156 latency=0.001881 robust=1.0 keyq=0.730897 far=0.0
+  B2-NAIVE-PHYSEC-NO-FLOOR service=1.0 energy=0.189945 latency=0.002470 robust=0.285319 keyq=0.730673 far=0.705753
+  B3-HYBRID-FIXED service=0.0245 energy=0.189768 latency=0.263429 robust=0.989931 keyq=0.613677 far=0.000356
+  B4-DM-NO-FAR-FLOOR service=1.0 energy=0.199122 latency=0.002049 robust=1.0 keyq=0.730673 far=0.0
+=== S5-CRITICAL-INFRASTRUCTURE-ATTACK (n=150 graines) ===
+  mean_energy_j -> -6.9 % — amélioration (diminution)
+  mean_latency_objective -> +1397.7 % — dégradation (augmentation)
+  mean_authentication_robustness -> +0.0000 pt — différence négligeable (IC95 chevauche zéro)
+  mean_key_quality -> -0.0767 pt — dégradation (diminution)
+  P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS service=1.0 energy=0.208990 latency=0.052849 robust=1.0 keyq=0.668621 far=0.0
+  B1-CONVENTIONAL service=0.948 energy=0.224504 latency=0.003528 robust=1.0 keyq=0.745357 far=0.0
+  B2-NAIVE-PHYSEC-NO-FLOOR service=1.0 energy=0.200695 latency=0.053150 robust=0.444101 keyq=0.668621 far=0.552217
+  B3-HYBRID-FIXED service=0.0004 energy=0.199769 latency=0.281745 robust=0.969407 keyq=0.645658 far=0.0
+  B4-DM-NO-FAR-FLOOR service=1.0 energy=0.208990 latency=0.052849 robust=1.0 keyq=0.668621 far=0.0

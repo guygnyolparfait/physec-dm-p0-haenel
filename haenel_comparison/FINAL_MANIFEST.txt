@@ -1,0 +1,147 @@
+FINAL_MANIFEST — Comparaison P0 vs Haenel et al. (Sensors 2021)
+VERSION SCIENTIFIQUE FINALE — 25/09/2026
+
+Historique : V1 (session autonome initiale) -> V2 (2 corrections :
+microcontrôleur Option B, campagne sécurité renforcée) -> VERSION
+FINALE (cette version : renommage B5, comparaison principale avec
+FAR publié Haenel, frontière des poids vérifiée dans le code, Option
+B recalculée en surcoût incrémental, timing CC110L corrigé, sourcing
+Chaskey approfondi, P0_COMPLETE séparé, audit récursif complet,
+SCIENTIFIC_FINAL_GATE.md 100% PASS avant création de ce ZIP).
+
+Voir `Compte_Rendu_Final_Haenel_vs_P0.md` Section 0 pour le détail
+complet de toutes les corrections, et `WORK_LOG.md` pour le journal
+horodaté de la session.
+
+=== 01_CODE (haenel_comparison/*.py) ===
+__init__.py                        - Documentation du module
+haenel_config.py                   - Configuration centrale, traçabilité (nouveau schéma : used_in, statuts PUBLISHED_HAENEL/CALIBRATED_EFFECTIVE/...)
+haenel_b5.py                       - B5_HAENEL_CALIBRATED (transposition stochastique, renommé)
+energy_option_a.py                 - Calibration à 2 paramètres nommés (EFFECTIVE_FIXED_HYBRID_OVERHEAD_MJ, EFFECTIVE_FALLBACK_COST_MJ), erreur EXACTEMENT 0,00%
+haenel_energy_adapter.py           - Échelle énergétique commune + apply_haenel_rff_far_to_a2 (FAR publié pour A2)
+p0_auth_only.py                    - P0 restreint à K0, échelle LoRa native (référence historique)
+p0_auth_only_haenel_scale.py       - P0_NATIVE_RFF_SENSITIVITY (SECONDAIRE, FAR natif physec_dm)
+p0_auth_only_haenel_rff.py         - P0_AUTH_ONLY_HAENEL_RFF (COMPARAISON PRINCIPALE, FAR publié Haenel=0.002) [NOUVEAU]
+run_haenel_reference.py            - HISTORIQUE/SUPERSEDED (10 graines, ancien nommage, non appelé par le pipeline)
+run_haenel_experiment_a.py         - Campagne 30 graines + P0 (principal + secondaire), convention 1ere auth complète
+run_haenel_experiment_b.py         - Expérience B (sécurité/FAR), campagne historique 30 graines
+security_monte_carlo.py            - Campagne sécurité renforcée (100 000 tentatives, IC95% Clopper-Pearson)
+latency_sensitivity.py             - Sensibilité latence + réserve méthodologique structurelle
+weight_sensitivity.py              - 4 profils grossiers (renvoie vers weight_boundary_sensitivity.py pour la frontière exacte)
+weight_boundary_sensitivity.py     - Sweep fin de la frontière des poids (VÉRIFIE score(A1)=w_energy, score(A2)=w_auth) [NOUVEAU]
+export_p0_diagnostics.py           - Export CSV+MD (utilise maintenant la comparaison principale)
+p0_complete.py                     - P0_COMPLETE (extension exploratoire, table séparée)
+energy_option_b.py                 - Modèle événementiel MSP430G2x+CC110L, timing IDLE (pas deep-sleep)
+haenel_option_b_sources.py         - Sources (10 OFFICIAL_DATASHEET, 2 PUBLISHED_IN_HAENEL, 1 DERIVED, 2 EXTERNAL_SCIENTIFIC_SOURCE, 1 ASSUMED_STATE_TRANSITION, 3 UNAVAILABLE)
+validate_option_b.py               - Validation en SURCOÛT INCRÉMENTAL (measured/modeled/explained_pct)
+option_b_missing_parameters.py     - Paramètres manquants pour Option B (avant sourcing web)
+haenel_parameter_traceability.py   - Export CSV traçabilité (schéma used_in)
+generate_figures_experiment_a.py   - Figures 1-3 (titres corrigés, non tronqués)
+generate_final_outputs.py          - Figure 4 (sécurité) + Figure 5 (frontière des poids, remplace les 4 barres) + 2 tableaux séparés
+md_to_pdf.py                       - Convertisseur Markdown -> LaTeX -> PDF (tectonic), gère les identifiants longs
+run_all_final.sh                   - Pipeline complet (13 étapes)
+
+=== 07_TESTS (haenel_comparison/tests/*.py) ===
+test_haenel_b5_statistics.py       - 7 tests : convergence FRR, reproductibilité
+test_energy_option_a.py            - 4 tests : validation Option A, ordre, pas de NaN
+test_haenel_energy_adapter.py      - 11 tests : adaptateur, latence neutralisée, Rauth/Qkey intacts
+test_realized_energy_consistency.py- 3 tests : cohérence réalisé vs espérance
+test_final_checks.py               - 5 tests : timing protocole, P0_COMPLETE, fichiers requis, S1-S5 intacts
+test_energy_option_b.py            - 9 tests : bon microcontrôleur, bornes LOW/HIGH câblées, pas de LPM
+test_security_monte_carlo.py       - 9 tests : taille d'échantillon, IC95%, garde-fous
+test_final_scientific_pass.py      - 29 tests : les 19 points de contrôle de la passe finale [NOUVEAU]
+TOTAL : 77 tests haenel_comparison, tous verts. 469 tests historiques (S1-S5 inclus), tous verts. 546 au total.
+
+=== 02_RESULTS_RAW (results/haenel_comparison/*.csv bruts) ===
+b5_option_a_runs_30seeds.csv                          - Réalisations B5_HAENEL_CALIBRATED brutes, par graine et message
+p0_auth_only_haenel_rff_deterministic.csv             - P0, COMPARAISON PRINCIPALE (FAR publié Haenel)
+p0_native_rff_sensitivity_deterministic.csv           - P0, analyse SECONDAIRE (FAR natif physec_dm)
+experiment_b_security_b5.csv, experiment_b_security_p0.csv - Ancienne campagne 30 graines (~450 tentatives, conservée pour contexte "mission complète")
+p0_complete_result.csv                                - Résultat unique P0_COMPLETE
+p0_complete_extension_table.csv                       - Table SÉPARÉE (extension exploratoire, jamais mêlée à la comparaison principale) [NOUVEAU]
+p0_decision_diagnostics.csv                           - Diagnostic complet par candidat/période (comparaison principale)
+
+=== 03_RESULTS_SUMMARY ===
+summary_statistics_experiment_a.csv  - Moyenne/écart-type/IC95%, 30 graines
+option_a_vs_option_b.csv             - Comparaison + SURCOÛT INCRÉMENTAL (measured/modeled/explained_pct), 3 jeux x 4 cas
+security_monte_carlo.csv             - Campagne sécurité 100 000 tentatives/politique, IC95% Clopper-Pearson
+latency_sensitivity.csv              - Grille de sensibilité latence (13 points x 2 FRR)
+weight_sensitivity.csv               - 4 profils grossiers x 2 FRR
+weight_boundary_sensitivity.csv      - Sweep fin (11 points), croisement exact à w_energy=0.25 [NOUVEAU]
+master_comparison_table.csv          - Tableau PRINCIPAL A/B/C uniquement (P0_COMPLETE exclu, voir p0_complete_extension_table.csv)
+haenel_parameter_traceability.csv    - Traçabilité complète (schéma used_in)
+haenel_option_b_sources.csv          - Sources datasheet pour Option B (MSP430G2x, incluant sourcing Chaskey approfondi)
+option_b_missing_parameters.csv      - Paramètres manquants (avant sourcing)
+
+=== 04_FIGURES (results/haenel_comparison/figures/*.png) ===
+figure_1_energy_comparison.png   - Énergie : Haenel publié vs B5_HAENEL_CALIBRATED vs P0_AUTH_ONLY_HAENEL_RFF (titre corrigé)
+figure_2_decision_split.png      - Répartition RFF/MAC (B5) vs A1/A2 (P0)
+figure_3_fallback_vs_frr.png     - Replis MAC observés en fonction du FRR (titre corrigé)
+figure_4_security.png            - FAR empirique (log) B5 vs limite de détection P0, Monte-Carlo 100 000
+figure_5_weight_sensitivity.png  - REMPLACÉE : courbe de la frontière des poids (croisement exact visible à w_energy=0.25) [NOUVEAU CONTENU]
+
+=== 05_REPORT ===
+Compte_Rendu_Final_Haenel_vs_P0.md   - Rapport scientifique complet (22 sections, entièrement réécrit)
+Compte_Rendu_Final_Haenel_vs_P0.pdf  - Même contenu, PDF (8 pages, vérifié visuellement page par page)
+p0_decision_explanation.md           - Explication de la comparaison principale (FAR publié Haenel)
+p0_decision_explanation.pdf          - Même contenu, PDF
+HAENEL_COMPARISON_README.md          - README reproductible, entièrement réécrit (statut "TERMINÉ", sans contradiction)
+HAENEL_COMPARISON_README.pdf         - Même contenu, PDF
+
+=== 06_SUPERVISOR ===
+EXPLICATION_SIMPLE_POUR_PARFAIT.md   - Explication simple, entièrement réécrite
+EXPLICATION_SIMPLE_POUR_PARFAIT.pdf  - Même contenu, PDF
+PRESENTATION_ENCADRANTE.md           - 3 versions + questions difficiles, entièrement réécrit
+PRESENTATION_ENCADRANTE.pdf          - Même contenu, PDF
+MAIL_ENCADRANTE_RESULTATS.txt        - Email corrigé ("transparent", reformulations honnêtes, pas de survente)
+PLAN_5_SLIDES_ENCADRANTE.md          - Plan de présentation, mis à jour
+PLAN_5_SLIDES_ENCADRANTE.pdf         - Même contenu, PDF
+
+=== 08_SOURCES_TRACEABILITY ===
+datasheets_extracted/cc110l.txt          - Datasheet CC110L officiel (TI SWRS109C), incluant Table 5-11 (timing IDLE)
+datasheets_extracted/msp430g2553.txt     - Datasheet MSP430G2553 officiel (TI SLAS735J) -- CPU réel du banc d'essai
+datasheets_extracted/msp430g2231_ep.txt  - Datasheet MSP430G2231-EP officiel (TI SLAS862) -- borne LOW intra-famille
+datasheets_extracted/msp430fr5994.txt    - Conservé pour référence : matériel utilisé AILLEURS dans le papier (nœud drone), PAS le microcontrôleur du banc d'essai énergétique
+
+=== 10_ARTICLE (article scientifique format IEEE conference) ===
+paper_en.tex                      - Source LaTeX (IEEEtran), version anglaise
+paper_en.pdf                      - PDF compilé, version anglaise (4 pages)
+paper_fr.tex                      - Source LaTeX (IEEEtran), version française
+paper_fr.pdf                      - PDF compilé, version française (4 pages)
+figure_1_energy_comparison.png    - Figure centrale de l'article (courbe, pas barres -- voir refonte ci-dessous)
+Structure : Abstract, Introduction, Related Work (11 références IEEE/Sensors réelles et
+vérifiées -- ICC, GLOBECOM, GIoTS, ASET, MILCOM, IEEE IoT Journal, Sensors, Int. J. Information
+Security), Background, Methodology, Results, Discussion, Conclusion. Compilé avec tectonic,
+bibliographie en thebibliography manuel (pas de dépendance bibtex externe).
+
+=== REFONTE DES FIGURES (demande du 25/09/2026, relayée par l'encadrante) ===
+Figure 1 entièrement reconstruite : l'ancien diagramme en barres groupées (avec "caps"
+d'erreur jugés artificiels) est remplacé par une COURBE montrant la vraie relation
+FRR/énergie de Haenel et al. (RFF seul -> hybride 5% -> hybride 10%), avec la bande IC95%
+de B5_HAENEL_CALIBRATED, et la décision de P0 tracée comme une ligne PLATE au niveau du
+plafond MAC_ONLY publié -- pour rendre immédiatement visible, sans lecture de légende, la
+différence entre la stratégie opportuniste de Haenel et al. et le choix fixe de P0. Les
+"caps" d'erreur ont aussi été retirés des Figures 3 et 4 par cohérence.
+
+=== 09_README ===
+HAENEL_COMPARISON_README.md   - (dupliqué ici pour navigation facile dans le ZIP)
+WORK_LOG.md                   - Journal complet horodaté (V1 -> V2 -> version finale)
+FINAL_TEST_REPORT.txt         - Rapport de tests final (546 tests, tous verts)
+FINAL_MANIFEST.txt            - Ce fichier
+SCIENTIFIC_FINAL_GATE.md      - Gate scientifique, 25 items, TOUS PASS avant création de ce ZIP [NOUVEAU]
+
+=== NON INCLUS DANS LE ZIP FINAL (volontairement) ===
+- Le reste du projet physec_dm historique (S1-S5, rapport de stage, article) : non modifié, non
+  nécessaire à cette livraison.
+- backups_haenel/ (sauvegardes internes de sécurité, pas un livrable).
+- La présentation PowerPoint : jugée secondaire par l'utilisateur lui-même ; le plan texte
+  (PLAN_5_SLIDES_ENCADRANTE.md/.pdf) est fourni à la place.
+
+=== GARANTIE DE NON-ARTIFICIALITÉ ===
+Tous les CSV, PNG et PDF de ce ZIP proviennent d'une exécution réelle du code Python (aucune
+valeur saisie ou dessinée à la main). Preuve : le 25/09/2026, tous les fichiers de sortie ont été
+supprimés puis `run_all_final.sh` a été relancé de zéro (exit code 0, 77/77 tests haenel_comparison
++ 469/469 tests historiques verts). Les statistiques régénérées sont BIT-IDENTIQUES à celles d'avant
+suppression car les graines aléatoires sont fixées -- signature d'un calcul déterministe réel.
+Chaque chiffre cité dans les documents narratifs a été revérifié contre les CSV frais avant la
+création de ce ZIP (voir WORK_LOG.md, entrée "2026-09-25 17:15").

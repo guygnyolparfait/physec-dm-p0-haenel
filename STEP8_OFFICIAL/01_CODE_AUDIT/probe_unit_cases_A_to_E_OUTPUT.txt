@@ -1,0 +1,38 @@
+======================================================================
+CAS A -- span normal (échelle réaliste des objectifs)
+======================================================================
+score pur D1 (dim energie) = 0.25
+score pur D2 (dim latence) = 0.25
+egaux sous la formule pure : True
+score CODE REEL (avec epsilon) D1 = 0.2499999999975
+score CODE REEL (avec epsilon) D2 = 0.24999999997222222
+difference = 2.527777986927049e-11
+|difference| <= score_tolerance (1e-12) ? False
+|difference| <= score_tolerance (1e-12), strict ? False
+
+======================================================================
+CAS B -- ideal == nadir sur une dimension (span nul)
+======================================================================
+score avec span nul sur dims 0 et 1 : 0.14999999999699978
+(numerateur dims 0/1 attendu = 0 car f=ideal=nadir -> 0/eps = 0, pas de division par zero)
+
+======================================================================
+CAS C -- span tres petit (mais non nul), proche de epsilon
+======================================================================
+span=1.0e-06  score_code=0.249999750000250  score_pur_sans_eps=0.250000000000250  ratio_code/pur=0.9999990000
+span=1.0e-09  score_code=0.249750249750118  score_pur_sans_eps=0.249999999868411  ratio_code/pur=0.9990009995
+span=1.0e-12  score_code=0.125000352114977  score_pur_sans_eps=0.250001408463874  ratio_code/pur=0.4999985915
+span=1.0e-15  score_code=0.000249550829172  score_pur_sans_eps=0.249800180540660  ratio_code/pur=0.0009990018
+
+======================================================================
+CAS D -- egalite EXACTE de vecteurs objectifs (D1==D2 en tout point)
+======================================================================
+score D1 == score D2 (vecteurs objectifs identiques) ? True 0.18749999999765615 0.18749999999765615
+
+======================================================================
+CAS E -- select_from_pareto_front() : la decision finale change-t-elle ?
+======================================================================
+Score final D1 (energie pire) : 0.2499999999975
+Score final D2 (latence pire) : 0.24999999997222222
+Decision selectionnee : D_LATENCY_WORST
+-> Si les deux scores etaient VRAIMENT egaux (formule pure), le tie-break (FAR puis energie puis latence puis nom) aurait du s'appliquer et choisir D2 (energie 0.16 < 0.20). Verifions si c'est bien D2 qui sort, ou si l'ecart induit par epsilon a court-circuite le tie-break en departageant directement sur le score.

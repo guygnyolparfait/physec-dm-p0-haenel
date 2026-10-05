@@ -1,0 +1,9 @@
+frr_case,frr,weight_profile,weights,chosen_action
+HYBRID_FRR_05,0.05,EQUAL,"[0.25, 0.25, 0.25, 0.25]",A1
+HYBRID_FRR_05,0.05,ENERGY,"[0.7, 0.1, 0.1, 0.1]",A2
+HYBRID_FRR_05,0.05,LATENCY,"[0.1, 0.7, 0.1, 0.1]",A1
+HYBRID_FRR_05,0.05,AUTH,"[0.1, 0.1, 0.7, 0.1]",A1
+HYBRID_FRR_10,0.1,EQUAL,"[0.25, 0.25, 0.25, 0.25]",A1
+HYBRID_FRR_10,0.1,ENERGY,"[0.7, 0.1, 0.1, 0.1]",A2
+HYBRID_FRR_10,0.1,LATENCY,"[0.1, 0.7, 0.1, 0.1]",A1
+HYBRID_FRR_10,0.1,AUTH,"[0.1, 0.1, 0.7, 0.1]",A1
