@@ -85,7 +85,7 @@ CONTEXTUAL_POLICY_STATUS = {
         "vieillissement de la clé), jamais une forme "
         "fonctionnelle ni des coefficients numériques. "
         "docs/03_EQUATIONS_REFERENCE.md et "
-        "physec_dm/scientific_config.py "
+        "src/physec_dm/scientific_config.py "
         "(build_policy_catalog, policy_id "
         "P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS) marquent explicitement cette "
         "politique comme non implémentée, en attente de "
@@ -94,8 +94,8 @@ CONTEXTUAL_POLICY_STATUS = {
     "fallback_used": (
         "parameters.contextual_weights (vecteur statique "
         "déjà validé et déjà utilisé par "
-        "physec_dm/scientific_config.py et "
-        "physec_dm/thesis_scenarios.py)."
+        "src/physec_dm/scientific_config.py et "
+        "src/physec_dm/thesis_scenarios.py)."
     )
 }
 

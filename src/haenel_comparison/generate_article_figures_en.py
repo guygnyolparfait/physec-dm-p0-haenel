@@ -26,7 +26,7 @@ from haenel_comparison.haenel_config import (
 
 RESULTS_DIR = Path("results/haenel_comparison")
 FIGURES_DIR = RESULTS_DIR / "figures"
-ARTICLE_DIR = Path("haenel_comparison/article")
+ARTICLE_DIR = Path("docs/article")
 
 
 def _read_csv(name):

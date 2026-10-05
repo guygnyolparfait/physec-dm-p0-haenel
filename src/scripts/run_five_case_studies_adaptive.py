@@ -1,23 +1,19 @@
-# Campagne adaptative de la version COMPLEXIFIÉE de S1-S5, à la
-# demande explicite de l'encadrante (complexifier S1-S5 eux-mêmes,
-# pas ajouter un scénario à côté). Copie conforme de
-# run_five_case_studies_adaptive.py, au jeu de cas d'étude près :
+# Ce script orchestre la campagne COMPLÈTE (Jour 2) des cinq
+# cas d'étude dynamiques, avec :
 #
-# - mêmes cinq politiques, même arrêt Monte-Carlo adaptatif borné,
-#   mêmes briques de simulation (build_scenario_traces,
-#   run_single_mission, extract_log_rows) — AUCUNE équation
-#   scientifique modifiée ou recalculée ici ;
-# - utilise build_five_case_studies_v2() (physec_dm/case_studies.py),
-#   qui applique deux leviers déjà sourcés (mallory_separation dans
-#   la plage validée [0,5 ; 5] du document de modélisation ;
-#   cost_profile_id LOW/CENTRAL/HIGH déjà codé et documenté comme
-#   test de sensibilité) sans toucher à build_five_case_studies()
-#   ni à build_case_study_s1()..s5(), qui restent strictement
-#   inchangés.
+# - cinq politiques : P0-PARETO-TCHEBYCHEFF-EQUAL-WEIGHTS,
+#   B1-CONVENTIONAL, B2-NAIVE-PHYSEC-NO-FLOOR,
+#   B3-HYBRID-FIXED, B4-DM-NO-FAR-FLOOR ;
+# - un arrêt Monte-Carlo ADAPTATIF BORNÉ par scénario
+#   (physec_dm/adaptive_monte_carlo.py) : minimum 30 graines,
+#   lots de 10, maximum 150, tolérances pré-enregistrées ;
+# - les mêmes graines communes à toutes les politiques d'un
+#   même scénario (Common Random Numbers).
 #
-# Sortie écrite dans results/five_case_studies_v2_complex_adaptive/,
-# JAMAIS dans results/five_case_studies_final_adaptive/ (les
-# données originales, déjà vérifiées, restent intactes).
+# Il ne modifie et ne recalcule AUCUNE équation scientifique :
+# il réutilise exclusivement build_scenario_traces,
+# run_single_mission et extract_log_rows de
+# run_five_case_studies.py.
 import csv
 import json
 import sys
@@ -34,12 +30,12 @@ from physec_dm.adaptive_monte_carlo import (
 from physec_dm.case_studies import (
     apply_case_study_overrides,
     build_case_study_base_parameters,
-    build_five_case_studies_v2
+    build_five_case_studies
 )
 
 from physec_dm.thesis_scenarios import build_thesis_seeds
 
-from run_five_case_studies import (
+from scripts.run_five_case_studies import (
     LOG_FIELD_NAMES,
     POLICIES,
     build_scenario_traces,
@@ -47,12 +43,75 @@ from run_five_case_studies import (
     run_single_mission
 )
 
-from run_five_case_studies_adaptive import (
-    compute_seed_summary_metrics
-)
+
+# ================================================================
+# 1. RÉSUMÉ PAR GRAINE (métriques principales du protocole)
+# ================================================================
+def compute_seed_summary_metrics(
+    rows
+):
+
+    served_rows = [
+        row
+        for row in rows
+        if row["legitimate_message_served"]
+    ]
+
+    service_rate = len(served_rows) / len(rows)
+
+    def mean_of(field_name):
+
+        values = [
+            row[field_name]
+            for row in rows
+            if row[field_name] is not None
+        ]
+
+        if len(values) == 0:
+
+            return None
+
+        return sum(values) / len(values)
+
+    mallory_attempts = [
+        row
+        for row in rows
+        if row["mallory_attempted"]
+    ]
+
+    mallory_accepted = [
+        row
+        for row in mallory_attempts
+        if row["mallory_accepted"]
+    ]
+
+    return {
+        "service_rate": service_rate,
+        "mean_energy_j": mean_of(
+            "energy_objective_j"
+        ),
+        "mean_latency_objective": mean_of(
+            "latency_objective"
+        ),
+        "mean_authentication_robustness": mean_of(
+            "authentication_robustness"
+        ),
+        "mean_key_quality": mean_of(
+            "key_quality"
+        ),
+        "far_accepted_count": len(
+            mallory_accepted
+        ),
+        "mallory_attempts_count": len(
+            mallory_attempts
+        )
+    }
 
 
-def run_adaptive_campaign_v2(
+# ================================================================
+# 2. CAMPAGNE ADAPTATIVE, SCÉNARIO PAR SCÉNARIO
+# ================================================================
+def run_adaptive_campaign(
     max_steps,
     output_directory
 ):
@@ -65,8 +124,8 @@ def run_adaptive_campaign_v2(
     )
 
     print(
-        "Lancement de la campagne adaptative COMPLEXIFIÉE "
-        "de S1-S5."
+        "Lancement de la campagne COMPLÈTE adaptative "
+        "des cinq cas d'étude (Jour 2)."
     )
     print(
         "Politiques : "
@@ -89,7 +148,7 @@ def run_adaptive_campaign_v2(
         build_case_study_base_parameters()
     )
 
-    case_studies = build_five_case_studies_v2()
+    case_studies = build_five_case_studies()
 
     all_rows = []
 
@@ -102,11 +161,8 @@ def run_adaptive_campaign_v2(
         print(
             "\nScénario "
             + scenario_id
-            + " (d_M="
-            + str(case_study["v2_mallory_separation"])
-            + ", profil coût="
-            + case_study["v2_cost_profile_id"]
-            + ") : démarrage de l'échantillonnage adaptatif."
+            + " : démarrage de l'échantillonnage "
+            "adaptatif."
         )
 
         scenario_parameters = (
@@ -116,6 +172,7 @@ def run_adaptive_campaign_v2(
             )
         )
 
+        # summaries_by_policy_seed[policy_id][seed] = résumé
         summaries_by_policy_seed = {
             policy["policy_id"]: {}
             for policy in POLICIES
@@ -188,6 +245,10 @@ def run_adaptive_campaign_v2(
                 all_seeds
             )
 
+            # Convergence évaluée séparément pour chaque
+            # politique : le scénario ne s'arrête que
+            # lorsque TOUTES les politiques ont convergé
+            # (ou que le maximum de graines est atteint).
             convergence_by_policy = {}
             all_policies_converged = True
 
@@ -240,17 +301,11 @@ def run_adaptive_campaign_v2(
         convergence_report[scenario_id] = {
             "seed_count": processed_seed_count,
             "all_converged": all_policies_converged,
-            "mallory_separation": (
-                case_study["v2_mallory_separation"]
-            ),
-            "cost_profile_id": (
-                case_study["v2_cost_profile_id"]
-            ),
             "per_policy": convergence_by_policy
         }
 
     log_path = (
-        output_path / "five_case_studies_v2_log.csv"
+        output_path / "five_case_studies_log.csv"
     )
 
     with log_path.open(
@@ -309,10 +364,10 @@ if __name__ == "__main__":
 
     if mode == "full":
 
-        run_adaptive_campaign_v2(
+        run_adaptive_campaign(
             max_steps=1500,
             output_directory=(
-                "results/five_case_studies_v2_complex_adaptive"
+                "results/five_case_studies_final_adaptive"
             )
         )
 

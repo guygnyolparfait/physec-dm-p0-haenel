@@ -399,12 +399,10 @@ if __name__ == "__main__":
     pdf_dir.mkdir(parents=True, exist_ok=True)
 
     files_to_convert = [
-        "haenel_comparison/Compte_Rendu_Final_Haenel_vs_P0.md",
+        "docs/haenel/Compte_Rendu_Final_Haenel_vs_P0.md",
         "results/haenel_comparison/p0_decision_explanation.md",
-        "haenel_comparison/EXPLICATION_SIMPLE_POUR_PARFAIT.md",
-        "haenel_comparison/PRESENTATION_ENCADRANTE.md",
-        "haenel_comparison/PLAN_5_SLIDES_ENCADRANTE.md",
-        "haenel_comparison/HAENEL_COMPARISON_README.md",
+        "docs/haenel/EXPLICATION_SIMPLE_POUR_PARFAIT.md",
+        "docs/haenel/HAENEL_COMPARISON_README.md",
     ]
 
     for filename in files_to_convert:

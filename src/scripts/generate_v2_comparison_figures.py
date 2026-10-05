@@ -15,14 +15,14 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-from generate_four_objective_scenario_figures_v2 import (
+from scripts.generate_four_objective_scenario_figures_v2 import (
     METRIC_COLUMNS,
     POLICY_IDS,
     figure_four_objectives_comparison_v2
 )
 
-import analyze_five_case_studies
-import generate_four_objective_scenario_figures_v2 as v2_module
+from scripts import analyze_five_case_studies
+from scripts import generate_four_objective_scenario_figures_v2 as v2_module
 
 
 V2_LOG_PATH = Path(

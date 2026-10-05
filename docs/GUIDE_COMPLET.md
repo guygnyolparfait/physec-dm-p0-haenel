@@ -3,7 +3,7 @@
 Ce dépôt contient le code complet du travail, ordonné selon les étapes de réalisation. Tous les résultats qu'il contient proviennent de la **campagne corrigée** : le calcul de Tchebycheff a été corrigé, et la campagne a été régénérée sur cette base.
 
 Dépôt : `https://github.com/guygnyolparfait/physec-dm-p0-haenel`
-Article : `haenel_comparison/article/paper_en.tex` et `paper_fr.tex`
+Article : `docs/article/paper_en.tex` et `paper_fr.tex`
 
 ---
 
@@ -17,9 +17,9 @@ Un capteur LoRa doit choisir, à chaque message, une méthode d'authentification
 
 | Volet | Question | Où |
 |---|---|---|
-| A. Le modèle | Comment P0 décide, et comment l'environnement est simulé | `physec_dm/` |
-| B. Les scénarios S1 à S5 | Comportement de P0 dans cinq contextes, face à quatre politiques de référence | `run_five_case_studies*.py`, `analyze_five_case_studies.py`, `generate_v2_comparison_figures*.py`, `results/five_case_studies_v2_complex_adaptive/` |
-| C. La comparaison avec Haenel et al. | Comparaison de P0 avec le schéma hybride publié (Sensors, 2021), sur la même échelle d'énergie et avec le même FAR publié | `haenel_comparison/`, `results/haenel_comparison/` |
+| A. Le modèle | Comment P0 décide, et comment l'environnement est simulé | `src/physec_dm/` |
+| B. Les scénarios S1 à S5 | Comportement de P0 dans cinq contextes, face à quatre politiques de référence | `run_five_case_studies*.py`, `src/scripts/analyze_five_case_studies.py`, `generate_v2_comparison_figures*.py`, `results/five_case_studies_v2_complex_adaptive/` |
+| C. La comparaison avec Haenel et al. | Comparaison de P0 avec le schéma hybride publié (Sensors, 2021), sur la même échelle d'énergie et avec le même FAR publié | `src/haenel_comparison/`, `results/haenel_comparison/` |
 
 L'article rapporte les volets B et C, et il s'appuie sur le volet A.
 
@@ -27,7 +27,7 @@ L'article rapporte les volets B et C, et il s'appuie sur le volet A.
 
 ## 1. Ordre du travail
 
-### Étape 1 — Le modèle (`physec_dm/`)
+### Étape 1 — Le modèle (`src/physec_dm/`)
 
 - `models.py` : structures de données (décisions, observations, résultats).
 - `authentication.py` : robustesse d'authentification, FAR, probabilité de forgerie MAC (`2**-mac_tag_bits`), composition du FAR total.
@@ -46,12 +46,12 @@ La documentation de référence se trouve dans `docs/` : architecture, diagramme
 
 Une constante numérique était ajoutée à chaque dénominateur de normalisation, y compris non dégénéré. Cela décalait les scores d'environ 2,5 × 10⁻¹¹, valeur supérieure à la tolérance de détection des égalités, et contournait le départage par FAR dans environ un tiers des périodes à poids égaux.
 
-- Correction : `physec_dm/decision_maker.py`, fonction `calculate_tchebycheff_score`. La constante ne sert plus qu'à détecter un écart numériquement nul.
-- Documentation de la correction : `STEP8_OFFICIAL/01_CODE_AUDIT/` (diagnostic), `02_CODE_CHANGES/` (changement de code), `03_TESTS/` (tests de non-régression, dans `tests/test_decision_maker.py`).
+- Correction : `src/physec_dm/decision_maker.py`, fonction `calculate_tchebycheff_score`. La constante ne sert plus qu'à détecter un écart numériquement nul.
+- Documentation de la correction : `docs/correction_tchebycheff/01_CODE_AUDIT/` (diagnostic), `02_CODE_CHANGES/` (changement de code), `03_TESTS/` (tests de non-régression, dans `tests/test_decision_maker.py`).
 
 ### Étape 3 — Campagne des scénarios S1 à S5 (corrigée)
 
-Les scénarios sont définis dans `physec_dm/case_studies.py` :
+Les scénarios sont définis dans `src/physec_dm/case_studies.py` :
 
 - **S1, capteur agricole isolé** : nœud fixe, une phase, RSB moyen 8 dB, probabilité d'attaque 0,10.
 - **S2, alarme critique industrielle** : nœud fixe, trois phases (normale, alarme avec criticité forcée, récupération), RSB 6 dB, probabilité d'attaque 0,15.
@@ -69,7 +69,7 @@ Les politiques comparées à P0 :
 Lancement de la campagne :
 
 ```bash
-python run_five_case_studies_v2_adaptive.py
+PYTHONPATH=src python -m scripts.run_five_case_studies_v2_adaptive
 ```
 
 Le journal brut est écrit dans `results/five_case_studies_v2_complex_adaptive/`. Les résumés sont dans `data/` et les figures dans `figures/` :
@@ -79,11 +79,11 @@ Le journal brut est écrit dans `results/five_case_studies_v2_complex_adaptive/`
 - `monte_carlo_convergence.json` : nombre de graines et état de convergence par scénario ;
 - `figures/` : quatre objectifs par scénario, en français (`_v2.*`) et en anglais (`_v2_en.*`).
 
-Le script `run_five_case_studies_v2_adaptive.py` importe des fonctions de `run_five_case_studies.py`, `run_five_case_studies_adaptive.py`, `analyze_five_case_studies.py` et `generate_four_objective_scenario_figures_v2.py`. Ces modules sont des bibliothèques pour la campagne corrigée : leur exécution directe peut écrire dans les dossiers de la campagne antérieure, il ne faut donc **pas** les lancer seuls.
+Le script `run_five_case_studies_v2_adaptive.py` importe des fonctions de `src/scripts/run_five_case_studies.py`, `src/scripts/run_five_case_studies_adaptive.py`, `src/scripts/analyze_five_case_studies.py` et `src/scripts/generate_four_objective_scenario_figures_v2.py`. Ces modules sont des bibliothèques pour la campagne corrigée : leur exécution directe peut écrire dans les dossiers de la campagne antérieure, il ne faut donc **pas** les lancer seuls.
 
-### Étape 4 — Comparaison avec Haenel et al. (`haenel_comparison/`)
+### Étape 4 — Comparaison avec Haenel et al. (`src/haenel_comparison/`)
 
-Le script `haenel_comparison/run_all_final.sh` enchaîne les étapes :
+Le script `src/haenel_comparison/run_all_final.sh` enchaîne les étapes :
 
 1. **Traçabilité des paramètres** : statut de chaque valeur (PUBLISHED_HAENEL, DERIVED_FROM_HAENEL, CALIBRATED_EFFECTIVE, OFFICIAL_DATASHEET, EXTERNAL_SCIENTIFIC_SOURCE, ASSUMED, ASSUMED_STATE_TRANSITION, UNAVAILABLE).
 2. **Option A, calibration énergétique** (`energy_option_a.py`) : un système linéaire 2×2 reproduit exactement les quatre valeurs publiées.
@@ -98,7 +98,7 @@ Résultat principal : à poids égaux, P0 choisit le MAC (564,743 mJ) plutôt qu
 
 ### Étape 5 — Rédaction de l'article
 
-- `haenel_comparison/article/paper_fr.tex` et `paper_en.tex`, avec leurs PDF.
+- `docs/article/paper_fr.tex` et `paper_en.tex`, avec leurs PDF.
 - Figures : `figure_1_energy_comparison*.png`, `figure_2_decision_split*.png`, `figure_4_security*.png`, `figure_5_weight_sensitivity*.png` (français et anglais), `figure_s2_four_objectives*.pdf` et `figure_s4_four_objectives*.pdf` (scénarios S2 et S4, campagne corrigée), `flowchart_dm*.pdf` (schéma du modèle).
 - Le lien vers ce dépôt figure dans la section « Implémentation » de chaque version.
 
@@ -119,8 +119,8 @@ pip install -r requirements.txt
 ## 3. Tests
 
 ```bash
-python -m unittest discover -s tests -p "test_*.py"                    # 469 tests
-python -m unittest discover -s haenel_comparison/tests -p "test_*.py"  # 76 tests
+PYTHONPATH=src python -m unittest discover -s tests -p "test_*.py"                    # 469 tests
+PYTHONPATH=src python -m unittest discover -s src/haenel_comparison/tests -p "test_*.py"  # 76 tests
 ```
 
 Total : 545 tests, tous verts.
@@ -128,11 +128,11 @@ Total : 545 tests, tous verts.
 ## 4. Reproduction
 
 ```bash
-bash haenel_comparison/run_all_final.sh                   # comparaison avec Haenel et al.
-python -m haenel_comparison.generate_article_figures_en   # figures anglaises de l'article
-python run_five_case_studies_v2_adaptive.py               # campagne S1 à S5 (journal brut, long)
-python generate_v2_comparison_figures.py                  # résumés et figures S1 à S5 (FR)
-python generate_v2_comparison_figures_en.py               # figures S1 à S5 (EN)
+bash src/haenel_comparison/run_all_final.sh                   # comparaison avec Haenel et al.
+PYTHONPATH=src python -m haenel_comparison.generate_article_figures_en   # figures anglaises de l'article
+PYTHONPATH=src python -m scripts.run_five_case_studies_v2_adaptive               # campagne S1 à S5 (journal brut, long)
+PYTHONPATH=src python -m scripts.generate_v2_comparison_figures                  # résumés et figures S1 à S5 (FR)
+PYTHONPATH=src python -m scripts.generate_v2_comparison_figures_en               # figures S1 à S5 (EN)
 ```
 
 Les résumés déjà calculés suffisent pour vérifier les chiffres de l'article sans relancer la campagne.

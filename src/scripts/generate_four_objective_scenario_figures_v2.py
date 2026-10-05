@@ -34,7 +34,7 @@ mpl.rcParams["font.size"] = 8
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 
-from analyze_five_case_studies import scenario_full_name
+from scripts.analyze_five_case_studies import scenario_full_name
 
 
 RESULTS_DIR = Path("results/five_case_studies_final_adaptive")

@@ -1161,7 +1161,7 @@ class TestTchebycheff(unittest.TestCase):
     # STEP8 -- tests de non-régression pour la correction de
     # calculate_tchebycheff_score (epsilon utilisé comme seuil
     # de span dégénéré, plus comme terme de lissage systématique
-    # sur les quatre dimensions). Voir STEP8_OFFICIAL/
+    # sur les quatre dimensions). Voir docs/correction_tchebycheff/
     # 01_CODE_AUDIT/STEP8_PARETO_TCHEBYCHEFF_DIAGNOSTIC.md pour
     # la démonstration chiffrée qui motive ces tests.
     # --------------------------------------------------------
@@ -1452,7 +1452,7 @@ class TestCompleteDecisionMaker(unittest.TestCase):
         # ajouté au dénominateur des quatre dimensions) rompait
         # cette égalité au profit de A2 -- un artefact numérique
         # dépendant du span de chaque objectif, sans lien avec
-        # DM-EQ107, démontré et chiffré dans STEP8_OFFICIAL/
+        # DM-EQ107, démontré et chiffré dans docs/correction_tchebycheff/
         # 01_CODE_AUDIT/STEP8_PARETO_TCHEBYCHEFF_DIAGNOSTIC.md.
         # "A2-K0" était donc la trace d'un bug, pas un
         # comportement validé : ce test devient un test de

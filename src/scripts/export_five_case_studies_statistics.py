@@ -9,7 +9,7 @@ import csv
 import math
 from pathlib import Path
 
-from analyze_five_case_studies import (
+from scripts.analyze_five_case_studies import (
     SCENARIO_FULL_NAMES,
     compute_scenario_policy_summary,
     get_phase_segments_in_steps,

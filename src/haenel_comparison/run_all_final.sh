@@ -2,24 +2,27 @@
 # ================================================================
 # PIPELINE FINAL — Comparaison P0 vs Haenel et al.
 # Relance tout le pipeline depuis zéro, dans l'ordre.
-# Usage : cd /home/parfait/physec_dm && bash haenel_comparison/run_all_final.sh
+# Usage (depuis la racine du dépôt, environnement virtuel actif) :
+#     bash src/haenel_comparison/run_all_final.sh
 # ================================================================
 set -e
 
-PY=/home/parfait/physec_dm/.venv/bin/python3
-cd /home/parfait/physec_dm
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+PY="${PYTHON:-python3}"
+export PYTHONPATH="$ROOT/src"
+cd "$ROOT"
 
-echo "=== 1. Tests (projet + tests unitaires haenel_comparison, hors ==="
+echo "=== 1. Tests (projet + tests unitaires haenel_comparison) ==="
 echo "===    vérification des fichiers de résultats -- ceux-ci n'existent"
 echo "===    pas encore avant la génération, voir étape 11) ==="
-$PY -m unittest discover -s tests
+$PY -m unittest discover -s tests -p "test_*.py"
 # test_final_checks.test_required_result_files_exist est un CONTROLE
 # A POSTERIORI : sur un dossier results/ vide (première exécution ou
 # rejeu propre), il échoue par construction avant que le pipeline
 # n'ait rien généré. On ne le traite donc pas comme fatal ici -- il
 # est revérifié, cette fois de façon significative, à l'étape 11.
 set +e
-$PY -m unittest discover -s haenel_comparison/tests -v
+$PY -m unittest discover -s src/haenel_comparison/tests -p "test_*.py" -v
 set -e
 
 echo "=== 2. Traçabilité des paramètres ==="
@@ -61,9 +64,12 @@ echo "=== 10. Figures finales + tableau de synthèse ==="
 $PY -m haenel_comparison.generate_figures_experiment_a
 $PY -m haenel_comparison.generate_final_outputs
 
+echo "=== 12. Figures anglaises de l'article ==="
+$PY -m haenel_comparison.generate_article_figures_en
+
 echo "=== 11. Tests finaux ==="
-$PY -m unittest discover -s haenel_comparison/tests -v
+$PY -m unittest discover -s src/haenel_comparison/tests -p "test_*.py" -v
 
 echo ""
 echo "Pipeline terminé. Résultats dans results/haenel_comparison/"
-echo "Rapport final : haenel_comparison/Compte_Rendu_Final_Haenel_vs_P0.md"
+echo "Rapport final : docs/haenel/Compte_Rendu_Final_Haenel_vs_P0.md"

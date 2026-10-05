@@ -1039,7 +1039,7 @@ def validate_contextual_weights(
 # Cette fonction correspond à DM-EQ106.
 #
 # ----------------------------------------------------------
-# CORRECTION STEP8 (voir STEP8_OFFICIAL/01_CODE_AUDIT/
+# CORRECTION STEP8 (voir docs/correction_tchebycheff/01_CODE_AUDIT/
 # STEP8_PARETO_TCHEBYCHEFF_DIAGNOSTIC.md pour la démonstration
 # complète, chiffrée sur le code réel, avant cette correction) :
 #

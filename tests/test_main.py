@@ -18,9 +18,7 @@ from physec_dm.models import (
 )
 
 
-import main
-
-
+from scripts import main
 class SimpleMissionResult:
 
     # Cette classe minimale suffit
@@ -282,7 +280,7 @@ class TestSummary(unittest.TestCase):
         output = io.StringIO()
 
         with patch(
-            "main.aggregate_campaign_results",
+            "scripts.main.aggregate_campaign_results",
             return_value=aggregate_rows
         ):
 
@@ -321,7 +319,7 @@ class TestLaunch(unittest.TestCase):
         )
 
         with patch(
-            "main.run_campaign",
+            "scripts.main.run_campaign",
             return_value=fake_result
         ) as mocked_run_campaign:
 
@@ -363,12 +361,12 @@ class TestLaunch(unittest.TestCase):
         )
 
         with patch(
-            "main.run_smoke_campaign",
+            "scripts.main.run_smoke_campaign",
             return_value=fake_result
         ):
 
             with patch(
-                "main.print_campaign_summary"
+                "scripts.main.print_campaign_summary"
             ):
 
                 returned_result = main.main()

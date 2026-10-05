@@ -9,7 +9,7 @@
 # figure change de langue (voir lang="en" dans
 # figure_four_objectives_comparison_v2). Aucune valeur numerique
 # n'est recalculee differemment.
-from generate_v2_comparison_figures import main
+from scripts.generate_v2_comparison_figures import main
 
 if __name__ == "__main__":
 

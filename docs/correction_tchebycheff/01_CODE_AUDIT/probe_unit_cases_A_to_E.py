@@ -7,9 +7,10 @@
 # chiffres réels avant toute décision de correction.
 
 import sys
+from pathlib import Path
 import types
 
-sys.path.insert(0, "/home/parfait/physec_dm")
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 
 from physec_dm.decision_maker import (
     calculate_tchebycheff_score,

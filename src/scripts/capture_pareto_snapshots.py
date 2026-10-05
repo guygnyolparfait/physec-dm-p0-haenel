@@ -29,7 +29,7 @@ from physec_dm.case_studies import (
     select_baseline_conventional_decision
 )
 
-from run_five_case_studies import (
+from scripts.run_five_case_studies import (
     build_scenario_traces,
     run_single_mission
 )

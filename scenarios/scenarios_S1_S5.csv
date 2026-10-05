@@ -1,0 +1,18 @@
+scenario_id,scenario_name,separation_mallory,cost_profile,phase_index,phase_name,start_fraction,end_fraction,mean_snr_db,shadowing_std_db,mallory_attempt_probability,effective_speed,criticality_forced
+S1-REMOTE-AGRICULTURAL-SENSOR,Capteur agricole isolé,4.0,LOW,1,Fonctionnement stable (mesures périodiques d'humidité),0.0,1.0,8.0,2.0,0.1,0.0,
+S2-INDUSTRIAL-CRITICAL-ALARM,Alarme critique industrielle,2.0,HIGH,1,Fonctionnement normal,0.0,0.4,6.0,3.0,0.15,0.0,
+S2-INDUSTRIAL-CRITICAL-ALARM,Alarme critique industrielle,2.0,HIGH,2,Alarme critique (apparition et maintien),0.4,0.5,6.0,3.0,0.15,0.0,1
+S2-INDUSTRIAL-CRITICAL-ALARM,Alarme critique industrielle,2.0,HIGH,3,Récupération progressive,0.5,1.0,6.0,3.0,0.15,0.0,
+S3-MOBILE-VEHICLE,Objet mobile sur véhicule de maintenance,2.0,CENTRAL,1,Véhicule à l'arrêt (départ),0.0,0.2,10.0,2.0,0.1,0.0,
+S3-MOBILE-VEHICLE,Objet mobile sur véhicule de maintenance,2.0,CENTRAL,2,Accélération,0.2,0.4,10.0,2.0,0.1,rampe 0.0 -> 8.3 m/s,
+S3-MOBILE-VEHICLE,Objet mobile sur véhicule de maintenance,2.0,CENTRAL,3,Déplacement à vitesse maximale du scénario (30.0 km/h),0.4,0.6,9.0,2.5,0.1,8.3,
+S3-MOBILE-VEHICLE,Objet mobile sur véhicule de maintenance,2.0,CENTRAL,4,Ralentissement,0.6,0.8,10.0,2.0,0.1,rampe 8.3 -> 0.0 m/s,
+S3-MOBILE-VEHICLE,Objet mobile sur véhicule de maintenance,2.0,CENTRAL,5,Véhicule à l'arrêt (arrivée),0.8,1.0,10.0,2.0,0.1,0.0,
+S4-DENSE-URBAN-NETWORK,Réseau urbain dense,1.0,CENTRAL,1,Charge normale,0.0,0.25,3.0,4.0,0.2,0.0,
+S4-DENSE-URBAN-NETWORK,Réseau urbain dense,1.0,CENTRAL,2,Congestion (1),0.25,0.4,3.0,7.0,0.3,0.0,
+S4-DENSE-URBAN-NETWORK,Réseau urbain dense,1.0,CENTRAL,3,Retour normal (1),0.4,0.65,3.0,4.0,0.2,0.0,
+S4-DENSE-URBAN-NETWORK,Réseau urbain dense,1.0,CENTRAL,4,Congestion (2),0.65,0.8,3.0,7.0,0.3,0.0,
+S4-DENSE-URBAN-NETWORK,Réseau urbain dense,1.0,CENTRAL,5,Retour normal (2),0.8,1.0,3.0,4.0,0.2,0.0,
+S5-CRITICAL-INFRASTRUCTURE-ATTACK,Infrastructure critique sous attaque,0.5,HIGH,1,Fonctionnement normal,0.0,0.3,12.0,2.0,0.1,0.0,
+S5-CRITICAL-INFRASTRUCTURE-ATTACK,Infrastructure critique sous attaque,0.5,HIGH,2,Attaque renforcée (avec suspicion de compromission à mi-phase),0.3,0.6,12.0,2.0,0.5,0.0,
+S5-CRITICAL-INFRASTRUCTURE-ATTACK,Infrastructure critique sous attaque,0.5,HIGH,3,Réaction et retour progressif à la normale,0.6,1.0,12.0,2.0,0.15,0.0,

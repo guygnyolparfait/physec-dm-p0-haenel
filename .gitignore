@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.claude/
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.pkl
+*.tmp
+results/five_case_studies_v2_complex_adaptive/five_case_studies_v2_log.csv

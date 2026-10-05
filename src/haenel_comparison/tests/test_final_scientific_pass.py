@@ -14,8 +14,9 @@ import re
 import unittest
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-HC_DIR = PROJECT_ROOT / "haenel_comparison"
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+HC_DIR = PROJECT_ROOT / "src" / "haenel_comparison"
+DOCS_HC = PROJECT_ROOT / "docs" / "haenel"
 RESULTS_DIR = PROJECT_ROOT / "results" / "haenel_comparison"
 
 
@@ -95,7 +96,7 @@ class TestFirstFullAuthenticationDocumented(unittest.TestCase):
 
     def test_report_cites_first_full_authentication(self):
         content = _read_text(
-            HC_DIR / "Compte_Rendu_Final_Haenel_vs_P0.md"
+            DOCS_HC / "Compte_Rendu_Final_Haenel_vs_P0.md"
         )
         self.assertIn("first full authentication", content)
 
@@ -146,7 +147,7 @@ class TestNoLiteralB5StringInDeliverables(unittest.TestCase):
     def test_b5_litteral_only_appears_in_corrective_context(self):
         offenders = []
         for name in self.DELIVERABLES:
-            content = _read_text(HC_DIR / name)
+            content = _read_text(DOCS_HC / name)
             ok, found = _every_occurrence_is_in_corrective_context(
                 content, "B5-littéral"
             )
@@ -165,7 +166,7 @@ class TestOptionANotCalledIndependentValidation(unittest.TestCase):
 
     def test_report_does_not_call_option_a_independent_validation(self):
         content = _read_text(
-            HC_DIR / "Compte_Rendu_Final_Haenel_vs_P0.md"
+            DOCS_HC / "Compte_Rendu_Final_Haenel_vs_P0.md"
         )
         self.assertNotIn("validation indépendante du modèle", content)
         # La formulation correcte doit être présente.
@@ -257,7 +258,7 @@ class TestNoRetractedPhrasesInDeliverables(unittest.TestCase):
 
     def test_no_63_89_percent_claim_outside_corrective_context(self):
         content = _read_text(
-            HC_DIR / "Compte_Rendu_Final_Haenel_vs_P0.md"
+            DOCS_HC / "Compte_Rendu_Final_Haenel_vs_P0.md"
         )
         offenders = []
         for banned in ("63 à 89", "63-89", "63% à 89%", "63 % à 89 %"):
@@ -273,7 +274,7 @@ class TestNoRetractedPhrasesInDeliverables(unittest.TestCase):
         )
 
     def test_readme_has_no_not_implemented_contradictions(self):
-        content = _read_text(HC_DIR / "HAENEL_COMPARISON_README.md")
+        content = _read_text(DOCS_HC / "HAENEL_COMPARISON_README.md")
         for banned in (
             "NON implémentée", "pas encore implémenté",
             "Option B bloquée",

@@ -5,7 +5,7 @@ import unittest
 from types import SimpleNamespace
 
 
-from run_three_scenarios import (
+from scripts.run_three_scenarios import (
     build_four_objective_summary_rows,
     build_per_mission_objective_rows,
     calculate_error_bar,

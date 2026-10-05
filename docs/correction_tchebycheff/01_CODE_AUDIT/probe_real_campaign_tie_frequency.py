@@ -20,8 +20,9 @@
 #
 # N'ecrit rien dans le depot.
 import sys
+from pathlib import Path
 
-sys.path.insert(0, "/home/parfait/physec_dm")
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 
 from physec_dm.case_studies import (
     apply_case_study_overrides,
@@ -38,7 +39,7 @@ from physec_dm.decision_maker import (
     build_tie_break_key
 )
 
-from run_five_case_studies import build_scenario_traces, run_single_mission
+from scripts.run_five_case_studies import build_scenario_traces, run_single_mission
 
 EQUAL_WEIGHTS = [0.25, 0.25, 0.25, 0.25]
 SEEDS = [9500, 9501, 9502]

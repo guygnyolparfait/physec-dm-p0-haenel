@@ -29,7 +29,7 @@ from physec_dm.models import KeyAction
 
 from physec_dm.scenario_controller import ScenarioController
 
-from run_five_case_studies import (
+from scripts.run_five_case_studies import (
     build_scenario_traces,
     extract_log_rows,
     LOG_FIELD_NAMES,

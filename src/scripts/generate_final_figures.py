@@ -7,7 +7,7 @@
 import json
 from pathlib import Path
 
-from analyze_five_case_studies import (
+from scripts.analyze_five_case_studies import (
     figure_decision_timeline_by_policy,
     figure_four_objectives_over_time,
     figure_global_summary_p0_vs_b1_gains,
